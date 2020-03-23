@@ -16,6 +16,7 @@ To be added:
  -Use OOP for the commands and arguments
 '''
 
+from commands import commands
 import os
 import platform
 
@@ -34,21 +35,6 @@ class ArgumentException(Exception):
 class MissingArgumentError(ArgumentException):
     def __init__(self, argument, command):
         self.args = ("Required argument", argument, "missing in command", command)
-
-class Command:
-    def __init__(self, name, action):
-        self.name = name
-        self.action = action
-    def exec(self, **kwargs):
-        self.action(**kwargs)
-
-def n_cmd():
-    pointer += 1
-
-def goto_cmd(): #To Do
-    pass
-
-commands = [Command("n", n_cmd), Command("goto", goto_cmd)]
 
 def wait_for_input():
     if platform.system() == "Linux" or platform.system() == "Darwin":
@@ -72,7 +58,7 @@ def strrange(max): # Wonder if this is actually necessary
 def check_commands(line): #OOF this is gonna be tough
     pass
 
-def parse(filename, action = print):
+def parse(filename, show = print):
     global flags
     global add_parameters
     global pointer
