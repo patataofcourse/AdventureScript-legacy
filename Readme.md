@@ -10,6 +10,6 @@
 - List support
 - Conditionals and checking variables/lists/flags
 - A title screen support, a way to save
-- Exceptions instead of err() [partial support, will be added to]
+- Exceptions instead of err() [partial support, will be added with OOP]
 - Doing something that's not printing to return the text, wait, etc
 - Use OOP for the commands and arguments [in progress]
