@@ -1,10 +1,3 @@
-class Command:
-    def __init__(self, name, action):
-        self.name = name
-        self.action = action
-    def exec(self, **kwargs):
-        self.action(**kwargs)
-
 def n(info):
     info.wait()
     info.pointer += 1
@@ -26,4 +19,4 @@ def flags(info, **kwargs):
 def ending(info, name): # How in the world am I going to do this
     info.ending(name)
 
-commands = {"n": n, "goto": goto, "choice": choice, Command("loadscript", loadscript), Command("flags", flags), Command("ending", ending)}
+commands = [n, goto, choice, loadscript, flags, ending]

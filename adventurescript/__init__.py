@@ -1,4 +1,4 @@
-from commands import commands
+from adventurescript.commands import commands
 import os
 import platform
 
@@ -182,7 +182,7 @@ def parse(filename, show = print):
             continue
         else:
             print (line)
-            pointer += 1
+        pointer += 1
         if add_parameters != {}: # add_parameters
             err("extra args in goto for the line you jumped to, you suck")
     raise NoEndingException()
