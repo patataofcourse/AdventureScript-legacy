@@ -1,0 +1,7 @@
+This is actually now a different script!
+Woo! [n]
+Now, do you want to return to the old choice or just exit? [n]
+[choice ch1 = "take me back to hell"; go1 = 5; ch2 = "take me out of this place"; go2 = 6]
+[loadscript name="test"]
+k bye [n]
+[ending name = "Only"]
