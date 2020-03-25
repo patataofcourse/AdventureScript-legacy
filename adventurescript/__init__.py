@@ -6,6 +6,9 @@ pointer = 0
 add_parameters = {}
 flags = {}
 
+class ContextInfo:
+    def __init__(self, script, pointer, flags)
+
 class NoEndingException(Exception):
     def __init__(self):
         self.args = ("No ending returned!",)
@@ -178,10 +181,12 @@ def parse(filename, show = print):
                 continue
             else:
                 err ("ending without name done, you suck")
-        elif check_commands(line):
-            continue
         else:
-            print (line)
+            result = check_commands(line)
+            if str(type(result)) == "<class 'str'>":
+                return result
+            elif not result:
+                print (line)
         pointer += 1
         if add_parameters != {}: # add_parameters
             err("extra args in goto for the line you jumped to, you suck")

@@ -5,7 +5,7 @@ def n(info):
 def goto(info, pos, **kwargs): #TODO
     pass
 
-def choice(info, ch1, go1, ch2, go2, flags=None, **kwargs): #TODO
+def choice(info, ch1, go1, flags=None, **kwargs): #TODO
     pass
 
 def loadscript(info, name):
@@ -16,7 +16,7 @@ def flags(info, **kwargs):
     for kwarg in kwargs:
         info.flags[kwarg] = kwargs[kwarg]
 
-def ending(info, name): # How in the world am I going to do this
+def ending(info, name):
     info.ending(name)
 
 commands = [n, goto, choice, loadscript, flags, ending]
