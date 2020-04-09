@@ -7,7 +7,8 @@ add_parameters = {}
 flags = {}
 
 class ContextInfo:
-    def __init__(self, script, pointer, flags)
+    def __init__(self, script, pointer, flags):
+        pass #gotta do this
 
 class NoEndingException(Exception):
     def __init__(self):
@@ -21,7 +22,7 @@ class MissingArgumentError(ArgumentException):
     def __init__(self, argument, command):
         self.args = ("Required argument", argument, "missing in command", command)
 
-def wait_for_input():
+def pause():
     if platform.system() == "Linux" or platform.system() == "Darwin":
         os.system('read -s -n 1')
     elif platform.system() == "Windows":
@@ -43,7 +44,7 @@ def strrange(max): # Wonder if this is actually necessary
 def check_commands(line): #OOF this is gonna be tough
     pass
 
-def parse(filename, show = print):
+def parse(filename, show = print, wait_for_input = pause):
     global flags
     global add_parameters
     global pointer
