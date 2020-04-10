@@ -2,7 +2,7 @@
 AdventureScript is a text game engine in progress, made specifically for the game codenamed Yet Another Text Game or YATG.
 ## Commands right now:
 - [n] - wait for input
-- [goto] - goes to a specific line, can pass extra arguments
+- [goto] - goes to a specific line
 - [flag] - sets flags, not implemented yet
 - [choice] - prompts player with choice between options and a way to save
 - [loadscript] - changes script

@@ -1,6 +1,5 @@
 def n(info):
     info.wait()
-    info.pointer += 1
 
 def goto(info, pos, **kwargs): #TODO
     pass

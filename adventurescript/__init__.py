@@ -1,8 +1,9 @@
-from adventurescript.commands import commands
+from adventurescript import commands, exceptions
 import os
 import platform
 
 add_parameters = {}
+status = ""
 
 class ContextInfo:
     def __init__(self, script, show, wait, pointer=0, flags={}):
@@ -12,7 +13,8 @@ class ContextInfo:
         self.pointer = pointer
         self.flags = flags
     def ending(end):
-        global status = f"ending {end}"
+        global status
+        status = f"ending {end}"
 
 def pause():
     if platform.system() == "Linux" or platform.system() == "Darwin":
@@ -33,19 +35,34 @@ def strrange(max): # Wonder if this is actually necessary
         sr.append(str(num))
     return sr
 
-def check_commands(line): #OOF this is gonna be tough
+def check_commands(info, line): #TODO
+    if line.startswith("[") and line.endswith("]"):
+        line = line[1:-1].split(";")
+        for command in commands:
+            if command.__name__ == line[0]:
+                print("command.name")
+                return False
+    elif line.endswith("[n]"):
+        line = line[:-3]
+        info.show(line)
+        commands.n(info)
+        return True
+    else:
+        return False
+
+def askchoice(name1): #TODO
     pass
 
-def parse(filename, show = print, wait_for_input = pause):
-    info = ContextInfo(open(filename + ".adv").read().split("\n"))
+def parse(filename, show = print, wait_for_input = pause, choicefunc = askchoice):
+    info = ContextInfo(open(filename + ".adv").read().split("\n"), show, wait_for_input)
     while info.pointer < len(info.script):
         line = info.script[info.pointer].rstrip()
         if line.startswith("#"):
             info.pointer += 1
             continue
-        elif line.endswith("[n]"):
-            show(line[:-3])
-            wait_for_input()
+        # elif line.endswith("[n]"):
+        #     show(line[:-3])
+        #     wait_for_input()
         elif line.startswith("[goto") and line.endswith("]"):
             cont = False
             for atr in line[5:-1].split(";"):
@@ -53,7 +70,7 @@ def parse(filename, show = print, wait_for_input = pause):
                     info.pointer = int(atr[atr.find("=")+1:].strip())-1
                     cont = True
                 else:
-                    add_parameters[atr[:atr.find("=")].strip()] = atr[atr.find("=")+1:].strip()
+                    err("ajalkgjklsdjg")
             if cont:
                 continue
             else:
@@ -171,14 +188,10 @@ def parse(filename, show = print, wait_for_input = pause):
             else:
                 err ("ending without name done, you suck")
         else:
-            result = check_commands(line)
-            if str(type(result)) == "<class 'str'>":
-                return result
-            elif not result:
-                print (line)
+            result = check_commands(info, line)
+            if not result:
+                show(line)
         info.pointer += 1
-        if add_parameters != {}: # add_parameters
-            err("extra args in goto for the line you jumped to, you suck")
     raise exceptions.ScriptEndException()
 
 # async def asyncparse() --- should finish standard parse first
