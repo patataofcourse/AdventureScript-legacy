@@ -6,7 +6,7 @@ add_parameters = {}
 status = ""
 
 class ContextInfo:
-    def __init__(self, script, show, wait, pointer=0, flags={}):
+    def __init__(self, script, show, wait, pointer=1, flags={}):
         self.script = script
         self.show = show
         self.wait = wait
@@ -38,10 +38,17 @@ def strrange(max): # Wonder if this is actually necessary
 def check_commands(info, line): #TODO
     if line.startswith("[") and line.endswith("]"):
         line = line[1:-1].split(";")
-        for command in commands:
+        line = [line[0].split(" ")[0], " ".join(line[0].split(" ")[1:])] + line[1:]
+        for command in commands.commands:
             if command.__name__ == line[0]:
-                print("command.name")
-                return False
+                kwargs = {}
+                for pair in line[1:]:
+                    pair = pair.split("=")
+                    kwargs[pair[0].strip()] = pair[1].strip()
+                print(kwargs)
+                command(info, **kwargs)
+                return True
+        return False
     elif line.endswith("[n]"):
         line = line[:-3]
         info.show(line)
@@ -56,25 +63,10 @@ def askchoice(name1): #TODO
 def parse(filename, show = print, wait_for_input = pause, choicefunc = askchoice):
     info = ContextInfo(open(filename + ".adv").read().split("\n"), show, wait_for_input)
     while info.pointer < len(info.script):
-        line = info.script[info.pointer].rstrip()
+        line = info.script[info.pointer-1].rstrip()
         if line.startswith("#"):
             info.pointer += 1
             continue
-        # elif line.endswith("[n]"):
-        #     show(line[:-3])
-        #     wait_for_input()
-        elif line.startswith("[goto") and line.endswith("]"):
-            cont = False
-            for atr in line[5:-1].split(";"):
-                if atr[:atr.find("=")].strip() == "pos":
-                    info.pointer = int(atr[atr.find("=")+1:].strip())-1
-                    cont = True
-                else:
-                    err("ajalkgjklsdjg")
-            if cont:
-                continue
-            else:
-                raise MissingArgumentError("pos")
         elif line.startswith("[choice") and line.endswith("]"):
             atrs = line[7:-1].split(";")
             choicenumber = 1.0

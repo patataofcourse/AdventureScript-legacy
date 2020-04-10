@@ -1,15 +1,15 @@
 def n(info):
     info.wait()
 
-def goto(info, pos, **kwargs): #TODO
-    pass
+def goto(info, pos):
+    info.pointer = int(pos)-1
 
 def choice(info, ch1, go1, flags=None, **kwargs): #TODO
     pass
 
 def loadscript(info, name):
     info.script = open(f"../{name}.adv")
-    info.pointer = 0
+    info.pointer = 1
 
 def flags(info, **kwargs):
     for kwarg in kwargs:
