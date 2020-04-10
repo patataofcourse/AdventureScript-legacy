@@ -2,13 +2,13 @@ from adventurescript.commands import commands
 import os
 import platform
 
-pointer = 0
 add_parameters = {}
-flags = {}
 
 class ContextInfo:
-    def __init__(self, script, pointer, flags):
+    def __init__(self, script, show, wait, pointer=0, flags={}):
         self.script = script
+        self.show = show
+        self.wait = wait
         self.pointer = pointer
         self.flags = flags
     def ending(end):
@@ -37,23 +37,20 @@ def check_commands(line): #OOF this is gonna be tough
     pass
 
 def parse(filename, show = print, wait_for_input = pause):
-    global flags
-    global add_parameters
-    global pointer
-    script = open(filename + ".adv").read().split("\n") # Parsed per line
-    while pointer < len(script):
-        line = script[pointer].rstrip()
+    info = ContextInfo(open(filename + ".adv").read().split("\n"))
+    while info.pointer < len(info.script):
+        line = info.script[info.pointer].rstrip()
         if line.startswith("#"):
-            pointer += 1
+            info.pointer += 1
             continue
         elif line.endswith("[n]"):
-            print (line[:-3])
+            show(line[:-3])
             wait_for_input()
         elif line.startswith("[goto") and line.endswith("]"):
             cont = False
             for atr in line[5:-1].split(";"):
                 if atr[:atr.find("=")].strip() == "pos":
-                    pointer = int(atr[atr.find("=")+1:].strip())-1
+                    info.pointer = int(atr[atr.find("=")+1:].strip())-1
                     cont = True
                 else:
                     add_parameters[atr[:atr.find("=")].strip()] = atr[atr.find("=")+1:].strip()
@@ -105,7 +102,7 @@ def parse(filename, show = print, wait_for_input = pause):
                     else:
                         err ("repeated ch" + str(int(choicenumber)) + " argument, you suck")
                 elif atr[:atr.find("=")].strip() == "flags":
-                    print ("//Use of flags attriblute not supported yet")
+                    print ("//Use of flags attribute not supported yet")
                     if not "flags" in done:
                         if "flags" in add_parameters:
                             pass
@@ -135,14 +132,14 @@ def parse(filename, show = print, wait_for_input = pause):
                         print ("Saved! (but not really)")
                         saved = True
             #os.system("cls")
-            pointer = gotos[int(choose)-1]
+            info.pointer = gotos[int(choose)-1]
             continue
         elif line.startswith("[loadscript") and line.endswith("]"):
             cont = False
             for atr in line[11:-1].split(";"):
                 if atr[:atr.find("=")].strip() == "name":
-                    pointer = 0
-                    script = open(atr[atr.find("=")+1:].strip().strip("\"")+".adv").read().split("\n")
+                    info.pointer = 0
+                    info.script = open(atr[atr.find("=")+1:].strip().strip("\"")+".adv").read().split("\n")
                     cont = True
                 else:
                     print(atr[:atr.find("=")].strip())
@@ -155,9 +152,9 @@ def parse(filename, show = print, wait_for_input = pause):
             cont = False
             for atr in line[5:-1].split(";"):
                 cont = True
-                flags[atr[:atr.find("=")].strip()] = atr[atr.find("=") + 1:].strip()
+                info.flags[atr[:atr.find("=")].strip()] = atr[atr.find("=") + 1:].strip()
             if cont:
-                pointer += 1
+                info.pointer += 1
                 continue
             else:
                 err ("flag without arguments done, you suck")
@@ -165,7 +162,7 @@ def parse(filename, show = print, wait_for_input = pause):
             cont = False
             for atr in line[7:-1].split(";"):
                 if atr[:atr.find("=")].strip() == "name":
-                    pointer = 0
+                    info.pointer = 0
                     return atr[atr.find("=")+1:].strip().strip("\"")
                 else:
                     err ("ending with other parameters, you suck")
@@ -179,7 +176,7 @@ def parse(filename, show = print, wait_for_input = pause):
                 return result
             elif not result:
                 print (line)
-        pointer += 1
+        info.pointer += 1
         if add_parameters != {}: # add_parameters
             err("extra args in goto for the line you jumped to, you suck")
     raise exceptions.ScriptEndException()
