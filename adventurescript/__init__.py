@@ -8,19 +8,11 @@ flags = {}
 
 class ContextInfo:
     def __init__(self, script, pointer, flags):
-        pass #gotta do this
-
-class NoEndingException(Exception):
-    def __init__(self):
-        self.args = ("No ending returned!",)
-
-class ArgumentException(Exception):
-    def __init__(self, argument, command):
-        self.args = ("Error with argument", argument, "in command", command)
-
-class MissingArgumentError(ArgumentException):
-    def __init__(self, argument, command):
-        self.args = ("Required argument", argument, "missing in command", command)
+        self.script = script
+        self.pointer = pointer
+        self.flags = flags
+    def ending(end):
+        global status = f"ending {end}"
 
 def pause():
     if platform.system() == "Linux" or platform.system() == "Darwin":
@@ -57,7 +49,6 @@ def parse(filename, show = print, wait_for_input = pause):
         elif line.endswith("[n]"):
             print (line[:-3])
             wait_for_input()
-            # os.system("cls")  # Have to choose if I cls or not
         elif line.startswith("[goto") and line.endswith("]"):
             cont = False
             for atr in line[5:-1].split(";"):
@@ -191,4 +182,6 @@ def parse(filename, show = print, wait_for_input = pause):
         pointer += 1
         if add_parameters != {}: # add_parameters
             err("extra args in goto for the line you jumped to, you suck")
-    raise NoEndingException()
+    raise exceptions.ScriptEndException()
+
+# async def asyncparse() --- should finish standard parse first
