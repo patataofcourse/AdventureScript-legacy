@@ -142,20 +142,6 @@ def parse(filename, show = print, wait_for_input = pause, choicefunc = askchoice
             #os.system("cls")
             info.pointer = gotos[int(choose)-1]
             continue
-        elif line.startswith("[loadscript") and line.endswith("]"):
-            cont = False
-            for atr in line[11:-1].split(";"):
-                if atr[:atr.find("=")].strip() == "name":
-                    info.pointer = 0
-                    info.script = open(atr[atr.find("=")+1:].strip().strip("\"")+".adv").read().split("\n")
-                    cont = True
-                else:
-                    print(atr[:atr.find("=")].strip())
-                    err ("loadscript with other parameters, you suck")
-            if cont:
-                continue
-            else:
-                err ("loadscript without name done, you suck")
         elif line.startswith("[ending") and line.endswith("]"):
             cont = False
             for atr in line[7:-1].split(";"):
