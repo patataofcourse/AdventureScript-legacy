@@ -45,7 +45,6 @@ def check_commands(info, line): #TODO
                 for pair in line[1:]:
                     pair = pair.split("=")
                     kwargs[pair[0].strip()] = pair[1].strip()
-                print(kwargs)
                 command(info, **kwargs)
                 return True
         return False
@@ -63,7 +62,7 @@ def askchoice(name1): #TODO
 def parse(filename, show = print, wait_for_input = pause, choicefunc = askchoice):
     info = ContextInfo(open(filename + ".adv").read().split("\n"), show, wait_for_input)
     while info.pointer < len(info.script):
-        line = info.script[info.pointer-1].rstrip()
+        line = info.script[info.pointer].rstrip()
         if line.startswith("#"):
             info.pointer += 1
             continue
@@ -157,16 +156,6 @@ def parse(filename, show = print, wait_for_input = pause, choicefunc = askchoice
                 continue
             else:
                 err ("loadscript without name done, you suck")
-        elif line.startswith("[flag") and line.endswith("]"):
-            cont = False
-            for atr in line[5:-1].split(";"):
-                cont = True
-                info.flags[atr[:atr.find("=")].strip()] = atr[atr.find("=") + 1:].strip()
-            if cont:
-                info.pointer += 1
-                continue
-            else:
-                err ("flag without arguments done, you suck")
         elif line.startswith("[ending") and line.endswith("]"):
             cont = False
             for atr in line[7:-1].split(";"):
