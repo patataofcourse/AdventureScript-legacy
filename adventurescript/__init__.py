@@ -31,10 +31,6 @@ def pause():
     else:
         print("Platform not supported")
 
-def err(text): # Replace with an Exception
-    print(text)
-    quit()
-
 def askinput(info, text, choices):
     if text != "":
         info.show(text)
