@@ -1,11 +1,36 @@
+from adventurescript import exceptions
 def n(info):
     info.wait()
 
 def goto(info, pos):
     info.pointer = int(pos)-1
 
-def choice(info, ch1, go1, flags=None, **kwargs): #TODO
-    pass
+def choice(info, text, ch1, go1, flags=None, **kwargs): #TODO
+    chs = [1]
+    gos = [1]
+    for kwarg in kwargs:
+        if kwarg.startswith("ch"):
+            chs.append(int(kwarg[2:]))
+        elif kwarg.startswith("go"):
+            gos.append(int(kwarg[2:]))
+        else:
+            raise Exception("Unwanted argument in choice command") #i don't feel like coding an entire exception
+    if not chs == gos or len(chs) != max(chs):
+        raise Exception("You screwed up somewhere with the chs and gos in a choice command") #same tbh
+    if flags != None: #insert here flag checking
+        info.show("Warning: 'flags' argument in choice not implemented")
+    for item in chs.sort():
+        choices.append(kwargs["ch"+str(item)])
+        gotos.append(kwargs["go"+str(item)])
+    result = ""
+    while result in ("r", "s", ""):
+        result = info.query(text, choices)
+        if result == "s":
+            info.show("Saved! (But not really)")
+        elif result == "r":
+            info.show("This would restore the save")
+    goto(gotos[result])
+
 
 def loadscript(info, name):
     info.script = open(f"{name}.adv").read().split("\n")

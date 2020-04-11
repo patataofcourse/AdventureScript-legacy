@@ -6,15 +6,22 @@ add_parameters = {}
 status = ""
 
 class ContextInfo:
-    def __init__(self, script, show, wait, pointer=1, flags={}):
+    def __init__(self, script, show, wait, query, pointer=1, flags={}):
         self.script = script
         self.show = show
         self.wait = wait
+        self.ask = query
         self.pointer = pointer
         self.flags = flags
-    def ending(info, end):
+    def ending(self, end):
         global status
         status = f"ending {end}"
+    def save(self): #TODO
+        pass
+    def reload(self): #TODO
+        pass
+    def query(self, text, choices):
+        ask(self, text, choices)
 
 def pause():
     if platform.system() == "Linux" or platform.system() == "Darwin":
@@ -27,7 +34,16 @@ def pause():
 def err(text): # Replace with an Exception
     print(text)
     quit()
-    
+
+def askinput(info, text, choices):
+    info.show(text)
+    c = 1
+    for ch in choices:
+        info.show(f"{c}. {ch}")
+    result = ""
+    while result == ""  or int(result) not in :
+        result = input(">")
+
 def strrange(max): # Wonder if this is actually necessary
     r = list(range(1, max+1))
     sr = []
