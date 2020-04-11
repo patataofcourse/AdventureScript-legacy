@@ -43,7 +43,7 @@ def askinput(info, text, choices):
         result = input(">")
     return result
 
-def strrange(max): # Wonder if this is actually necessary
+def strrange(max):
     r = list(range(1, max+1))
     sr = []
     for num in r:
@@ -74,7 +74,6 @@ def check_commands(info, line):
 def parse(filename, show = print, wait_for_input = pause, query=askinput):
     info = ContextInfo(open(filename + ".adv").read().split("\n"), show, wait_for_input, query)
     while info.pointer <= len(info.script):
-        print(info.pointer)
         line = info.script[info.pointer-1].rstrip()
         if not line.startswith("#"):
             result = check_commands(info, line)
