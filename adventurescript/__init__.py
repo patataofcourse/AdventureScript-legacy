@@ -21,7 +21,7 @@ class ContextInfo:
     def reload(self): #TODO
         pass
     def query(self, text, choices):
-        ask(self, text, choices)
+        return self.ask(self, text, choices)
 
 def pause():
     if platform.system() == "Linux" or platform.system() == "Darwin":
@@ -36,13 +36,16 @@ def err(text): # Replace with an Exception
     quit()
 
 def askinput(info, text, choices):
-    info.show(text)
+    if text != "":
+        info.show(text)
     c = 1
     for ch in choices:
         info.show(f"{c}. {ch}")
+        c += 1
     result = ""
-    while result == ""  or int(result) not in :
+    while result == ""  and result not in (strrange(len(choices)) + ["r", "s"]):
         result = input(">")
+    return result
 
 def strrange(max): # Wonder if this is actually necessary
     r = list(range(1, max+1))
@@ -72,93 +75,12 @@ def check_commands(info, line):
     else:
         return False
 
-def askchoice(name1): #TODO
-    pass
-
-def parse(filename, show = print, wait_for_input = pause, choicefunc = askchoice):
-    info = ContextInfo(open(filename + ".adv").read().split("\n"), show, wait_for_input)
+def parse(filename, show = print, wait_for_input = pause, query=askinput):
+    info = ContextInfo(open(filename + ".adv").read().split("\n"), show, wait_for_input, query)
     while info.pointer < len(info.script):
         print(info.pointer)
         line = info.script[info.pointer-1].rstrip()
-        if line.startswith("#"):
-            info.pointer += 1
-            continue
-        elif line.startswith("[choice") and line.endswith("]"):
-            atrs = line[7:-1].split(";")
-            choicenumber = 1.0
-            done = []
-            choices = []
-            gotos = []
-            text = ""
-            for atr in atrs:
-                if int(choicenumber * 10) != int(choicenumber) * 10:
-                    if atr[:atr.find("=")].strip() == "go" + str(int(choicenumber)):
-                        if not "go" + str(int(choicenumber)) in done:
-                            if "ch" + str(int(choicenumber)) in add_parameters:
-                                gotos.append(add_parameters["ch" + str(int(choicenumber))])
-                                add_parameters.pop("go" + str(int(choicenumber)))
-                            else:
-                                gotos.append(int(atr[atr.find("=")+1:].strip()))
-                            done.append("go" + str(int(choicenumber)))
-                            choicenumber += 0.5
-                        else:
-                            err ("repeated 'go" + str(int(choicenumber)) + "' argument, you suck")
-                    else:
-                        err("go" + str(int(choicenumber)) + " argument missing right after ch1 argument, you suck")
-                elif atr[:atr.find("=")].strip() == "text":
-                    if not "text" in done:
-                        if "text" in add_parameters:
-                            print (">" + add_parameters["text"].strip("\""))
-                            add_parameters.pop("text")
-                        else:
-                            print (">" + atr[atr.find("=")+1:].strip().strip("\""))
-                        done.append("text")
-                    else:
-                        err ("repeated 'text' argument, you suck")
-                elif atr[:atr.find("=")].strip() == "ch" + str(int(choicenumber)):
-                    if not "ch" + str(int(choicenumber)) in done:
-                        if "ch" + str(int(choicenumber)) in add_parameters:
-                            choices.append(add_parameters["ch" + str(int(choicenumber))].strip("\""))
-                            add_parameters.pop("ch" + str(int(choicenumber)))
-                        else:
-                            choices.append(atr[atr.find("=")+1:].strip().strip("\""))
-                        choicenumber += 0.5
-                        done.append("ch" + str(int(choicenumber)))
-                    else:
-                        err ("repeated ch" + str(int(choicenumber)) + " argument, you suck")
-                elif atr[:atr.find("=")].strip() == "flags":
-                    print ("//Use of flags attribute not supported yet")
-                    if not "flags" in done:
-                        if "flags" in add_parameters:
-                            pass
-                        else:
-                            pass
-                        pass
-                    else:
-                        print ("repeated 'flags' argument, you suck")
-                else:
-                    err ("unrecognized parameter, you suck")
-            print (text)
-            choicenumber = 0
-            for choice in choices:
-                choicenumber += 1
-                print (str(choicenumber) + ": " + choice)
-            choose = input ("> ")
-            saved = False
-            if choose.lower() in ("s", "save"):
-                saved = True
-                print ("Saved! (but not really)")
-            while not choose.lower() in strrange(choicenumber):
-                choose = input("> ")
-                if choose.lower() in ("s", "save"):
-                    if saved:
-                        print ("You have already saved in this choice!")
-                    else:
-                        print ("Saved! (but not really)")
-                        saved = True
-            info.pointer = gotos[int(choose)]
-            continue
-        else:
+        if not line.startswith("#"):
             result = check_commands(info, line)
             if not result:
                 show(line)

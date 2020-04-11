@@ -5,7 +5,7 @@ def n(info):
 def goto(info, pos):
     info.pointer = int(pos)-1
 
-def choice(info, text, ch1, go1, flags=None, **kwargs): #TODO
+def choice(info, ch1, go1, text="", flags=None, **kwargs): #TODO
     chs = [1]
     gos = [1]
     for kwarg in kwargs:
@@ -19,7 +19,10 @@ def choice(info, text, ch1, go1, flags=None, **kwargs): #TODO
         raise Exception("You screwed up somewhere with the chs and gos in a choice command") #same tbh
     if flags != None: #insert here flag checking
         info.show("Warning: 'flags' argument in choice not implemented")
-    for item in chs.sort():
+    chs.sort()
+    choices = [ch1]
+    gotos = [go1]
+    for item in chs[1:]:
         choices.append(kwargs["ch"+str(item)])
         gotos.append(kwargs["go"+str(item)])
     result = ""
@@ -29,7 +32,7 @@ def choice(info, text, ch1, go1, flags=None, **kwargs): #TODO
             info.show("Saved! (But not really)")
         elif result == "r":
             info.show("This would restore the save")
-    goto(gotos[result])
+    goto(info, gotos[int(result)-1])
 
 
 def loadscript(info, name):
