@@ -77,7 +77,7 @@ def check_commands(info, line):
 
 def parse(filename, show = print, wait_for_input = pause, query=askinput):
     info = ContextInfo(open(filename + ".adv").read().split("\n"), show, wait_for_input, query)
-    while info.pointer < len(info.script):
+    while info.pointer <= len(info.script):
         print(info.pointer)
         line = info.script[info.pointer-1].rstrip()
         if not line.startswith("#"):
