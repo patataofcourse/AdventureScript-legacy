@@ -12,7 +12,7 @@ class ContextInfo:
         self.wait = wait
         self.pointer = pointer
         self.flags = flags
-    def ending(end):
+    def ending(info, end):
         global status
         status = f"ending {end}"
 
@@ -35,7 +35,7 @@ def strrange(max): # Wonder if this is actually necessary
         sr.append(str(num))
     return sr
 
-def check_commands(info, line): #TODO
+def check_commands(info, line):
     if line.startswith("[") and line.endswith("]"):
         line = line[1:-1].split(";")
         line = [line[0].split(" ")[0], " ".join(line[0].split(" ")[1:])] + line[1:]
@@ -44,7 +44,7 @@ def check_commands(info, line): #TODO
                 kwargs = {}
                 for pair in line[1:]:
                     pair = pair.split("=")
-                    kwargs[pair[0].strip()] = pair[1].strip()
+                    kwargs[pair[0].strip()] = pair[1].strip().strip("\"") #TODO: Remove that last strip whenever I add variables, and add variable checking or some shit
                 command(info, **kwargs)
                 return True
         return False
@@ -62,7 +62,8 @@ def askchoice(name1): #TODO
 def parse(filename, show = print, wait_for_input = pause, choicefunc = askchoice):
     info = ContextInfo(open(filename + ".adv").read().split("\n"), show, wait_for_input)
     while info.pointer < len(info.script):
-        line = info.script[info.pointer].rstrip()
+        print(info.pointer)
+        line = info.script[info.pointer-1].rstrip()
         if line.startswith("#"):
             info.pointer += 1
             continue
@@ -81,7 +82,7 @@ def parse(filename, show = print, wait_for_input = pause, choicefunc = askchoice
                                 gotos.append(add_parameters["ch" + str(int(choicenumber))])
                                 add_parameters.pop("go" + str(int(choicenumber)))
                             else:
-                                gotos.append(int(atr[atr.find("=")+1:].strip())-1)
+                                gotos.append(int(atr[atr.find("=")+1:].strip()))
                             done.append("go" + str(int(choicenumber)))
                             choicenumber += 0.5
                         else:
@@ -139,26 +140,15 @@ def parse(filename, show = print, wait_for_input = pause, choicefunc = askchoice
                     else:
                         print ("Saved! (but not really)")
                         saved = True
-            #os.system("cls")
-            info.pointer = gotos[int(choose)-1]
+            info.pointer = gotos[int(choose)]
             continue
-        elif line.startswith("[ending") and line.endswith("]"):
-            cont = False
-            for atr in line[7:-1].split(";"):
-                if atr[:atr.find("=")].strip() == "name":
-                    info.pointer = 0
-                    return atr[atr.find("=")+1:].strip().strip("\"")
-                else:
-                    err ("ending with other parameters, you suck")
-            if cont:
-                continue
-            else:
-                err ("ending without name done, you suck")
         else:
             result = check_commands(info, line)
             if not result:
                 show(line)
         info.pointer += 1
+        if status.startswith("ending"):
+            return " ".join(status.split(" ")[1:])
     raise exceptions.ScriptEndException()
 
 # async def asyncparse() --- should finish standard parse first
