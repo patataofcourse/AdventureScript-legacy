@@ -51,12 +51,17 @@ def strrange(max):
     return sr
 
 def check_commands(info, line):
-    if line.startswith("[") and line.endswith("]"):
+    if line == "":
+        return False
+    elif line.startswith("[") and line.endswith("]"):
         line = line[1:-1].split(";")
         line = [line[0].split(" ")[0], " ".join(line[0].split(" ")[1:])] + line[1:]
         for command in commands.commands:
             if command.__name__ == line[0]:
                 kwargs = {}
+                if line[1] == "":
+                    command(info)
+                    return True
                 for pair in line[1:]:
                     pair = pair.split("=")
                     kwargs[pair[0].strip()] = pair[1].strip().strip("\"") #TODO: Remove that last strip whenever I add variables, and add variable checking or some shit
