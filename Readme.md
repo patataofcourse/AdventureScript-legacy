@@ -3,9 +3,10 @@ AdventureScript is a text game engine in progress, made specifically for the gam
 ## Commands right now:
 - [n] - wait for input
 - [goto] - goes to a specific line
-- [flag] - sets flags, not implemented yet
-- [choice] - prompts player with choice between options and a way to save
+- [flag] - sets flags
+- [choice] - prompts player with choice between options and a way to save/load data
 - [loadscript] - changes script
 - [ending] - ends the script managing and returns
+- [checkflag] - goes to a different position depending on whether a flag is true or false
 
 Only flags are supported as variables.
