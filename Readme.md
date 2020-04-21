@@ -1,4 +1,4 @@
-# AdventureScript is getting a refactor right now! New features will be added afterwards
+# AdventureScript
 AdventureScript is a text game engine in progress, made specifically for the game codenamed Yet Another Text Game or YATG.
 ## Commands right now:
 - [n] - wait for input
