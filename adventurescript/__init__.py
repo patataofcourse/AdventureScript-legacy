@@ -6,7 +6,7 @@ add_parameters = {}
 status = ""
 
 class ContextInfo:
-    def __init__(self, scriptname, show, wait, query, pointer=1, flags={}, variables={}, lists):
+    def __init__(self, scriptname, show, wait, query, pointer=1, flags={}, variables={}, lists={}):
         self.scriptname = scriptname
         self.script = open(scriptname + ".adv").read().split("\n")
         self.show = show
