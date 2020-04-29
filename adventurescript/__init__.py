@@ -6,13 +6,16 @@ add_parameters = {}
 status = ""
 
 class ContextInfo:
-    def __init__(self, script, show, wait, query, pointer=1, flags={}):
-        self.script = script
+    def __init__(self, scriptname, show, wait, query, pointer=1, flags={}, variables={}, lists):
+        self.scriptname = scriptname
+        self.script = open(scriptname + ".adv").read().split("\n")
         self.show = show
         self.wait = wait
         self.ask = query
         self.pointer = pointer
         self.flags = flags
+        self.variables = variables
+        self.lists = lists
     def ending(self, end):
         global status
         status = f"ending {end}"
@@ -77,7 +80,7 @@ def check_commands(info, line):
         return False
 
 def parse(filename, show = print, wait_for_input = pause, query=askinput):
-    info = ContextInfo(open(filename + ".adv").read().split("\n"), show, wait_for_input, query)
+    info = ContextInfo(filename, show, wait_for_input, query)
     while info.pointer <= len(info.script):
         line = info.script[info.pointer-1].rstrip()
         if not line.startswith("#"):
