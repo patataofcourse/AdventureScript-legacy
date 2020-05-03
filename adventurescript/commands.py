@@ -49,7 +49,6 @@ def choice(info, ch1, go1, text="", flags=None, **kwargs):
             info.show("This would restore the save")
     goto(info, gotos[int(result)-1])
 
-
 def checkflag(info, flag, gotrue, gofalse):
     if info.flags.get(flag, None) == None: #If the flag doesn't exist, it immediately gets set as false
         info.flags[flag] = False
@@ -74,4 +73,19 @@ def flag(info, **kwargs):
 def ending(info, name):
     info.ending(name)
 
-commands = [n, goto, choice, loadscript, flag, ending, checkflag]
+def setvar(info, **kwargs):
+    pass
+
+def checkvar(info, var, value, comparison="equal"):
+    pass
+
+def makelist(info, list):
+    pass
+
+def append(info, list, element):
+    pass
+
+def checklist(info, list, element):
+    pass
+
+commands = [n, goto, choice, loadscript, flag, ending, checkflag] # setvar, chackvar, makelist, append, checklist
