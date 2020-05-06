@@ -26,6 +26,7 @@ def choice(info, ch1, go1, text="", flags=None, **kwargs):
                 raise Exception("Choice number mentioned twice in flag argument of choice command")
             elif info.flags.get(flag.split(":")[1], None) == None: #If the flag doesn't exist, it immediately gets set as false
                 info.flags[flag.split(":")[1]] = False
+                flagdict[int(flag.split(":")[0])] = False
             elif info.flags[flag.split(":")[1]] == "true":
                 flagdict[int(flag.split(":")[0])] = True
             else:
