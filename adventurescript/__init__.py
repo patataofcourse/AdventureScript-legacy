@@ -42,7 +42,7 @@ def askinput(info, text, choices):
         info.show(f"{c}. {ch}")
         c += 1
     result = ""
-    while result == ""  and result not in (strrange(len(choices)) + ["r", "s"]):
+    while result == "" or result not in (strrange(len(choices)) + ["r", "s"]):
         result = input(">")
     return result
 
@@ -92,4 +92,4 @@ def parse(filename, show = print, wait_for_input = pause, query=askinput):
             return " ".join(status.split(" ")[1:])
     raise exceptions.ScriptEndException()
 
-# async def asyncparse() --- should finish standard parse first
+# Add a way to run async functions, and to check if they're async
