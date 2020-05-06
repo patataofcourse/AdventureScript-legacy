@@ -42,7 +42,7 @@ def askinput(info, text, choices):
         info.show(f"{c}. {ch}")
         c += 1
     result = ""
-    while result == "" or result not in (strrange(len(choices)) + ["r", "s"]):
+    while result not in (strrange(len(choices)) + ["r", "s"]):
         result = input(">")
     return result
 
