@@ -1,3 +1,4 @@
+import asyncio
 from adventurescript import commands, exceptions
 import os
 import platform
@@ -67,7 +68,7 @@ def check_commands(info, line):
                     return True
                 for pair in line[1:]:
                     pair = pair.split("=")
-                    kwargs[pair[0].strip()] = pair[1].strip().strip("\"") #TODO: Remove that last strip whenever I add variables, and add variable checking or some shit
+                    kwargs[pair[0].strip()] = pair[1].strip().strip("\"") #TODO: Make the thing interpret properly
                 command(info, **kwargs)
                 return True
         return False
@@ -79,7 +80,7 @@ def check_commands(info, line):
     else:
         return False
 
-def parse(filename, show = print, wait_for_input = pause, query=askinput):
+def parse(filename, show = print, wait_for_input = pause, query=askinput, isasync=False):
     info = ContextInfo(filename, show, wait_for_input, query)
     while info.pointer <= len(info.script):
         line = info.script[info.pointer-1].rstrip()
@@ -92,4 +93,4 @@ def parse(filename, show = print, wait_for_input = pause, query=askinput):
             return " ".join(status.split(" ")[1:])
     raise exceptions.ScriptEndException()
 
-# Add a way to run async functions, and to check if they're async
+#TODO: Add a way to run async functions, and to check if they're async

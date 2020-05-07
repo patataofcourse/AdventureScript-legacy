@@ -75,9 +75,31 @@ def ending(info, name):
     info.ending(name)
 
 def setvar(info, **kwargs):
-    pass
+    for kw in kwargs:
+        #can't be bothered to number check, i'll do that in __init__.py
+        info.variables[kw] = kwargs[kw]
 
-def checkvar(info, var, value, comparison="equal"):
+def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
+    if var not in info.variables:
+        raise exceptions.UndefinedVariableError(info.scriptname, info.pointer+1, "checkvar", var)
+    if comparison.lower() in ("equal", "=", "==", "==="):
+        result = info.variables[var] == value
+    elif comparison.lower() in ("greater", ">"):
+        result = info.variables[var] > value
+    elif comparison.lower() in ("greater or equal", ">="):
+        result = info.variables[var] >= value
+    elif comparison.lower() in ("lesser", "<"):
+        result = info.variables[var] < value
+    elif comparison.lower() in ("lesser or equal", "<="):
+        result = info.variables[var] <= value
+    else:
+        raise exceptions.CommandException(info.scriptname, info.pointer+1, "checkvar", f"Invalid comparison type: {comparison}")
+    if result:
+        info.pointer = int(gotrue)-1
+    else:
+        info.pointer = int(gofalse)-1
+
+def incvar(info, var, value): #basically +=
     pass
 
 def makelist(info, list):
@@ -86,7 +108,10 @@ def makelist(info, list):
 def append(info, list, element):
     pass
 
+def remove(info, list, element, find="pos"):
+    pass
+
 def checklist(info, list, element):
     pass
 
-commands = [n, goto, choice, loadscript, flag, ending, checkflag] # setvar, chackvar, makelist, append, checklist
+commands = [n, goto, choice, loadscript, flag, ending, checkflag, setvar, checkvar] #, incvar, makelist, append, remove, checklist
