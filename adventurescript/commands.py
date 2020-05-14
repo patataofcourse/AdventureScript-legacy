@@ -1,12 +1,12 @@
 from adventurescript import exceptions
 
-def n(info):
-    info.wait()
+async def n(info):
+    await info.wait()
 
-def goto(info, pos):
+async def goto(info, pos):
     info.pointer = int(pos)-1
 
-def choice(info, ch1, go1, text="", flags=None, **kwargs):
+async def choice(info, ch1, go1, text="", flags=None, **kwargs):
     chs = [1]
     gos = [1]
     for kwarg in kwargs:
@@ -43,14 +43,14 @@ def choice(info, ch1, go1, text="", flags=None, **kwargs):
             gotos.pop(flag-1)
     result = ""
     while result in ("r", "s", ""):
-        result = info.query(text, choices)
+        result = await info.query(text, choices)
         if result == "s":
-            info.show("Saved! (But not really)")
+            await info.show("Saved! (But not really)")
         elif result == "r":
-            info.show("This would restore the save")
-    goto(info, gotos[int(result)-1])
+            await info.show("This would restore the save")
+    await goto(info, gotos[int(result)-1])
 
-def checkflag(info, flag, gotrue, gofalse):
+async def checkflag(info, flag, gotrue, gofalse):
     if info.flags.get(flag, None) == None: #If the flag doesn't exist, it immediately gets set as false
         info.flags[flag] = False
 
@@ -59,27 +59,27 @@ def checkflag(info, flag, gotrue, gofalse):
     else:
         info.pointer = int(gofalse)-1
 
-def loadscript(info, name):
+async def loadscript(info, name):
     info.scriptname = name
     info.script = open(f"{name}.adv").read().split("\n")
     info.pointer = 1
 
-def flag(info, **kwargs):
+async def flag(info, **kwargs):
     for kwarg in kwargs:
         if kwargs[kwarg].lower() in ("true", "false"):
             info.flags[kwarg] = kwargs[kwarg].lower()
         else:
             raise exceptions.NonBoolFlagException(info.scriptname, info.pointer+1, "flag", kwarg)
 
-def ending(info, name):
+async def ending(info, name):
     info.ending(name)
 
-def setvar(info, **kwargs):
+async def setvar(info, **kwargs):
     for kw in kwargs:
         #can't be bothered to number check, i'll do that in __init__.py
         info.variables[kw] = kwargs[kw]
 
-def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
+async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     if var not in info.variables:
         raise exceptions.UndefinedVariableError(info.scriptname, info.pointer+1, "checkvar", var)
     if comparison.lower() in ("equal", "=", "==", "==="):
@@ -99,19 +99,19 @@ def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     else:
         info.pointer = int(gofalse)-1
 
-def incvar(info, var, value): #basically +=
+async def incvar(info, var, value): #basically +=
     pass
 
-def makelist(info, list):
+async def deflist(info, list):
     pass
 
-def append(info, list, element):
+async def append(info, list, element):
     pass
 
-def remove(info, list, element, find="pos"):
+async def remove(info, list, element, find="pos"):
     pass
 
-def checklist(info, list, element):
+async def checklist(info, list, element):
     pass
 
-commands = [n, goto, choice, loadscript, flag, ending, checkflag, setvar, checkvar] #, incvar, makelist, append, remove, checklist
+commands = [n, goto, choice, loadscript, flag, ending, checkflag, setvar, checkvar] #, deflist, append, remove, checklist, incvar

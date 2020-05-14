@@ -4,28 +4,42 @@ import os
 import platform
 
 add_parameters = {}
-status = ""
+status = "ok"
 
 class ContextInfo:
-    def __init__(self, scriptname, show, wait, query, pointer=1, flags={}, variables={}, lists={}):
+    def __init__(self, scriptname, show, wait, query, is_async, pointer=1, flags={}, variables={}, lists={}):
         self.scriptname = scriptname
         self.script = open(scriptname + ".adv").read().split("\n")
-        self.show = show
-        self.wait = wait
-        self.ask = query
+        self.showfunc = show
+        self.waitfunc = wait
+        self.queryfunc = query
         self.pointer = pointer
         self.flags = flags
         self.variables = variables
         self.lists = lists
+        self.is_async = is_async
     def ending(self, end):
         global status
         status = f"ending {end}"
-    def save(self): #TODO
+    async def save(self): #TODO
         pass
-    def reload(self): #TODO
+    async def reload(self): #TODO
         pass
-    def query(self, text, choices):
-        return self.ask(self, text, choices)
+    async def show(self, text):
+        if self.is_async:
+            return await self.showfunc(text)
+        else:
+            return self.showfunc(text)
+    async def wait(self):
+        if self.is_async:
+            return await self.waitfunc()
+        else:
+            return self.waitfunc()
+    async def query(self, text, choices):
+        if self.is_async:
+            return await self.queryfunc(self, text, choices)
+        else:
+            return self.queryfunc(self, text, choices)
 
 def pause():
     if platform.system() == "Linux" or platform.system() == "Darwin":
@@ -37,10 +51,10 @@ def pause():
 
 def askinput(info, text, choices):
     if text != "":
-        info.show(text)
+        info.showfunc(text)
     c = 1
     for ch in choices:
-        info.show(f"{c}. {ch}")
+        info.showfunc(f"{c}. {ch}")
         c += 1
     result = ""
     while result not in (strrange(len(choices)) + ["r", "s"]):
@@ -54,7 +68,15 @@ def strrange(max):
         sr.append(str(num))
     return sr
 
-def check_commands(info, line):
+def formatcmd(text):
+    pass
+'''
+This command requires:
+-checking for "" and ''
+-checking for +, -, * and /
+'''
+
+async def check_commands(info, line):
     if line == "":
         return False
     elif line.startswith("[") and line.endswith("]"):
@@ -64,33 +86,34 @@ def check_commands(info, line):
             if command.__name__ == line[0]:
                 kwargs = {}
                 if line[1] == "":
-                    command(info)
+                    await command(info)
                     return True
                 for pair in line[1:]:
                     pair = pair.split("=")
                     kwargs[pair[0].strip()] = pair[1].strip().strip("\"") #TODO: Make the thing interpret properly
-                command(info, **kwargs)
+                await command(info, **kwargs)
                 return True
         return False
     elif line.endswith("[n]"):
         line = line[:-3]
-        info.show(line)
-        commands.n(info)
+        await info.show(line)
+        await commands.n(info)
         return True
     else:
         return False
 
-def parse(filename, show = print, wait_for_input = pause, query=askinput, isasync=False):
-    info = ContextInfo(filename, show, wait_for_input, query)
+async def parse(filename, show = print, wait_for_input = pause, query=askinput, is_async=False):
+    info = ContextInfo(filename, show, wait_for_input, query, is_async)
     while info.pointer <= len(info.script):
         line = info.script[info.pointer-1].rstrip()
         if not line.startswith("#"):
-            result = check_commands(info, line)
+            result = await check_commands(info, line)
             if not result:
-                show(line)
+                await info.show(line)
         info.pointer += 1
         if status.startswith("ending"):
             return " ".join(status.split(" ")[1:])
     raise exceptions.ScriptEndException()
 
-#TODO: Add a way to run async functions, and to check if they're async
+def parse_sync(filename, show = print, wait_for_input = pause, query = askinput):
+    return asyncio.run(parse(filename, show, wait_for_input, query))
