@@ -4,7 +4,6 @@ import os
 import platform
 
 add_parameters = {}
-status = "ok"
 
 class ContextInfo:
     def __init__(self, scriptname, save_id, show, wait, query, is_async, pass_info, pointer=1, flags={}, variables={}, lists={}):
@@ -20,9 +19,9 @@ class ContextInfo:
         self.lists = lists
         self.is_async = is_async
         self.pass_info = pass_info
+        self.status = "ok"
     def ending(self, end):
-        global status
-        status = f"ending {end}"
+        self.status = f"ending {end}"
     async def save(self): #TODO
         pass
     async def reload(self): #TODO
@@ -128,7 +127,7 @@ async def parse(filename, save_id=0, show = print, wait = pause, query=askinput,
             if not result:
                 await info.show(line)
         info.pointer += 1
-        if status.startswith("ending"):
+        if self.status.startswith("ending"):
             return " ".join(status.split(" ")[1:])
     raise exceptions.ScriptEndException()
 
