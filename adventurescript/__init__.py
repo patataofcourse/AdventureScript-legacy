@@ -113,8 +113,8 @@ async def check_commands(info, line):
     else:
         return False
 
-async def parse(filename, save_id=0, show = print, wait_for_input = pause, query=askinput, pass_info = False, addons = [], is_async=False):
-    info = ContextInfo(filename, save_id, show, wait_for_input, query, is_async, pass_info)
+async def parse(filename, save_id=0, show = print, wait = pause, query=askinput, pass_info = False, addons = [], is_async=False):
+    info = ContextInfo(filename, save_id, show, wait, query, is_async, pass_info)
     for addon in addons:
         try:
             addon.setup(info)
@@ -132,5 +132,5 @@ async def parse(filename, save_id=0, show = print, wait_for_input = pause, query
             return " ".join(status.split(" ")[1:])
     raise exceptions.ScriptEndException()
 
-def parse_sync(filename, save_id=0, show = print, wait_for_input = pause, query = askinput, pass_info = False, addons = []):
-    return asyncio.run(parse(filename, save_id, show, wait_for_input, query, pass_info, addons))
+def parse_sync(filename, save_id=0, show = print, wait = pause, query = askinput, pass_info = False, addons = []):
+    return asyncio.run(parse(filename, save_id, show, wait, query, pass_info, addons))
