@@ -7,9 +7,10 @@ add_parameters = {}
 status = "ok"
 
 class ContextInfo:
-    def __init__(self, scriptname, show, wait, query, is_async, pass_info, pointer=1, flags={}, variables={}, lists={}):
+    def __init__(self, scriptname, save_id, show, wait, query, is_async, pass_info, pointer=1, flags={}, variables={}, lists={}):
         self.scriptname = scriptname
         self.script = open(scriptname + ".adv").read().split("\n")
+        self.save_id = save_id
         self.showfunc = show
         self.waitfunc = wait
         self.queryfunc = query
@@ -112,8 +113,14 @@ async def check_commands(info, line):
     else:
         return False
 
-async def parse(filename, show = print, wait_for_input = pause, query=askinput, is_async=False, pass_info = False):
-    info = ContextInfo(filename, show, wait_for_input, query, is_async, pass_info)
+async def parse(filename, save_id=0, show = print, wait_for_input = pause, query=askinput, pass_info = False, addons = [], is_async=False):
+    info = ContextInfo(filename, save_id, show, wait_for_input, query, is_async, pass_info)
+    for addon in addons:
+        try:
+            addon.setup(info)
+            commands.commands += addon.commands
+        except Exception as e:
+            print (f"Exception while attempting to add addon {addon.__name__}:", e)
     while info.pointer <= len(info.script):
         line = info.script[info.pointer-1].rstrip()
         if not line.startswith("#"):
@@ -125,5 +132,5 @@ async def parse(filename, show = print, wait_for_input = pause, query=askinput, 
             return " ".join(status.split(" ")[1:])
     raise exceptions.ScriptEndException()
 
-def parse_sync(filename, show = print, wait_for_input = pause, query = askinput, pass_info = False):
-    return asyncio.run(parse(filename, show, wait_for_input, query))
+def parse_sync(filename, save_id=0, show = print, wait_for_input = pause, query = askinput, pass_info = False, addons = []):
+    return asyncio.run(parse(filename, save_id, show, wait_for_input, query, pass_info, addons))
