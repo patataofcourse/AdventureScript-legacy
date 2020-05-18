@@ -39,6 +39,12 @@ class ContextInfo:
         self.variables = eval("{"+save[3]+"}")
         self.lists = eval("{"+save[4]+"}")
     async def show(self, text):
+        while text.find("{") != -1:
+            text = text[:text.find("{")]+ text[text.find("}")+1:]
+        if text.find("}") != -1:
+            raise Exception("UnmatchedBracketException: Remember nesting {}s doesn't work") #TODO
+        text.strip()
+
         if self.pass_info:
             f = self.showfunc(self, text)
         else:
@@ -105,13 +111,8 @@ def strrange(max):
         sr.append(str(num))
     return sr
 
-def formatcmd(text):
+def input_format(text):
     pass
-'''
-This command requires:
--checking for "" and ''
--checking for +, -, * and /
-'''
 
 async def check_commands(info, line):
     if line == "":
@@ -141,12 +142,16 @@ async def check_commands(info, line):
 
 async def parse(name, save_id=0, show = print, wait = pause, query=askinput, pass_info = False, addons = [], is_async=False):
     info = ContextInfo(name, save_id, show, wait, query, is_async, pass_info)
+    
+    #Load addons
     for addon in addons:
         try:
             addon.setup(info)
             commands.commands += addon.commands
         except Exception as e:
             print (f"Exception while attempting to add addon {addon.__name__}:", e)
+
+    #Prompt to restore last save
     try:
         save = open(f"save/{info.gamename}/{info.save_id}.asv").read().split("}{")
     except:
@@ -160,6 +165,8 @@ async def parse(name, save_id=0, show = print, wait = pause, query=askinput, pas
             info.reload()
             await info.show("Save restored!")
         await info.wait()
+    
+    #The actual parsing
     while info.pointer <= len(info.script):
         line = info.script[info.pointer-1].rstrip()
         if not line.startswith("#"):
