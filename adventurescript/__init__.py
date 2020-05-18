@@ -9,7 +9,7 @@ class ContextInfo:
     def __init__(self, name, save_id, show, wait, query, is_async, pass_info, pointer=1, flags={}, variables={}, lists={}):
         self.gamename = name
         self.scriptname = f"script/{name}/start"
-        self.script = open(self.scriptname + ".adv").read().split("\n")
+        self.script = open(self.scriptname + ".asf").read().split("\n")
         self.save_id = save_id
         self.showfunc = show
         self.waitfunc = wait
@@ -21,11 +21,13 @@ class ContextInfo:
         self.is_async = is_async
         self.pass_info = pass_info
         self.status = "ok"
+        self.allow_save = False
     def ending(self, end):
         self.status = f"ending {end}"
     async def save(self, sq=False): #TODO
-        strsave = "}{".join((self.scriptname,self.pointer))+"}"+str(self.flags)+str(self.variables)+str(self.lists)[:-1]
-        print(strsave)
+        svfile = open(f"save/{self.gamename}/{self.save_id}.asv","w")
+        svfile.write("}{".join((self.scriptname,str(self.pointer)))+"}"+str(self.flags)+str(self.variables)+str(self.lists)[:-1])
+        svfile.close()
         if sq:
             self.status = "quit"
     async def reload(self): #TODO
@@ -49,7 +51,7 @@ class ContextInfo:
         else:
             return f
     async def query(self, text, choices):
-        f = self.queryfunc(self, text, choices)
+        f = self.queryfunc(self, text, choices, self.allow_save)
         if self.is_async:
             return await f
         else:
@@ -63,7 +65,7 @@ def pause():
     else:
         print("Platform not supported")
 
-def askinput(info, text, choices):
+def askinput(info, text, choices, allow_save):
     if text != "":
         info.showfunc(text)
     c = 1
@@ -71,8 +73,13 @@ def askinput(info, text, choices):
         info.showfunc(f"{c}. {ch}")
         c += 1
     result = ""
-    while result not in (strrange(len(choices)) + ["r", "s"]):
+    while result not in (strrange(len(choices))):
         result = input(">")
+        if allow_save:
+            if result == "s":
+                info.showfunc("Saved! (But not really)")
+            elif result == "r":
+                info.showfunc("This would restore the save")
     return result
 
 def strrange(max):
@@ -131,10 +138,10 @@ async def parse(name, save_id=0, show = print, wait = pause, query=askinput, pas
             if not result:
                 await info.show(line)
         info.pointer += 1
-        if status == ok:
+        if info.status == "ok":
             pass
-        elif info.status.startswith("ending") or status == "quit":
-            return status
+        elif info.status.startswith("ending") or info.status == "quit":
+            return info.status
         else:
             raise Exception("Unknown status!")
 

@@ -42,12 +42,7 @@ async def choice(info, ch1, go1, text="", flags=None, **kwargs):
             choices.pop(flag-1)
             gotos.pop(flag-1)
     result = ""
-    while result in ("r", "s", ""):
-        result = await info.query(text, choices)
-        if result == "s":
-            await info.show("Saved! (But not really)")
-        elif result == "r":
-            await info.show("This would restore the save")
+    result = await info.query(text, choices)
     await goto(info, gotos[int(result)-1])
 
 async def checkflag(info, flag, gotrue, gofalse):
@@ -61,7 +56,7 @@ async def checkflag(info, flag, gotrue, gofalse):
 
 async def loadscript(info, name, pos=1):
     info.scriptname = f"script/{info.gamename}/{name}"
-    info.script = open(f"{info.scriptname}.adv").read().split("\n")
+    info.script = open(f"{info.scriptname}.asf").read().split("\n")
     info.pointer = pos
 
 async def flag(info, **kwargs):
@@ -73,6 +68,12 @@ async def flag(info, **kwargs):
 
 async def ending(info, name):
     info.ending(name)
+
+async def saveoff(info):
+    info.allow_save = False
+
+async def saveon(info):
+    info.allow_save = True
 
 async def setvar(info, **kwargs):
     for kw in kwargs:
@@ -114,4 +115,4 @@ async def remove(info, list, element, find="pos"):
 async def checklist(info, list, element):
     pass
 
-commands = [n, goto, choice, loadscript, flag, ending, checkflag, setvar, checkvar] #, deflist, append, remove, checklist, incvar
+commands = [n, goto, choice, loadscript, flag, ending, saveoff, saveon, checkflag, setvar, checkvar] #, deflist, append, remove, checklist, incvar
