@@ -24,7 +24,7 @@ class ContextInfo:
     def ending(self, end):
         self.status = f"ending {end}"
     async def save(self, sq=False): #TODO
-        strsave = "}{".join((scriptname,pointer)+"}"+str(flags)+str(variables)+str(lists)[:-1]
+        strsave = "}{".join((scriptname,pointer))+"}"+str(flags)+str(variables)+str(lists)[:-1]
         print(strsave)
         if sq:
             status = "quit"
