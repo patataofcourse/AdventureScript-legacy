@@ -149,16 +149,17 @@ async def parse(name, save_id=0, show = print, wait = pause, query=askinput, pas
             print (f"Exception while attempting to add addon {addon.__name__}:", e)
     try:
         save = open(f"save/{info.gamename}/{info.save_id}.asv").read().split("}{")
-        await info.show("A save file has been detected. Would you like to restore it?")
-        response = await info.query("",("Yes", "No"), False)
-        if response == 2:
-            await info.show("Starting a new game...")
-        else:
-            await info.reload()
-            await info.show("Save restored!")
-        await info.wait()
     except:
         pass
+    else:
+        await info.show("A save file has been detected. Would you like to restore it?")
+        response = await info.query("",("Yes", "No"), False)
+        if response == "2":
+            await info.show("A new game will be started.")
+        else:
+            info.reload()
+            await info.show("Save restored!")
+        await info.wait()
     while info.pointer <= len(info.script):
         line = info.script[info.pointer-1].rstrip()
         if not line.startswith("#"):
@@ -171,7 +172,7 @@ async def parse(name, save_id=0, show = print, wait = pause, query=askinput, pas
         elif info.status.startswith("ending") or info.status == "quit":
             return info.status
         else:
-            raise Exception("Unknown status!")
+            raise Exception("Unknown status!") #TODO
 
     raise exceptions.ScriptEndException()
 

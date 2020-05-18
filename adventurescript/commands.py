@@ -105,15 +105,23 @@ async def incvar(info, var, value): #basically +=
     pass
 
 async def deflist(info, list):
-    pass
+    info.lists[list] = []
 
 async def append(info, list, element):
-    pass
+    info.lists[list].append(element)
 
 async def remove(info, list, element, find="pos"):
-    pass
+    if find == "pos":
+        info.lists[list].pop(int(element))
+    elif find == "name":
+        info.lists[list].pop(list.find(element, None))
+    else:
+        Exception() #TODO
 
-async def checklist(info, list, element):
-    pass
+async def checklist(info, list, element, gotrue, gofalse):
+    if list.find(element, None) != -1:
+        await goto(info, gotrue)
+    else:
+        await goto(info, gofalse)
 
-commands = [n, goto, choice, loadscript, flag, ending, saveoff, saveon, checkflag, setvar, checkvar] #, deflist, append, remove, checklist, incvar
+commands = [n, goto, choice, loadscript, flag, ending, saveoff, saveon, checkflag, setvar, checkvar, deflist, append, remove, checklist] #, incvar
