@@ -37,7 +37,7 @@ class ContextInfo:
         self.pointer = int(save[1])
         self.flags = eval("{"+save[2]+"}")
         self.variables = eval("{"+save[3]+"}")
-        self.flags = eval("{"+save[4]+"}")
+        self.lists = eval("{"+save[4]+"}")
     async def show(self, text):
         if self.pass_info:
             f = self.showfunc(self, text)

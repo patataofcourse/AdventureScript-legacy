@@ -119,7 +119,7 @@ async def remove(info, list, element, find="pos"):
         Exception() #TODO
 
 async def checklist(info, list, element, gotrue, gofalse):
-    if list.find(element, None) != -1:
+    if element in info.lists[list]:
         await goto(info, gotrue)
     else:
         await goto(info, gofalse)

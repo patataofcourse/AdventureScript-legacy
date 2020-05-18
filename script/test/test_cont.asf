@@ -17,9 +17,9 @@ lets go
 [deflist list="list"]
 [append list=list; element="one"]
 [append list=list; element="two"]
-[remove list=list; element="1"]
-[checklist list=list; element="one"; gotrue=22; gofalse={fail1}]
-[checklist list=list; element="two"; gotrue={fail2}; gofalse=23]
+[remove list=list; element="1"; find="name"]
+[checklist list=list; element="one"; gotrue=22; gofalse=25]
+[checklist list=list; element="two"; gotrue=27; gofalse=23]
 The test was a success!
 [ending name="List Test Success"]
 Oops, seems like the first element didn't get added! >.>
