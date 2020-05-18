@@ -41,8 +41,9 @@ async def choice(info, ch1, go1, text="", flags=None, **kwargs):
         if not flagdict[flag]:
             choices.pop(flag-1)
             gotos.pop(flag-1)
-    result = ""
     result = await info.query(text, choices)
+    if result == 0:
+        return
     await goto(info, gotos[int(result)-1])
 
 async def checkflag(info, flag, gotrue, gofalse):

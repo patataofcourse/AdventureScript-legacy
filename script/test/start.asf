@@ -16,4 +16,4 @@ This is the text for the second choice [n]
 You haven't seen both choices!
 Unless flags hasn't been added, there has to be an error somewhere... [n]
 [goto pos = 4]
-[loadscript name = "test2"]
+[loadscript name = "test_cont"]

@@ -2,7 +2,7 @@ This is actually now a different script!
 Woo! [n]
 Now, do you want to return to the old choice or just exit? [n]
 [choice ch1 = "take me back to hell"; go1 = 5; ch2 = "take me out of this place"; go2 = 6]
-[loadscript name="test"]
+[loadscript name="start"]
 k bye [n]
 [choice text="what ending do you want"; ch1="good"; ch2="bad"; go1=8; go2=10]
 [setvar doneWith="life"; fu=2381]

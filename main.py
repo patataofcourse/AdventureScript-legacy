@@ -4,5 +4,5 @@ print('''Yet Another Text Game
 Pre-Alpha 1
 ''')
 AS.pause()
-ending = AS.parse_sync("test")
-print("Congrats, you got the " + ending + " Ending!")
+out = AS.parse_sync("test")
+print("Output: " + out)

@@ -24,13 +24,13 @@ class ContextInfo:
         self.allow_save = True
     def ending(self, end):
         self.status = f"ending {end}"
-    async def save(self, sq=False):
+    def save(self, sq=False):
         svfile = open(f"save/{self.gamename}/{self.save_id}.asv","w")
         svfile.write("}{".join((self.scriptname,str(self.pointer)))+"}"+str(self.flags)+str(self.variables)+str(self.lists)[:-1])
         svfile.close()
         if sq:
             self.status = "quit"
-    async def reload(self):
+    def reload(self):
         save = open(f"save/{self.gamename}/{self.save_id}.asv").read().split("}{")
         self.scriptname = save[0]
         self.script = open(f"{self.scriptname}.asf").read().split("\n")
@@ -56,8 +56,10 @@ class ContextInfo:
             return await f
         else:
             return f
-    async def query(self, text, choices):
-        f = self.queryfunc(self, text, choices, self.allow_save)
+    async def query(self, text, choices, allow_save=None):
+        if allow_save == None:
+            allow_save = self.allow_save
+        f = self.queryfunc(self, text, choices, allow_save)
         if self.is_async:
             return await f
         else:
@@ -83,16 +85,17 @@ def askinput(info, text, choices, allow_save):
         result = input(">")
         if allow_save:
             if result == "s":
+                info.save()
                 info.showfunc("Saved!")
             elif result == "r":
                 try:
-                    open(f"save/{self.gamename}/{self.save_id}.asv").read().split("}{")
+                    open(f"save/{info.gamename}/{info.save_id}.asv").read().split("}{")
                 except:
                     info.showfunc("No save exists!")
                 else:
                     info.showfunc("Save restored!")
-                    info.restore()
-                    info.check_commands(info, info.script[info.pointer-1])
+                    info.reload()
+                    return 0
     return result
 
 def strrange(max):
@@ -148,7 +151,7 @@ async def parse(name, save_id=0, show = print, wait = pause, query=askinput, pas
         save = open(f"save/{info.gamename}/{info.save_id}.asv").read().split("}{")
         await info.show("A save file has been detected. Would you like to restore it?")
         response = await info.query("",("Yes", "No"), False)
-        if response-1:
+        if response == 2:
             await info.show("Starting a new game...")
         else:
             await info.reload()
