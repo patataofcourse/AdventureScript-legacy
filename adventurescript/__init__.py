@@ -9,7 +9,7 @@ class ContextInfo:
     def __init__(self, name, save_id, show, wait, query, is_async, pass_info, pointer=1, flags={}, variables={}, lists={}):
         self.gamename = name
         self.scriptname = f"script/{name}/start"
-        self.script = open(scriptname + ".adv").read().split("\n")
+        self.script = open(self.scriptname + ".adv").read().split("\n")
         self.save_id = save_id
         self.showfunc = show
         self.waitfunc = wait
@@ -24,10 +24,10 @@ class ContextInfo:
     def ending(self, end):
         self.status = f"ending {end}"
     async def save(self, sq=False): #TODO
-        strsave = "}{".join((scriptname,pointer))+"}"+str(flags)+str(variables)+str(lists)[:-1]
+        strsave = "}{".join((self.scriptname,self.pointer))+"}"+str(self.flags)+str(self.variables)+str(self.lists)[:-1]
         print(strsave)
         if sq:
-            status = "quit"
+            self.status = "quit"
     async def reload(self): #TODO
         pass
     async def show(self, text):
