@@ -21,17 +21,23 @@ class ContextInfo:
         self.is_async = is_async
         self.pass_info = pass_info
         self.status = "ok"
-        self.allow_save = False
+        self.allow_save = True
     def ending(self, end):
         self.status = f"ending {end}"
-    async def save(self, sq=False): #TODO
+    async def save(self, sq=False):
         svfile = open(f"save/{self.gamename}/{self.save_id}.asv","w")
         svfile.write("}{".join((self.scriptname,str(self.pointer)))+"}"+str(self.flags)+str(self.variables)+str(self.lists)[:-1])
         svfile.close()
         if sq:
             self.status = "quit"
-    async def reload(self): #TODO
-        pass
+    async def reload(self):
+        save = open(f"save/{self.gamename}/{self.save_id}.asv").read().split("}{")
+        self.scriptname = save[0]
+        self.script = open(f"{self.scriptname}.asf").read().split("\n")
+        self.pointer = int(save[1])
+        self.flags = eval("{"+save[2]+"}")
+        self.variables = eval("{"+save[3]+"}")
+        self.flags = eval("{"+save[4]+"}")
     async def show(self, text):
         if self.pass_info:
             f = self.showfunc(self, text)
@@ -77,9 +83,16 @@ def askinput(info, text, choices, allow_save):
         result = input(">")
         if allow_save:
             if result == "s":
-                info.showfunc("Saved! (But not really)")
+                info.showfunc("Saved!")
             elif result == "r":
-                info.showfunc("This would restore the save")
+                try:
+                    open(f"save/{self.gamename}/{self.save_id}.asv").read().split("}{")
+                except:
+                    info.showfunc("No save exists!")
+                else:
+                    info.showfunc("Save restored!")
+                    info.restore()
+                    info.check_commands(info, info.script[info.pointer-1])
     return result
 
 def strrange(max):
@@ -131,6 +144,18 @@ async def parse(name, save_id=0, show = print, wait = pause, query=askinput, pas
             commands.commands += addon.commands
         except Exception as e:
             print (f"Exception while attempting to add addon {addon.__name__}:", e)
+    try:
+        save = open(f"save/{info.gamename}/{info.save_id}.asv").read().split("}{")
+        await info.show("A save file has been detected. Would you like to restore it?")
+        response = await info.query("",("Yes", "No"), False)
+        if response-1:
+            await info.show("Starting a new game...")
+        else:
+            await info.reload()
+            await info.show("Save restored!")
+        await info.wait()
+    except:
+        pass
     while info.pointer <= len(info.script):
         line = info.script[info.pointer-1].rstrip()
         if not line.startswith("#"):
