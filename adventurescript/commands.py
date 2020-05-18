@@ -59,10 +59,10 @@ async def checkflag(info, flag, gotrue, gofalse):
     else:
         info.pointer = int(gofalse)-1
 
-async def loadscript(info, name):
-    info.scriptname = name
-    info.script = open(f"{name}.adv").read().split("\n")
-    info.pointer = 1
+async def loadscript(info, name, pos=1):
+    info.scriptname = f"script/{info.gamename}/{name}"
+    info.script = open(f"{info.scriptname}.adv").read().split("\n")
+    info.pointer = pos
 
 async def flag(info, **kwargs):
     for kwarg in kwargs:

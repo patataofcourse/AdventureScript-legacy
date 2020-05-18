@@ -6,8 +6,9 @@ import platform
 add_parameters = {}
 
 class ContextInfo:
-    def __init__(self, scriptname, save_id, show, wait, query, is_async, pass_info, pointer=1, flags={}, variables={}, lists={}):
-        self.scriptname = scriptname
+    def __init__(self, name, save_id, show, wait, query, is_async, pass_info, pointer=1, flags={}, variables={}, lists={}):
+        self.gamename = name
+        self.scriptname = f"script/{name}/start"
         self.script = open(scriptname + ".adv").read().split("\n")
         self.save_id = save_id
         self.showfunc = show
@@ -22,8 +23,11 @@ class ContextInfo:
         self.status = "ok"
     def ending(self, end):
         self.status = f"ending {end}"
-    async def save(self): #TODO
-        pass
+    async def save(self, sq=False): #TODO
+        strsave = "}{".join((scriptname,pointer)+"}"+str(flags)+str(variables)+str(lists)[:-1]
+        print(strsave)
+        if sq:
+            status = "quit"
     async def reload(self): #TODO
         pass
     async def show(self, text):
@@ -112,8 +116,8 @@ async def check_commands(info, line):
     else:
         return False
 
-async def parse(filename, save_id=0, show = print, wait = pause, query=askinput, pass_info = False, addons = [], is_async=False):
-    info = ContextInfo(filename, save_id, show, wait, query, is_async, pass_info)
+async def parse(name, save_id=0, show = print, wait = pause, query=askinput, pass_info = False, addons = [], is_async=False):
+    info = ContextInfo(name, save_id, show, wait, query, is_async, pass_info)
     for addon in addons:
         try:
             addon.setup(info)
@@ -127,9 +131,14 @@ async def parse(filename, save_id=0, show = print, wait = pause, query=askinput,
             if not result:
                 await info.show(line)
         info.pointer += 1
-        if self.status.startswith("ending"):
-            return " ".join(status.split(" ")[1:])
+        if status == ok:
+            pass
+        elif info.status.startswith("ending") or status == "quit":
+            return status
+        else:
+            raise Exception("Unknown status!")
+
     raise exceptions.ScriptEndException()
 
-def parse_sync(filename, save_id=0, show = print, wait = pause, query = askinput, pass_info = False, addons = []):
-    return asyncio.run(parse(filename, save_id, show, wait, query, pass_info, addons))
+def parse_sync(name, save_id=0, show = print, wait = pause, query = askinput, pass_info = False, addons = []):
+    return asyncio.run(parse(name, save_id, show, wait, query, pass_info, addons))
