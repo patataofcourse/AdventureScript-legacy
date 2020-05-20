@@ -31,10 +31,10 @@ These parse functions take the following arguments:
  - query [optional] - A function to replace the default choice function.
  - pass_info [optional] - Whether it should pass the ContextInfo to the I/O functions. Defaults to False.
  - addons [optional] - An iterable of addons (python modules) to load. More info below.
- - is_async [optional] - Whether it should run the I/O functions as standard functions (False) or coroutines (True). Defaults to False. **Only in parse(), not in parse_sync()**
+ - is_async [optional] - Whether it should run the I/O functions as standard functions (False) or coroutines (True). Defaults to False. Can theoretically be used in parse_sync, but that makes no sense.
 
 ## Addons
 Addons must have:
- - a synchronous setup function which takes the ContextInfo as an argument
+ - a synchronous setup function which takes the ContextInfo as an argument.
  - a list called commands which includes all addon command functions (can be empty if there are none)
  Currently, the only addon is AScord.

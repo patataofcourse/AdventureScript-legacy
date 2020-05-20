@@ -1,12 +1,12 @@
 import asyncio
-from adventurescript import commands, exceptions
+from adventurescript import commands, exceptions, default
 import os
 import platform
 
 add_parameters = {}
 
 class ContextInfo:
-    def __init__(self, name, save_id, show, wait, query, is_async, pass_info, pointer=1, flags={}, variables={}, lists={}):
+    def __init__(self, name, save_id, show, wait, query, is_async, pass_info):
         self.gamename = name
         self.scriptname = f"script/{name}/start"
         self.script = open(self.scriptname + ".asf").read().split("\n")
@@ -14,12 +14,12 @@ class ContextInfo:
         self.showfunc = show
         self.waitfunc = wait
         self.queryfunc = query
-        self.pointer = pointer
-        self.flags = flags
-        self.variables = variables
-        self.lists = lists
         self.is_async = is_async
         self.pass_info = pass_info
+        self.pointer = 1
+        self.flags = {}
+        self.variables = {}
+        self.lists = {}
         self.status = "ok"
         self.allow_save = True
     def ending(self, end):
@@ -71,49 +71,10 @@ class ContextInfo:
         else:
             return f
 
-def pause():
-    if platform.system() == "Linux" or platform.system() == "Darwin":
-        os.system('read -s -n 1')
-    elif platform.system() == "Windows":
-        os.system("pause >nul")
-    else:
-        print("Platform not supported")
-
-def askinput(info, text, choices, allow_save):
-    if text != "":
-        info.showfunc(text)
-    c = 1
-    for ch in choices:
-        info.showfunc(f"{c}. {ch}")
-        c += 1
-    result = ""
-    while result not in (strrange(len(choices))):
-        result = input(">")
-        if allow_save:
-            if result == "s":
-                info.save()
-                info.showfunc("Saved!")
-            elif result == "r":
-                try:
-                    open(f"save/{info.gamename}/{info.save_id}.asv").read().split("}{")
-                except:
-                    info.showfunc("No save exists!")
-                else:
-                    info.showfunc("Save restored!")
-                    info.reload()
-                    return 0
-    return result
-
-def strrange(max):
-    r = list(range(1, max+1))
-    sr = []
-    for num in r:
-        sr.append(str(num))
-    return sr
-
 # This function takes a string and does a sort of eval() with it, but using AS' variables, flags and lists;
 # and also counts the #.# expressions using AS' own values (so, #.int, for example).
-def input_format(text):     # Warning: badly named variables ahead
+def input_format(text):
+    # Warning: badly named variables ahead
     text = text.split("+")  # text2 is used as a way to store the text through the loop, so like a temp variable
     text2 = text + []
     c = 0
@@ -206,7 +167,6 @@ def input_format(text):     # Warning: badly named variables ahead
             text2 = str(eval(text2+operation+text.pop(0)))
     #TODO: Add format detecting, so it knows if they're ints, lists, strs, flags, etc
 
-
 async def check_commands(info, line):
     if line == "":
         return False
@@ -233,7 +193,7 @@ async def check_commands(info, line):
     else:
         return False
 
-async def parse(name, save_id=0, show = print, wait = pause, query=askinput, pass_info = False, addons = [], is_async=False):
+async def parse(name, save_id=0, show=default.show, wait=default.wait, query=default.query, pass_info = False, addons = [], is_async=False):
     info = ContextInfo(name, save_id, show, wait, query, is_async, pass_info)
     
     #Load addons
@@ -276,5 +236,5 @@ async def parse(name, save_id=0, show = print, wait = pause, query=askinput, pas
 
     raise exceptions.ScriptEndException()
 
-def parse_sync(name, save_id=0, show = print, wait = pause, query = askinput, pass_info = False, addons = []):
-    return asyncio.run(parse(name, save_id, show, wait, query, pass_info, addons))
+def parse_sync(*args):
+    return asyncio.run(parse(*args))

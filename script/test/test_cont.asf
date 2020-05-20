@@ -17,7 +17,7 @@ lets go
 [deflist list="list"]
 [append list=list; element="one"]
 [append list=list; element="two"]
-[remove list=list; element="1"; find="name"]
+[remove list=list; element="two"; find="name"]
 [checklist list=list; element="one"; gotrue=22; gofalse=25]
 [checklist list=list; element="two"; gotrue=27; gofalse=23]
 The test was a success!

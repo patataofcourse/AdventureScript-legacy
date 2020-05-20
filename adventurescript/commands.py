@@ -114,7 +114,7 @@ async def remove(info, list, element, find="pos"):
     if find == "pos":
         info.lists[list].pop(int(element))
     elif find == "name":
-        info.lists[list].pop(list.index(element, None))
+        info.lists[list].pop(info.lists[list].index(element))
     else:
         Exception() #TODO
 
