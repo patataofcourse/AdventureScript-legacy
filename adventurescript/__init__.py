@@ -16,20 +16,26 @@ class ContextInfo:
         self.queryfunc = query
         self.is_async = is_async
         self.pass_info = pass_info
-        self.pointer = 1
         self.flags = {}
         self.variables = {}
         self.lists = {}
+        self.pointer = 1
         self.status = "ok"
         self.allow_save = True
+        self.extra_slots = []
     def ending(self, end):
         self.status = f"ending {end}"
     def save(self, sq=False):
         svfile = open(f"save/{self.gamename}/{self.save_id}.asv","w")
         svfile.write("}{".join((self.scriptname,str(self.pointer)))+"}"+str(self.flags)+str(self.variables)+str(self.lists)[:-1])
+        for slot in self.extra_slots:
+            data = getattr(self, slot)
+            svfile.write("}{"+str(data))
         svfile.close()
         if sq:
-            self.status = "quit"
+            self.status = "quit sv"
+    def quit(self):
+        self.status = "quit"
     def reload(self):
         save = open(f"save/{self.gamename}/{self.save_id}.asv").read().split("}{")
         self.scriptname = save[0]
@@ -38,6 +44,11 @@ class ContextInfo:
         self.flags = eval("{"+save[2]+"}")
         self.variables = eval("{"+save[3]+"}")
         self.lists = eval("{"+save[4]+"}")
+        c = 5
+        for slot in self.extra_slots:
+            exec('self.' + slot + '= save[c]')
+            c+=1
+
     async def show(self, text):
         while text.find("{") != -1:
             text = text[:text.find("{")]+ text[text.find("}")+1:]
@@ -90,12 +101,11 @@ async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query
     else:
         await info.show("A save file has been detected. Would you like to restore it?")
         response = await info.query("",("Yes", "No"), False)
-        if response == "2":
+        if response == 2:
             await info.show("A new game will be started.")
+            await info.wait()
         else:
             info.reload()
-            await info.show("Save restored!")
-        await info.wait()
     
     #The actual parsing
     while info.pointer <= len(info.script):
@@ -107,7 +117,7 @@ async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query
         info.pointer += 1
         if info.status == "ok":
             pass
-        elif info.status.startswith("ending") or info.status == "quit":
+        elif info.status.startswith("ending") or info.status.startswith("quit"):
             return info.status
         else:
             raise Exception("Unknown status!") #TODO
