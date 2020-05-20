@@ -27,7 +27,7 @@ async def choice(info, ch1, go1, text="", flags=None, **kwargs):
             elif info.flags.get(flag.split(":")[1], None) == None: #If the flag doesn't exist, it immediately gets set as false
                 info.flags[flag.split(":")[1]] = False
                 flagdict[int(flag.split(":")[0])] = False
-            elif info.flags[flag.split(":")[1]] == "true":
+            elif info.flags[flag.split(":")[1]]:
                 flagdict[int(flag.split(":")[0])] = True
             else:
                 flagdict[int(flag.split(":")[0])] = False
@@ -49,8 +49,7 @@ async def choice(info, ch1, go1, text="", flags=None, **kwargs):
 async def checkflag(info, flag, gotrue, gofalse):
     if info.flags.get(flag, None) == None: #If the flag doesn't exist, it immediately gets set as false
         info.flags[flag] = False
-
-    if info.flags[flag] == "true":
+    if info.flags[flag]:
         info.pointer = int(gotrue)-1
     else:
         info.pointer = int(gofalse)-1
@@ -62,10 +61,7 @@ async def loadscript(info, name, pos=1):
 
 async def flag(info, **kwargs):
     for kwarg in kwargs:
-        if kwargs[kwarg].lower() in ("true", "false"):
-            info.flags[kwarg] = kwargs[kwarg].lower()
-        else:
-            raise exceptions.NonBoolFlagException(info.scriptname, info.pointer+1, "flag", kwarg)
+        info.flags[kwarg] = kwargs[kwarg]
 
 async def ending(info, name):
     info.ending(name)
