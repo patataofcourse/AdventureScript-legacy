@@ -61,6 +61,9 @@ async def loadscript(info, name, pos=1):
 
 async def flag(info, **kwargs):
     for kwarg in kwargs:
+        for character in kwarg:
+            if character in info.forbidden_characters:
+                raise Exception (f"Character '{character}' can't be used in a flag name")
         info.flags[kwarg] = kwargs[kwarg]
 
 async def ending(info, name):
@@ -74,6 +77,9 @@ async def saveon(info):
 
 async def setvar(info, **kwargs):
     for kw in kwargs:
+        for character in kw:
+            if character in info.forbidden_characters:
+                raise Exception (f"Character '{character}'' can't be used in a variable name")
         info.variables[kw] = kwargs[kw]
 
 async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
@@ -100,6 +106,9 @@ async def incvar(info, var, value): #basically +=
     info.variables[var] += value
 
 async def deflist(info, list):
+    for character in list:
+        if character in info.forbidden_characters:
+            raise Exception (f"Character '{character}'' can't be used in a list name")
     info.lists[list] = []
 
 async def append(info, list, element):

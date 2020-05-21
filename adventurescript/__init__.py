@@ -3,8 +3,6 @@ from adventurescript import commands, exceptions, defaultio, parsecmd
 import os
 import platform
 
-add_parameters = {}
-
 class ContextInfo:
     def __init__(self, name, save_id, show, wait, query, is_async, pass_info):
         self.gamename = name
@@ -23,6 +21,7 @@ class ContextInfo:
         self.status = "ok"
         self.allow_save = True
         self.extra_slots = []
+        self.forbidden_characters = ["%", "$", ".", "[", "]", "{", "}", "=", ";", "\\", "(", ")", " ", "\n", "\"", "'", ","]
     def ending(self, end):
         self.status = f"ending {end}"
     def save(self, sq=False):
