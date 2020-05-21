@@ -54,7 +54,7 @@ class ContextInfo:
         if text.find("}") != -1:
             raise Exception("UnmatchedBracketException: Remember nesting {}s doesn't work") #TODO
         text.strip()
-
+        
         if self.pass_info:
             f = self.showfunc(self, text)
         else:

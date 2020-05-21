@@ -6,31 +6,24 @@ async def n(info):
 async def goto(info, pos):
     info.pointer = int(pos)-1
 
-async def choice(info, ch1, go1, text="", flags=None, **kwargs):
+async def choice(info, ch1, go1, text="", **kwargs):
     chs = [1]
     gos = [1]
+    flags = []
     for kwarg in kwargs:
         if kwarg.startswith("ch"):
             chs.append(int(kwarg[2:]))
         elif kwarg.startswith("go"):
             gos.append(int(kwarg[2:]))
+        elif kwarg.startswith("flag"):
+            flags.append(int(kwarg[4:]))
         else:
             raise Exception("Unwanted argument in choice command") #TODO: use the proper exception
     if not chs == gos or len(chs) != max(chs):
         raise Exception("You screwed up somewhere with the chs and gos in a choice command") #TODO: use the proper exception
     flagdict = {}
-    if flags != None:
-        flags = flags.strip("{}").split(",")
-        for flag in flags:
-            if int(flag.split(":")[0]) in flagdict:
-                raise Exception("Choice number mentioned twice in flag argument of choice command")
-            elif info.flags.get(flag.split(":")[1], None) == None: #If the flag doesn't exist, it immediately gets set as false
-                info.flags[flag.split(":")[1]] = False
-                flagdict[int(flag.split(":")[0])] = False
-            elif info.flags[flag.split(":")[1]]:
-                flagdict[int(flag.split(":")[0])] = True
-            else:
-                flagdict[int(flag.split(":")[0])] = False
+    for flag in flags:
+        flagdict[flag] = kwargs["flag"+str(flag)]
     chs.sort()
     choices = [ch1]
     gotos = [go1]

@@ -91,7 +91,11 @@ async def input_format(info, text):
                 elif value.startswith("$"):
                     value = info.lists[value[1:]]
                 elif value.startswith("%"):
-                    value = info.flags[value[1:]]
+                    val = info.flags.get(value[1:], None)
+                    if val == None:
+                        val = False
+                        info.flags[value[1:]] = False
+                    value = val
                 elif value.lower() in ("true", "false"):
                     if value.lower() == "true":
                         value = True
@@ -173,6 +177,12 @@ def str_but_quotes(value):
         return str(value)
 
 async def check_commands(info, line):
+    while line.find("{") != -1:
+        line = line[:line.find("{")]+ line[line.find("}")+1:]
+    if line.find("}") != -1:
+        raise Exception("UnmatchedBracketException: Remember nesting {}s doesn't work") #TODO
+    line.strip()
+
     if line == "":
         return False
     elif line.startswith("[") and line.endswith("]"):
@@ -197,3 +207,10 @@ async def check_commands(info, line):
         return True
     else:
         return False
+
+def find_label(info, label=""):
+    for line in info.script:
+        if line.find("{"+label+"}") != -1:
+            info.pointer = info.script.index(line)
+            break
+    raise Exception(f"Label '{label}' not found!")
