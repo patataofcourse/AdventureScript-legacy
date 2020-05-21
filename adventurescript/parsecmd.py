@@ -86,8 +86,8 @@ async def input_format(info, text):
                     value = value.strip("'\"").replace("\\n","\n")
                 elif value.startswith("{") and value.endswith("}"):
                     value = find_label(info, value)
-                elif value.startswith("(") and value.endswith(")"): #temporary
-                    value = eval(f"[+{value[1:-1]}]")
+                # elif value.startswith("(") and value.endswith(")"): #TODO: Add this. Not gonna be needed for now
+                #     value = eval(f"[+{value[1:-1]}]")
                 elif value.startswith("$"):
                     value = info.lists[value[1:]]
                 elif value.startswith("%"):
