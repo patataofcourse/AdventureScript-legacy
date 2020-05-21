@@ -1,7 +1,7 @@
 This is actually now a different script!
 Woo! [n]
 Now, do you want to return to the old choice or just exit? [n]
-[choice ch1 = "take me back to hell"; go1 = 5; ch2 = "take me out of this place"; go2 = 6; ch3="i wanna test the lists"; go3=15]
+[choice ch1 = "take me back to hell"; go1 = 5; ch2 = "take me out of this place"; go2 = 6; ch3="MOAR TEST"; go3=15]
 [loadscript name="start"]
 k bye [n]
 [choice text="what ending do you want"; ch1="good"; ch2="bad"; go1=8; go2=10]
@@ -12,17 +12,5 @@ k bye [n]
 F A I L U R E
 [ending name = "hahaha u stink"]
 [ending name = "oooo u gud"]
-oke
-lets go
-[deflist list="list"]
-[append list="list"; element="one"]
-[append list="list"; element="two"]
-[remove list="list"; element="two"; find="name"]
-[checklist list="list"; element="one"; gotrue=22; gofalse=25]
-[checklist list="list"; element="two"; gotrue=27; gofalse=23]
-The test was a success!
-[ending name="List Test Success"]
-Oops, seems like the first element didn't get added! >.>
-[goto pos=28]
-Oops, seems like the second element didn't get removed! <.<
-[ending name="List Test Failure"]
+test
+[loadscript name="moar_test"]

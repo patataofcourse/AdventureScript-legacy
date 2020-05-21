@@ -103,7 +103,6 @@ async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query
         response = await info.query("",("Yes", "No"), False)
         if response == 2:
             await info.show("A new game will be started.")
-            await info.wait()
         else:
             info.reload()
     
@@ -121,7 +120,7 @@ async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query
             return info.status
         else:
             raise Exception("Unknown status!") #TODO
-
+    print(info.scriptname, info.pointer)
     raise exceptions.ScriptEndException()
 
 def parse_sync(*args):

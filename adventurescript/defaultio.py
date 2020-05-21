@@ -38,4 +38,4 @@ def query(info, text, choices, allow_save):
         if result.isdecimal():
             if int(result)-1 in range(len(choices)):
                 break
-    return result
+    return int(result)

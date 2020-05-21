@@ -74,7 +74,6 @@ async def saveon(info):
 
 async def setvar(info, **kwargs):
     for kw in kwargs:
-        #can't be bothered to number check, i'll do that in __init__.py
         info.variables[kw] = kwargs[kw]
 
 async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
@@ -98,7 +97,7 @@ async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
         info.pointer = int(gofalse)-1
 
 async def incvar(info, var, value): #basically +=
-    pass
+    info.variables[var] += value
 
 async def deflist(info, list):
     info.lists[list] = []
@@ -120,4 +119,4 @@ async def checklist(info, list, element, gotrue, gofalse):
     else:
         await goto(info, gofalse)
 
-commands = [n, goto, choice, loadscript, flag, ending, saveoff, saveon, checkflag, setvar, checkvar, deflist, append, remove, checklist] #, incvar
+commands = [n, goto, choice, loadscript, flag, ending, saveoff, saveon, checkflag, setvar, checkvar, incvar, deflist, append, remove, checklist]

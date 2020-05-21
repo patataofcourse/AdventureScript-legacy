@@ -1,0 +1,20 @@
+oke
+lets go
+[choice text="what test?"; ch1="list";go1=4;ch2="incvar";go2=16]
+[deflist list="list"]
+[append list="list"; element="one"]
+[append list="list"; element="two"]
+[remove list="list"; element="two"; find="name"]
+[checklist list="list"; element="one"; gotrue=22; gofalse=25]
+[checklist list="list"; element="two"; gotrue=27; gofalse=23]
+The test was a success!
+[ending name="List Test Success"]
+Oops, seems like the first element didn't get added! >.>
+[goto pos=28]
+Oops, seems like the second element didn't get removed! <.<
+[ending name="List Test Failure"]
+[setvar idiocy="Ye"; best_number=10]
+[incvar var="idiocy"; value="s"]
+[incvar var="best_number"; value=1]
+[choice text=best_number.str+idiocy;ch1="Continue";go1=20]
+[ending name="poop"]

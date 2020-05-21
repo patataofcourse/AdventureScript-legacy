@@ -105,7 +105,7 @@ async def input_format(info, text):
             subitem2 = subitem.pop(0)
             if len(subitem) != 0:
                 for operation in operations3[0][0]:
-                    subitem2 = str(eval(subitem2+operation+subitem.pop(0)))
+                    subitem2 = str_but_quotes(eval(subitem2+operation+subitem.pop(0)))
             item2.append(subitem2)
             operations3[0].pop(0)
         operations3.pop(0)
@@ -113,14 +113,14 @@ async def input_format(info, text):
         item2 = item.pop(0)
         if len(item) != 0:
             for operation in operations2[0]:
-                item2 = str(eval(item2+operation+item.pop(0)))
+                item2 = str_but_quotes(eval(item2+operation+item.pop(0)))
         operations2.pop(0)
         text2.append(item2)
     text = text2
     text2 = text.pop(0)
     if len(text) != 0:
         for operation in operations1:
-            text2 = str(eval(text2+operation+text.pop(0)))
+            text2 = str_but_quotes(eval(text2+operation+text.pop(0)))
     return eval(text2)
 
 async def manage_operations(value, ops):
