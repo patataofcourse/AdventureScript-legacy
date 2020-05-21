@@ -19,7 +19,7 @@ async def input_format(info, text):
     text2 = []
     operations1= []
     for item in text:
-        if (text.startswith("'") and text.endswith("'")) or (text.startswith('"') and text.endswith('"')): #aaaaaaa
+        if (item.startswith("'") and item.endswith("'")) or (item.startswith('"') and item.endswith('"')): #aaaaaaa
             text2 = text #dirtiest fix ever
             continue
         if item == "+":
@@ -71,6 +71,9 @@ async def input_format(info, text):
         for subitem in item:
             if (subitem.startswith("'") and subitem.endswith("'")) or (subitem.startswith('"') and subitem.endswith('"')):
                 item2.append([subitem]) #dirtiest fix ever
+                operations1 = []
+                operations2 = [[]]
+                operations3 = [[[]]]
                 continue
             operations3[-1].append([])
             subitem = subitem.split("^")
