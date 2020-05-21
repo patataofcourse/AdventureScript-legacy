@@ -49,11 +49,10 @@ class ContextInfo:
             c+=1
 
     async def show(self, text):
-        while text.find("{") != -1:
-            text = text[:text.find("{")]+ text[text.find("}")+1:]
-        if text.find("}") != -1:
-            raise Exception("UnmatchedBracketException: Remember nesting {}s doesn't work") #TODO
-        text.strip()
+        text = text.strip()
+        if text.startswith("{"):
+            text = text[text.find("}")+1:]
+            text = text.lstrip()
         
         if self.pass_info:
             f = self.showfunc(self, text)

@@ -85,7 +85,7 @@ async def input_format(info, text):
                 elif (value.startswith("'") and value.endswith("'")) or (value.startswith('"') and value.endswith('"')):
                     value = value.strip("'\"").replace("\\n","\n")
                 elif value.startswith("{") and value.endswith("}"):
-                    await info.show("**Alert: Labels not supported yet**")
+                    value = find_label(info, value)
                 elif value.startswith("(") and value.endswith(")"): #temporary
                     value = eval(f"[+{value[1:-1]}]")
                 elif value.startswith("$"):
@@ -177,11 +177,10 @@ def str_but_quotes(value):
         return str(value)
 
 async def check_commands(info, line):
-    while line.find("{") != -1:
-        line = line[:line.find("{")]+ line[line.find("}")+1:]
-    if line.find("}") != -1:
-        raise Exception("UnmatchedBracketException: Remember nesting {}s doesn't work") #TODO
-    line.strip()
+    line = line.strip()
+    if line.startswith("{"):
+        line = line[line.find("}")+1:]
+        line = line.lstrip()
 
     if line == "":
         return False
@@ -208,9 +207,8 @@ async def check_commands(info, line):
     else:
         return False
 
-def find_label(info, label=""):
+def find_label(info, label):
     for line in info.script:
-        if line.find("{"+label+"}") != -1:
-            info.pointer = info.script.index(line)
-            break
+        if line.strip().find(label) == 0:
+            return info.script.index(line)+1
     raise Exception(f"Label '{label}' not found!")
