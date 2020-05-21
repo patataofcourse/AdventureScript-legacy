@@ -13,6 +13,11 @@ For the Discord addon, check out [doesn't exist yet].
 - [checkflag] - goes to a different position depending on whether a flag is true or false
 - [setvar] - sets variables
 - [checkvar] - goes to a different position depending on a conditional between a variable and a given value
+- [incvar] - basically +=
+- [deflist] - create a list
+- [append] - add an item to a list
+- [remove] - remove an item from a list. can also remove it based on the value, not the position
+- [checklist] - checks if an item is in a list, and goes to a different position whether it's true or false
 
 ## What you'll need in your game's directory:
  - AdventureScript folder - You'll have to import this into your "main" python file.
