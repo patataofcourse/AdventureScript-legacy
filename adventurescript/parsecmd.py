@@ -4,7 +4,10 @@ from adventurescript import commands, exceptions
 # and also counts the #.# expressions using AS' own values (so, #.int, for example).
 async def input_format(info, text):
     # Warning: badly named variables ahead
-    text = text.split("+")  # text2 is used as a way to store the text through the loop, so like a temp variable
+    if (text.startswith("'") and text.endswith("'")) or (text.startswith('"') and text.endswith('"')): #dirtiest fix ever
+        text = [text]
+    else:
+        text = text.split("+")  # text2 is used as a way to store the text through the loop, so like a temp variable
     text2 = text + []
     c = 0
     for item in text:
@@ -16,6 +19,9 @@ async def input_format(info, text):
     text2 = []
     operations1= []
     for item in text:
+        if (text.startswith("'") and text.endswith("'")) or (text.startswith('"') and text.endswith('"')): #aaaaaaa
+            text2 = text #dirtiest fix ever
+            continue
         if item == "+":
             operations1.append(item)
         else:
@@ -30,6 +36,9 @@ async def input_format(info, text):
     text2 = []
     operations2 = []
     for item in text:
+        if (item.startswith("'") and item.endswith("'")) or (item.startswith('"') and item.endswith('"')):
+            text2.append([item]) #dirtiest fix ever
+            continue
         operations2.append([])
         item = item.split("*")
         item2 = item
@@ -60,6 +69,9 @@ async def input_format(info, text):
         operations3.append([])
         item2 = []
         for subitem in item:
+            if (subitem.startswith("'") and subitem.endswith("'")) or (subitem.startswith('"') and subitem.endswith('"')):
+                item2.append([subitem]) #dirtiest fix ever
+                continue
             operations3[-1].append([])
             subitem = subitem.split("^")
             c = 0
@@ -78,7 +90,7 @@ async def input_format(info, text):
             subitem2 = []
             for subsubitem in subitem:
                 if (subsubitem.startswith("'") and subsubitem.endswith("'")) or (subsubitem.startswith('"') and subsubitem.endswith('"')):
-                    value = subsubitem
+                    value = subsubitem #dirtiest fix ever
                     ops = []
                 else:
                     value = subsubitem.split(".")[0]
