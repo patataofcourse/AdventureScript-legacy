@@ -9,7 +9,7 @@ k bye [n]
 [goto pos=11]
 [setvar doneWith="ildggjnkladjgaklj"]
 [checkvar var="doneWith"; value="life"; gotrue=14; gofalse=12]
-F A I L U R E
+F A I L U R E $doneWith
 [ending name = "hahaha u stink"]
 [ending name = "oooo u gud"]
 test

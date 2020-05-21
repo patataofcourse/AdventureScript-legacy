@@ -53,7 +53,23 @@ class ContextInfo:
         if text.startswith("{"):
             text = text[text.find("}")+1:]
             text = text.lstrip()
-        
+            
+        text = text.split(" ")
+        text2 = []
+        for word in text:
+            if word.startswith("$"):
+                if word.startswith("$$"):
+                    var = self.lists[word.split(".")[0][2:]]
+                else:
+                    var = self.variables[word.split(".")[0][1:]]
+                if len(word.split(".")) > 1:
+                    op = word.split(".")[1:]
+                    word = str(parsecmd.manage_operations(var, op))
+                else:
+                    word = str(var)
+            text2.append(word)
+        text = " ".join(text2)
+
         if self.pass_info:
             f = self.showfunc(self, text)
         else:
