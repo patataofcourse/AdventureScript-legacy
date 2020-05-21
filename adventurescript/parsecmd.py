@@ -77,9 +77,13 @@ async def input_format(info, text):
         for subitem in item:
             subitem2 = []
             for subsubitem in subitem:
-                value = subsubitem.split(".")[0]
-                value_type = ""
-                ops = subsubitem.split(".")[1:]
+                if (subsubitem.startswith("'") and subsubitem.endswith("'")) or (subsubitem.startswith('"') and subsubitem.endswith('"')):
+                    value = subsubitem
+                    ops = []
+                else
+                    value = subsubitem.split(".")[0]
+                    value_type = ""
+                    ops = subsubitem.split(".")[1:]
                 if value.isdecimal():
                     value = int(value)
                 elif (value.startswith("'") and value.endswith("'")) or (value.startswith('"') and value.endswith('"')):
