@@ -117,6 +117,7 @@ async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query
         response = await info.query("",("Yes", "No"), False)
         if response == 2:
             await info.show("A new game will be started.")
+            await info.wait()
         else:
             info.reload()
     

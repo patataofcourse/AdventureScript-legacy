@@ -121,4 +121,12 @@ async def checklist(info, list, element, gotrue, gofalse):
     else:
         await goto(info, gofalse)
 
-commands = [n, goto, choice, loadscript, flag, ending, saveoff, saveon, checkflag, setvar, checkvar, incvar, deflist, append, remove, checklist]
+async def gameover(info):
+    await info.show("**GAME OVER**")
+    r = await info.query("Start over from last save?",("Yes","No"),False)
+    if r == 1:
+        info.reload()
+    else:
+        info.quit()
+
+commands = [n, goto, choice, loadscript, flag, ending, saveoff, saveon, checkflag, setvar, checkvar, incvar, deflist, append, remove, checklist, gameover]

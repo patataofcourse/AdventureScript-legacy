@@ -214,7 +214,7 @@ async def check_commands(info, line):
                     return True
                 for pair in line[1:]:
                     pair = pair.split("=")
-                    kwargs[pair[0].strip()] = await input_format(info,pair[1])
+                    kwargs[pair[0].strip()] = await input_format(info,"=".join(pair[1:]))
                 await command(info, **kwargs)
                 return True
         return False
