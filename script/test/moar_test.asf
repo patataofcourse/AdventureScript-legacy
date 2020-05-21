@@ -5,12 +5,12 @@ lets go
 [append list="list"; element="one"]
 [append list="list"; element="two"]
 [remove list="list"; element="two"; find="name"]
-[checklist list="list"; element="one"; gotrue=22; gofalse=25]
-[checklist list="list"; element="two"; gotrue=27; gofalse=23]
+[checklist list="list"; element="one"; gotrue=9; gofalse=12]
+[checklist list="list"; element="two"; gotrue=14; gofalse=10]
 The test was a success!
 [ending name="List Test Success"]
 Oops, seems like the first element didn't get added! >.>
-[goto pos=28]
+[goto pos=15]
 Oops, seems like the second element didn't get removed! <.<
 [ending name="List Test Failure"]
 [setvar idiocy="Ye"; best_number=10]
