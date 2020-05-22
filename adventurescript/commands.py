@@ -32,8 +32,11 @@ async def choice(info, ch1, go1, text="", **kwargs):
         gotos.append(kwargs["go"+str(item)])
     for flag in flagdict:
         if not flagdict[flag]:
-            choices.pop(flag-1)
-            gotos.pop(flag-1)
+            choices[flag-1] = ""
+            gotos[flag-1] = ""
+    while "" in gotos:
+        choices.pop(choices.index(""))
+        gotos.pop(gotos.index(""))
     result = await info.query(text, choices)
     if result == 0:
         return
