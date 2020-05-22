@@ -43,14 +43,14 @@ async def checkflag(info, flag, gotrue, gofalse):
     if info.flags.get(flag, None) == None: #If the flag doesn't exist, it immediately gets set as false
         info.flags[flag] = False
     if info.flags[flag]:
-        info.pointer = int(gotrue)-1
+        info.pointer = gotrue-1
     else:
-        info.pointer = int(gofalse)-1
+        info.pointer = gofalse-1
 
 async def loadscript(info, name, pos=1):
     info.scriptname = f"script/{info.gamename}/{name}"
     info.script = open(f"{info.scriptname}.asf").read().split("\n")
-    info.pointer = pos
+    info.pointer = pos-1
 
 async def flag(info, **kwargs):
     for kwarg in kwargs:
