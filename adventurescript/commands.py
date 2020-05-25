@@ -55,6 +55,9 @@ async def loadscript(info, name, pos=1):
     info.script = open(f"{info.scriptname}.asf").read().split("\n")
     info.pointer = pos-1
 
+async def setflag(info, **kwargs):
+    await flag(info, **kwargs)
+
 async def flag(info, **kwargs):
     for kwarg in kwargs:
         for character in kwarg:
@@ -132,4 +135,4 @@ async def gameover(info):
     else:
         info.quit()
 
-commands = [n, goto, choice, loadscript, flag, ending, saveoff, saveon, checkflag, setvar, checkvar, incvar, deflist, append, remove, checklist, gameover]
+commands = [n, goto, choice, loadscript, flag, setflag, ending, saveoff, saveon, checkflag, setvar, checkvar, incvar, deflist, append, remove, checklist, gameover]
