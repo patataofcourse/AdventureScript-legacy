@@ -1,6 +1,7 @@
 # AdventureScript
 AdventureScript is a text game engine in progress, made specifically for the game codenamed Yet Another Text Game or YATG, and written in Python. It's meant to be imported as a library and can be used asynchronously.
-For the Discord addon, check out [doesn't exist yet].
+
+**WARNING: IT'S NOT MEANT TO BE USED BY OTHERS AS OF RN. WILL TRY TO CLEAN UP FOR 2.0**
 
 ## Commands right now:
 - [n] - wait for input
