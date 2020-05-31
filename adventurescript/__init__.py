@@ -39,7 +39,7 @@ class ContextInfo:
         save = open(f"save/{self.gamename}/{self.save_id}.asv").read().split("}{")
         self.scriptname = save[0]
         self.script = open(f"{self.scriptname}.asf").read().split("\n")
-        self.pointer = int(save[1])
+        self.pointer = int(save[1]) -1
         self.flags = eval("{"+save[2]+"}")
         self.variables = eval("{"+save[3]+"}")
         self.lists = eval("{"+save[4]+"}")
