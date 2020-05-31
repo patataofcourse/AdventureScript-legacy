@@ -120,6 +120,7 @@ async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query
             await info.wait()
         else:
             info.reload()
+            info.pointer += 1
     
     #The actual parsing
     while info.pointer <= len(info.script):
