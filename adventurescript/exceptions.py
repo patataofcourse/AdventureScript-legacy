@@ -4,7 +4,7 @@ class ScriptEndException(Exception):
 
 class CommandException(Exception):
     def __init__(self, scriptname, line, cmdname, info=""):
-        self.args = (f"Error in script '{scriptname}'.adv, line {line}, in command {cmdname}:",info)
+        self.args = (f"Error in script '{scriptname}'.adv, line {line}, in command {cmdname}: {info}",)
 
 class UndefinedVariableError(CommandException):
     def __init__(self, scriptname, line, cmdname, varname):
