@@ -97,9 +97,18 @@ async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     else:
         raise exceptions.CommandException(info.scriptname, info.pointer+1, "checkvar", f"Invalid comparison type: {comparison}")
     if result:
-        info.pointer = int(gotrue)-1
+        info.pointer = gotrue-1
     else:
-        info.pointer = int(gofalse)-1
+        info.pointer = gofalse-1
+
+async def switch(info, var, default=None, **kwargs):
+    for kw in kwargs:
+        if str(var).strip('"') == kw:
+            info.pointer = kwargs[kw]-1
+            return
+    if default==None:
+        raise exceptions.CommandException(info.scriptname, info.pointer, "switch", "Missing 'default' argument")
+    info.pointer= default-1
 
 async def incvar(info, var, value): #basically +=
     info.variables[var] += value
@@ -135,4 +144,4 @@ async def gameover(info):
     else:
         info.quit()
 
-commands = [n, goto, choice, loadscript, flag, setflag, ending, saveoff, saveon, checkflag, setvar, checkvar, incvar, deflist, append, remove, checklist, gameover]
+commands = [n, goto, choice, loadscript, flag, setflag, ending, saveoff, saveon, checkflag, setvar, checkvar, incvar, deflist, append, remove, checklist, gameover, switch]
