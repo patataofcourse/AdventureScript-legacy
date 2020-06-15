@@ -230,4 +230,4 @@ def find_label(info, label):
     for line in info.script:
         if line.strip().find(label) == 0:
             return info.script.index(line)+1
-    raise Exception(f"Label '{label}' not found!")
+    raise Exception(f"Label '{label}' not found!") #TODO
