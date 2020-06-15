@@ -28,8 +28,9 @@ def query(info, text, choices, allow_save):
                 continue
             elif result == "r":
                 try:
-                    open(f"save/{info.gamename}/{info.save_id}.asv").read().split("}{")
-                except:
+                    open(f"games/{info.gamename}/save/{info.save_id}.asv").read().split("}{")
+                except Exception as e:
+                    print(e)
                     info.showfunc("No save exists!")
                 else:
                     info.showfunc("Save restored!")

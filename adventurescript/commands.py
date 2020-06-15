@@ -51,7 +51,7 @@ async def checkflag(info, flag, gotrue, gofalse):
         info.pointer = gofalse-1
 
 async def loadscript(info, name, pos=1):
-    info.scriptname = f"script/{info.gamename}/{name}"
+    info.scriptname = f"games/{info.gamename}/script/{name}"
     info.script = open(f"{info.scriptname}.asf").read().split("\n")
     info.pointer = pos-1
 

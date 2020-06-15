@@ -6,7 +6,7 @@ import platform
 class ContextInfo:
     def __init__(self, name, save_id, show, wait, query, is_async, pass_info):
         self.gamename = name
-        self.scriptname = f"script/{name}/start"
+        self.scriptname = f"games/{name}/script/start"
         self.script = open(self.scriptname + ".asf").read().split("\n")
         self.save_id = save_id
         self.showfunc = show
@@ -25,7 +25,7 @@ class ContextInfo:
     def ending(self, end):
         self.status = f"ending {end}"
     def save(self, sq=False):
-        svfile = open(f"save/{self.gamename}/{self.save_id}.asv","w")
+        svfile = open(f"games/{self.gamename}/save/{self.save_id}.asv","w")
         svfile.write("}{".join((self.scriptname,str(self.pointer)))+"}"+str(self.flags)+str(self.variables)+str(self.lists)[:-1])
         for slot in self.extra_slots:
             data = getattr(self, slot)
@@ -36,7 +36,7 @@ class ContextInfo:
     def quit(self):
         self.status = "quit"
     def reload(self):
-        save = open(f"save/{self.gamename}/{self.save_id}.asv").read().split("}{")
+        save = open(f"games/{self.gamename}/save/{self.save_id}.asv").read().split("}{")
         self.scriptname = save[0]
         self.script = open(f"{self.scriptname}.asf").read().split("\n")
         self.pointer = int(save[1]) -1
@@ -109,7 +109,7 @@ async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query
 
     #Prompt to restore last save
     try:
-        save = open(f"save/{info.gamename}/{info.save_id}.asv").read().split("}{")
+        save = open(f"games/{info.gamename}/save/{info.save_id}.asv").read().split("}{")
     except:
         pass
     else:
