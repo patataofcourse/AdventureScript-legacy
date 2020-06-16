@@ -83,7 +83,7 @@ async def setvar(info, **kwargs):
 
 async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     if var not in info.variables:
-        raise exceptions.UndefinedVariableError(info.scriptname, info.pointer+1, "checkvar", var)
+        raise exceptions.UndefinedVariableError(info.scriptname, info.pointer+1, var, "checkvar")
     if comparison.lower() in ("equal", "=", "==", "==="):
         result = info.variables[var] == value
     elif comparison.lower() in ("greater", ">"):
