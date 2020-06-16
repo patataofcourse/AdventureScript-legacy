@@ -2,4 +2,5 @@
 "description":"A tasty, testy test"
 "logo_url":None
 "banner_url":None
-"inventory":False
+"inventory":True
+"inventory_slots":1
