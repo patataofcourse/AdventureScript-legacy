@@ -15,9 +15,9 @@ class Inventory:
             self.add(item, start_items[item])
         self.money = money
     def find(self, item, min_quantity=1):
-        for elmt in inventory:
-            if item == elmt[0]:
-                return inventory.index(elmt) if min_quantity <= elmt[1] else None
+        for elmt in self.inv:
+            if elmt != None and item == elmt[0]:
+                return self.inv.index(elmt) if min_quantity <= elmt[1] else None
         return None
     def upgrade(self, plus_size):
         self.inv += [None] * plus_size
@@ -46,14 +46,21 @@ class Inventory:
                 return True
     def remove(self, item, quantity=1):
         pos = self.find(item, quantity)
-        if pos == None:
+        if pos != None:
             self.inv[pos][1] -= quantity
             if self.inv[pos][1] == 0:
                 self.inv.pop(pos)
                 self.inv.append(None)
+            return True
+        else:
+            return False
     def represent(self):
         out = ""
-        return out
+        for item in self.inv:
+            if item == None:
+                continue
+            out += f"{item[0]} x{item[1]}\n"
+        return out.strip()
 
 async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query=defaultio.query, pass_info = False, addons = [], is_async=False):
     info = ContextInfo(name, save_id, show, wait, query, is_async, pass_info)
