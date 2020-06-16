@@ -1,6 +1,10 @@
+from adventurescript import exceptions, parsecmd
+
 class ContextInfo:
     def __init__(self, name, save_id, show, wait, query, is_async, pass_info):
         self.gamename = name
+        self.gameinfo = eval("{"+",".join(open(f"games/{name}/info").read().split("\n"))+"}")
+        print(self.gameinfo)
         self.scriptname = f"games/{name}/script/start"
         self.script = open(self.scriptname + ".asf").read().split("\n")
         self.save_id = save_id
