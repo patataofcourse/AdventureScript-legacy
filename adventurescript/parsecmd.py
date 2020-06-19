@@ -206,17 +206,19 @@ async def check_commands(info, line):
     elif line.startswith("[") and line.endswith("]"):
         line = line[1:-1].split(";")
         line = [line[0].split(" ")[0], " ".join(line[0].split(" ")[1:])] + line[1:]
-        for command in commands.commands:
-            if command.__name__ == line[0]:
-                kwargs = {}
-                if line[1] == "":
-                    await command(info)
+        for command in commands.__dict__:
+            if type(commands.__dict__[command]) == type(str_but_quotes):
+                if command == line[0]:
+                    command = commands.__dict__[command]
+                    kwargs = {}
+                    if line[1] == "":
+                        await command(info)
+                        return True
+                    for pair in line[1:]:
+                        pair = pair.split("=")
+                        kwargs[pair[0].strip()] = await input_format(info,"=".join(pair[1:]))
+                    await command(info, **kwargs)
                     return True
-                for pair in line[1:]:
-                    pair = pair.split("=")
-                    kwargs[pair[0].strip()] = await input_format(info,"=".join(pair[1:]))
-                await command(info, **kwargs)
-                return True
         return False
     elif line.endswith("[n]"):
         line = line[:-3]

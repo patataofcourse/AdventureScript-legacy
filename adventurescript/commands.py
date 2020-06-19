@@ -1,7 +1,11 @@
 from adventurescript import exceptions
 
+#General use commands
+
 async def n(info):
     await info.wait()
+
+pause = n
 
 async def goto(info, pos):
     info.pointer = int(pos)-1
@@ -42,28 +46,18 @@ async def choice(info, ch1, go1, text="", **kwargs):
         return
     await goto(info, gotos[int(result)-1])
 
-async def checkflag(info, flag, gotrue, gofalse):
-    if info.flags.get(flag, None) == None: #If the flag doesn't exist, it immediately gets set as false
-        info.flags[flag] = False
-    if info.flags[flag]:
-        info.pointer = gotrue-1
-    else:
-        info.pointer = gofalse-1
-
 async def loadscript(info, name, pos=1):
     info.scriptname = f"games/{info.gamename}/script/{name}"
     info.script = open(f"{info.scriptname}.asf").read().split("\n")
     info.pointer = pos-1
 
-async def setflag(info, **kwargs):
-    await flag(info, **kwargs)
-
-async def flag(info, **kwargs):
-    for kwarg in kwargs:
-        for character in kwarg:
-            if character in info.forbidden_characters:
-                raise Exception (f"Character '{character}' can't be used in a flag name")
-        info.flags[kwarg] = kwargs[kwarg]
+async def gameover(info):
+    await info.show("**GAME OVER**")
+    r = await info.query("Start over from last save?",("Yes","No"),False)
+    if r == 1:
+        info.reload()
+    else:
+        info.quit()
 
 async def ending(info, name):
     info.ending(name)
@@ -74,12 +68,35 @@ async def saveoff(info):
 async def saveon(info):
     info.allow_save = True
 
-async def setvar(info, **kwargs):
+#Flag commands
+
+async def checkflag(info, flag, gotrue, gofalse):
+    if info.flags.get(flag, None) == None: #If the flag doesn't exist, it immediately gets set as false
+        info.flags[flag] = False
+    if info.flags[flag]:
+        info.pointer = gotrue-1
+    else:
+        info.pointer = gofalse-1
+
+async def flag(info, **kwargs):
+    for kwarg in kwargs:
+        for character in kwarg:
+            if character in info.forbidden_characters:
+                raise Exception (f"Character '{character}' can't be used in a flag name") #TODO
+        info.flags[kwarg] = kwargs[kwarg]
+
+setflag = flag #viva le alias
+
+#Variable commands
+
+async def var(info, **kwargs):
     for kw in kwargs:
         for character in kw:
             if character in info.forbidden_characters:
-                raise Exception (f"Character '{character}'' can't be used in a variable name")
+                raise Exception (f"Character '{character}'' can't be used in a variable name") #TODO
         info.variables[kw] = kwargs[kw]
+
+setvar = var
 
 async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     if var not in info.variables:
@@ -101,7 +118,7 @@ async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     else:
         info.pointer = gofalse-1
 
-async def switch(info, var, default=None, **kwargs):
+async def switch(info, var, default=None, **kwargs): #hehe i actually did a switchcase
     for kw in kwargs:
         if str(var).strip('"') == kw:
             info.pointer = kwargs[kw]-1
@@ -112,6 +129,8 @@ async def switch(info, var, default=None, **kwargs):
 
 async def incvar(info, var, value): #basically +=
     info.variables[var] += value
+
+#List commands
 
 async def deflist(info, list):
     for character in list:
@@ -128,7 +147,7 @@ async def remove(info, list, element, find="pos"):
     elif find == "name":
         info.lists[list].pop(info.lists[list].index(element))
     else:
-        Exception() #TODO
+        raise Exception() #TODO
 
 async def checklist(info, list, element, gotrue, gofalse):
     if element in info.lists[list]:
@@ -136,12 +155,6 @@ async def checklist(info, list, element, gotrue, gofalse):
     else:
         await goto(info, gofalse)
 
-async def gameover(info):
-    await info.show("**GAME OVER**")
-    r = await info.query("Start over from last save?",("Yes","No"),False)
-    if r == 1:
-        info.reload()
-    else:
-        info.quit()
+#Inventory commands
 
-commands = [n, goto, choice, loadscript, flag, setflag, ending, saveoff, saveon, checkflag, setvar, checkvar, incvar, deflist, append, remove, checklist, gameover, switch]
+#To be added
