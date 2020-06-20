@@ -25,3 +25,7 @@ class UndefinedFlagError(UndefinedObjectError):
 class UndefinedListError(UndefinedObjectError):
     def __init__(self, scriptname, line, listname):
         self.args = (f"List '{listname}' doesn't exist! ({scriptname}.adv, line {line})",)
+
+class UndefinedInventoryError(UndefinedObjectError):
+    def __init__(self, scriptname, line, invname):
+        self.args = (f"Inventory '{invname}' doesn't exist! ({scriptname}.adv, line {line})",)

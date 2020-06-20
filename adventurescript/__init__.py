@@ -5,14 +5,10 @@ import os
 import platform
 
 class Inventory:
-    def __init__(self, size, start_items={}, money=0):
+    def __init__(self, size, money=0):
         if size == 0:
             raise Exception("Inventory size cannot be 0") #TODO
-        if len(start_items) > size:
-            raise Exception("Inventory size too small for all the starting items given!") #TODO
         self.inv = [None]*size
-        for item in start_items:
-            self.add(item, start_items[item])
         self.money = money
     def find(self, item, min_quantity=1):
         for elmt in self.inv:

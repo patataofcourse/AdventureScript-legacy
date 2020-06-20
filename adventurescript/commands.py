@@ -1,4 +1,4 @@
-from adventurescript import exceptions
+from adventurescript import exceptions, Inventory
 
 #General use commands
 
@@ -100,7 +100,7 @@ setvar = var
 
 async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     if var not in info.variables:
-        raise exceptions.UndefinedVariableError(info.scriptname, info.pointer+1, var, "checkvar")
+        raise exceptions.UndefinedVariableError(info.scriptname, info.pointer+1, var)
     if comparison.lower() in ("equal", "=", "==", "==="):
         result = info.variables[var] == value
     elif comparison.lower() in ("greater", ">"):
@@ -155,6 +155,87 @@ async def checklist(info, list, element, gotrue, gofalse):
     else:
         await goto(info, gofalse)
 
+listfind = checklist
+
 #Inventory commands
 
-#To be added
+async def definv(info, inventory, size):
+    for character in inventory:
+        if character in info.forbidden_characters:
+            raise Exception (f"Character '{character}' can't be used in an inventory name") #TODO
+    info.extrainvs[inventory] = Inventory(size)
+
+async def invadd(info, item, gofail, amount=1, inventory=None, gosuccess=None):
+    if inventory == None:
+        if not hasattr(info, inventory):
+            raise Exception("No default inventory preset! Check your game's info file!")
+        res = info.inventory.add(item, amount)
+    else:
+        try:
+            res = info.extrainvs[inventory].add(item, amount)
+        except NameError:
+            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+    if not res:
+        await goto(gofail)
+    elif gosuccess != None:
+        await goto(gosuccess)
+
+async def invrmv(info, item, gofail, amount=1, inventory=None, gosuccess=None):
+    if inventory == None:
+        if not hasattr(info, inventory):
+            raise Exception("No default inventory preset! Check your game's info file!")
+        res = info.inventory.remove(item, amount)
+    else:
+        try:
+            res = info.extrainvs[inventory].remove(item, amount)
+        except NameError:
+            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+    if not res:
+        await goto(gofail)
+    elif gosuccess != None:
+        await goto(gosuccess)
+
+async def invfind(info, item, gotrue, gofalse, amount=1, inventory=None):
+    if inventory == None:
+        if not hasattr(info, inventory):
+            raise Exception("No default inventory preset! Check your game's info file!")
+        res = info.inventory.find(item, amount)
+    else:
+        try:
+            res = info.extrainvs[inventory].find(item, amount)
+        except NameError:
+            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+    if not res:
+        await goto(gofalse)
+    elif gosuccess != None:
+        await goto(gotrue)
+
+checkinv = invfind
+
+async def addmoney(info, amount, inventory=None):
+    if inventory == None:
+        if not hasattr(info, inventory):
+            raise Exception("No default inventory preset! Check your game's info file!")
+        info.inventory.money += amount
+    else:
+        try:
+            info.extrainvs[inventory].money += amount
+        except NameError:
+            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+
+async def rmvmoney(info, amount, inventory=None):
+    if inventory == None:
+        if not hasattr(info, inventory):
+            raise Exception("No default inventory preset! Check your game's info file!")
+        info.inventory.money -= amount
+    else:
+        try:
+            info.extrainvs[inventory].money -= amount
+        except NameError:
+            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+
+async def buy(info, item, price, gofail, amount=1, inventory=None): #Buy/sell commands to make my job simpler lol
+    pass
+
+async def sell(info, item, price, gofail, amount=1, inventory=None):
+    pass

@@ -1,10 +1,11 @@
-from adventurescript import exceptions, parsecmd
+from adventurescript import exceptions, parsecmd, Inventory
 
 class ContextInfo:
     def __init__(self, name, save_id, show, wait, query, is_async, pass_info):
         self.gamename = name
         self.gameinfo = eval("{"+",".join(open(f"games/{name}/info").read().split("\n"))+"}")
-        print(self.gameinfo)
+        if self.gameinfo.get("inventory", False):
+            self.inventory = Inventory(self.gameinfo["inventory_size"])
         self.scriptname = f"games/{name}/script/start"
         self.script = open(self.scriptname + ".asf").read().split("\n")
         self.save_id = save_id
@@ -16,6 +17,7 @@ class ContextInfo:
         self.flags = {}
         self.variables = {}
         self.lists = {}
+        self.extrainvs = {} #Added for shop storage purposes and crap
         self.pointer = 1
         self.status = "ok"
         self.allow_save = True
