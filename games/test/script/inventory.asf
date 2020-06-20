@@ -1,1 +1,20 @@
-berp
+{merge}
+Contents of **THE INVENTORY** (tm)
+&&
+Money: &&.money moneys
+
+[choice ch1="Add item"; go1={add}; ch2="Remove item"; go2={remove}; ch3="Find item"; go3={find}; ch4="Money shiz"; go4={muns};ch5="GIMME THAT COMPLEX SHIT"; go5={moar}; ch6="i wanna gtfo"; go6={gtfo}]
+#
+{add}
+#
+{remove}
+#
+{find}
+#
+{muns} [choice text="ok what do you want to do with money"; ch1="get 10 moneys"; ch2="remove 10 moneys"; go1={munsplus}; go2={munsminus}]
+#
+{moar} lol no this is still a wip go fuck yourself
+[goto pos={merge}]
+#
+{gtfo} ok asshat
+[ending name="Inventory"]

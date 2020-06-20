@@ -23,7 +23,7 @@ class ContextInfo:
         self.status = "ok"
         self.allow_save = True
         self.extra_slots = []
-        self.forbidden_characters = ["%", "$", ".", "[", "]", "{", "}", "=", ";", "\\", "(", ")", " ", "\n", "\"", "'", ","]
+        self.forbidden_characters = ["&", "%", "$", ".", "[", "]", "{", "}", "=", ";", "\\", "(", ")", " ", "\n", "\"", "'", ","]
     def ending(self, end):
         self.status = f"ending {end}"
     def save(self, sq=False):
@@ -65,9 +65,19 @@ class ContextInfo:
                     var = self.variables[word.split(".")[0][1:]]
                 if len(word.split(".")) > 1:
                     op = word.split(".")[1:]
-                    word = str(parsecmd.manage_operations(var, op))
+                    word = str(await parsecmd.manage_operations(var, op))
                 else:
                     word = str(var)
+            if word.startswith("&"):
+                if word.startswith("&&"):
+                    inv = self.inventory
+                else:
+                    inv = self.extrainvs[word.split(".")[0][1:]]
+                if len(word.split(".")) > 1:
+                    op = word.split(".")[1:]
+                    word = str(await parsecmd.manage_operations(inv, op))
+                else:
+                    word = str(inv)
             text2.append(word)
         text = " ".join(text2)
 

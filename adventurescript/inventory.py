@@ -4,6 +4,8 @@ class Inventory:
             raise Exception("Inventory size cannot be 0") #TODO
         self.inv = [None]*size
         self.money = money
+    def __str__(self):
+        return self.represent()
     def find(self, item, min_quantity=1):
         for elmt in self.inv:
             if elmt != None and item == elmt[0]:
@@ -44,10 +46,20 @@ class Inventory:
             return True
         else:
             return False
+    def add_money(self, quantity): #maybe i should add money limit? idfk
+        self.money += quantity
+        return True
+    def remove_money(self, quantity):
+        if self.money < quantity:
+            return False
+        else:
+            self.money -= quantity
+            return True
     def represent(self):
         out = ""
         for item in self.inv:
             if item == None:
                 continue
-            out += f"{item[0]} x{item[1]}\n"
-        return out.strip()
+            out += f"- {item[0]} x{item[1]}\n"
+        out = out.strip()
+        return out if out != "" else "Empty!"

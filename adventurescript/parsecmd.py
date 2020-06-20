@@ -1,4 +1,9 @@
+#TODO: ADD EXCEPTIONS WHENEVER THERE'S A POTENTIAL UNDEFINED OBJECT!!!!!!!!!!!
+#DUDE THIS IS VERY IMPORTANT AND IT'S GONNA MAKE DEBUGGING AS NOT BE ASS
+#AAAAAAAAAAAAAAAAAAAAAAAAAAAAAa
+
 from adventurescript import commands, exceptions
+from adventurescript.inventory import Inventory
 
 # This function takes a string and does a sort of eval() with it, but using AS' variables, flags and lists;
 # and also counts the #.# expressions using AS' own values (so, #.int, for example).
@@ -115,6 +120,17 @@ async def input_format(info, text):
                         val = False
                         info.flags[value[1:]] = False
                     value = val
+                elif value.startswith("&"):
+                    if value.startswith("&&"):
+                        try:
+                            value = info.inventory
+                        except AttributeError:
+                            raise Exception("No default inventory!") #TODO
+                    else:
+                        try:
+                            value = info.extrainvs[value[1:]]
+                        except NameError:
+                            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
                 elif value.lower() in ("true", "false"):
                     if value.lower() == "true":
                         value = True
@@ -151,7 +167,7 @@ async def manage_operations(value, ops):
         if op == "str":
             value = str(value)
         elif op == "int":
-            value = int(value)
+            value = int(value) #TODO: Exception
         elif op == "list":
             try:
                 value = list(value)
@@ -160,7 +176,7 @@ async def manage_operations(value, ops):
         elif op == "flag":
             if value.lower == "false":
                 value = False
-            value = bool(value)
+            value = bool(value) # I do not know how bool() works, but it's probably stupid enough to be used in AS
         elif op.split("(")[0] == "elmt" and op.endswith(")") and op.split("(")[1][:-1].isdecimal():
             if type(value) == type([]):
                 value = value[int(op.split("(")[1][:-1])]
@@ -182,6 +198,11 @@ async def manage_operations(value, ops):
                     out += f"{c}- {item}\n"
                     c += 1
                 value = out.strip()
+            else:
+                raise TypeError("Operation 'ol' can only be used with lists")
+        elif op == "money":
+            if type(value) == Inventory:
+                value = value.money
             else:
                 raise TypeError("Operation 'ol' can only be used with lists")
         else:

@@ -168,7 +168,7 @@ async def definv(info, inventory, size):
 
 async def invadd(info, item, gofail, amount=1, inventory=None, gosuccess=None):
     if inventory == None:
-        if not hasattr(info, inventory):
+        if not hasattr(info, "inventory"):
             raise Exception("No default inventory preset! Check your game's info file!")
         res = info.inventory.add(item, amount)
     else:
@@ -183,7 +183,7 @@ async def invadd(info, item, gofail, amount=1, inventory=None, gosuccess=None):
 
 async def invrmv(info, item, gofail, amount=1, inventory=None, gosuccess=None):
     if inventory == None:
-        if not hasattr(info, inventory):
+        if not hasattr(info, "inventory"):
             raise Exception("No default inventory preset! Check your game's info file!")
         res = info.inventory.remove(item, amount)
     else:
@@ -198,7 +198,7 @@ async def invrmv(info, item, gofail, amount=1, inventory=None, gosuccess=None):
 
 async def invfind(info, item, gotrue, gofalse, amount=1, inventory=None):
     if inventory == None:
-        if not hasattr(info, inventory):
+        if not hasattr(info, "inventory"):
             raise Exception("No default inventory preset! Check your game's info file!")
         res = info.inventory.find(item, amount)
     else:
@@ -215,7 +215,7 @@ checkinv = invfind
 
 async def addmoney(info, amount, inventory=None):
     if inventory == None:
-        if not hasattr(info, inventory):
+        if not hasattr(info, "inventory"):
             raise Exception("No default inventory preset! Check your game's info file!")
         info.inventory.money += amount
     else:
@@ -226,7 +226,7 @@ async def addmoney(info, amount, inventory=None):
 
 async def rmvmoney(info, amount, inventory=None):
     if inventory == None:
-        if not hasattr(info, inventory):
+        if not hasattr(info, "inventory"):
             raise Exception("No default inventory preset! Check your game's info file!")
         info.inventory.money -= amount
     else:
