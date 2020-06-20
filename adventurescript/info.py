@@ -1,4 +1,5 @@
-from adventurescript import exceptions, parsecmd, Inventory
+from adventurescript import exceptions, parsecmd
+from adventurescript.inventory import Inventory
 
 class ContextInfo:
     def __init__(self, name, save_id, show, wait, query, is_async, pass_info):

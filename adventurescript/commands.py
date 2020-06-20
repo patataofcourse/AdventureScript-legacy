@@ -1,4 +1,5 @@
-from adventurescript import exceptions, Inventory
+from adventurescript import exceptions
+from adventurescript.inventory import Inventory
 
 #General use commands
 
