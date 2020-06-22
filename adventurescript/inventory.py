@@ -28,6 +28,7 @@ class Inventory:
                 pos = self.inv.index(pair)
         if item_in_inv:
             self.inv[pos][1] += quantity
+            return True
         else:
             try:
                 empty_slot = self.inv.index(None)
