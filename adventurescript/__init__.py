@@ -11,7 +11,8 @@ async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query
     for addon in addons:
         try:
             addon.setup(info)
-            commands.commands += addon.commands
+            for command in addon.commands:
+                info.commands[command.__name__] = command
         except Exception as e:
             print (f"Exception while attempting to add addon {addon.__name__}:", e)
 

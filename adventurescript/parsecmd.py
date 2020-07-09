@@ -227,10 +227,10 @@ async def check_commands(info, line):
     elif line.startswith("[") and line.endswith("]"):
         line = line[1:-1].split(";")
         line = [line[0].split(" ")[0], " ".join(line[0].split(" ")[1:])] + line[1:]
-        for command in commands.__dict__:
-            if type(commands.__dict__[command]) == type(str_but_quotes):
+        for command in info.commands:
+            if type(info.commands[command]) == type(str_but_quotes):
                 if command == line[0]:
-                    command = commands.__dict__[command]
+                    command = info.commands[command]
                     kwargs = {}
                     if line[1] == "":
                         await command(info)
