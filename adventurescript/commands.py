@@ -239,6 +239,18 @@ async def rmvmoney(info, gofail, amount, inventory=None, gosuccess=None):
     elif gosuccess != None:
         await goto(info, gosuccess)
 
+async def chkmoney(info, amount, gotrue, gofalse, inventory=None):
+    if inventory == None:
+        if not hasattr(info, "inventory"):
+            raise Exception("No default inventory preset! Check your game's info file!")
+        inventory = info.inventory
+    if inventory.money >= amount:
+        info.pointer = gotrue-1
+    else:
+        info.pointer = gofalse-1
+
+checkmoney = chkmoney
+
 async def buy(info, item, price, gofail, amount=1, inventory=None): #Buy/sell commands to make my job simpler lol
     pass
 

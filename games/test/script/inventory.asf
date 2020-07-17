@@ -28,6 +28,10 @@ Item commit remove.
 {munsplus} [addmoney amount=20]
 {munsminus} [rmvmoney amount=10; gofail={notenoughmuns}]
 the moneying happen
+[checkmoney amount=1; gotrue={munsgud}; gofalse={munsbad}]
+{munsgud} you have muns congrats
+[goto pos={merge}]
+{munsbad} you don't have muns you suck
 [goto pos={merge}]
 #
 {moar} lol no this is still a wip go fuck yourself
