@@ -100,7 +100,7 @@ async def var(info, **kwargs):
     for kw in kwargs:
         for character in kw:
             if character in info.forbidden_characters:
-                raise Exception (f"Character '{character} can't be used in a variable name") #TODO
+                raise Exception (f"Character '{character}' can't be used in a variable name") #TODO
         info.variables[kw] = kwargs[kw]
 
 setvar = var
