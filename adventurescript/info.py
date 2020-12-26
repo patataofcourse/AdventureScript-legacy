@@ -29,7 +29,11 @@ class ContextInfo:
         self.status = f"ending {end}"
     def save(self, sq=False):
         svfile = open(f"games/{self.gamename}/save/{self.save_id}.asv","w")
-        svfile.write("}{".join((self.scriptname,str(self.pointer)))+"}"+str(self.flags)+str(self.variables)+str(self.lists)[:-1])
+        if hasattr(self, "inventory"):
+            invtext = "{"+str(self.inventory)+"}"
+        else:
+            invtext = ""
+        svfile.write("}{".join((self.scriptname,str(self.pointer)))+"}"+str(self.flags)+str(self.variables)+str(self.lists)+invtext+str(self.extrainvs)[:-1])
         for slot in self.extra_slots:
             data = getattr(self, slot)
             svfile.write("}{"+str(data))
@@ -40,13 +44,16 @@ class ContextInfo:
         self.status = "quit"
     def reload(self):
         save = open(f"games/{self.gamename}/save/{self.save_id}.asv").read().split("}{")
+        print(save)
         self.scriptname = save[0]
         self.script = open(f"{self.scriptname}.asf").read().split("\n")
         self.pointer = int(save[1]) -1
         self.flags = eval("{"+save[2]+"}")
         self.variables = eval("{"+save[3]+"}")
         self.lists = eval("{"+save[4]+"}")
-        c = 5
+        self.inventory.recreate(*eval(save[5]))
+        print(self.inventory)
+        c = 7
         for slot in self.extra_slots:
             exec('self.' + slot + '= save[c]')
             c+=1
@@ -78,7 +85,7 @@ class ContextInfo:
                     op = word.split(".")[1:]
                     word = str(await parsecmd.manage_operations(inv, op))
                 else:
-                    word = str(inv)
+                    word = inv.represent()
             text2.append(word)
         text = " ".join(text2)
 

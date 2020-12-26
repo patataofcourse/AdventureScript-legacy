@@ -5,7 +5,10 @@ class Inventory:
         self.inv = [None]*size
         self.money = money
     def __str__(self):
-        return self.represent()
+        return str(self.inv) + ", " + str(self.money)
+    def recreate (self, items, money):
+        self.inv = items
+        self.money = money
     def find(self, item, min_quantity=1):
         for elmt in self.inv:
             if elmt != None and item == elmt[0]:
