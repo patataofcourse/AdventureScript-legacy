@@ -98,6 +98,7 @@ async def var(info, **kwargs):
         info.variables[kw] = kwargs[kw]
 
 setvar = var
+defvar = var
 
 async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     if var not in info.variables:
