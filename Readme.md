@@ -3,7 +3,7 @@ AdventureScript is a text game engine in progress, made specifically for the gam
 
 **WARNING: IT'S NOT MEANT TO BE USED BY OTHERS AS OF RN. WILL TRY TO CLEAN UP FOR 2.0**
 
-## Commands right now:
+## Commands right now: - needs updating
 - [n] - wait for input
 - [goto] - goes to a specific line
 - [flag] - sets flags
