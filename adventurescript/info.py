@@ -44,7 +44,6 @@ class ContextInfo:
         self.status = "quit"
     def reload(self):
         save = open(f"games/{self.gamename}/save/{self.save_id}.asv").read().split("}{")
-        print(save)
         self.scriptname = save[0]
         self.script = open(f"{self.scriptname}.asf").read().split("\n")
         self.pointer = int(save[1]) -1
@@ -52,7 +51,6 @@ class ContextInfo:
         self.variables = eval("{"+save[3]+"}")
         self.lists = eval("{"+save[4]+"}")
         self.inventory.recreate(*eval(save[5]))
-        print(self.inventory)
         c = 7
         for slot in self.extra_slots:
             exec('self.' + slot + '= save[c]')
