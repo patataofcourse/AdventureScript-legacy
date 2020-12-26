@@ -140,6 +140,8 @@ async def deflist(info, list):
             raise Exception (f"Character '{character}' can't be used in a list name")
     info.lists[list] = []
 
+list = deflist #careful: this alias might not work well
+
 async def append(info, list, element):
     info.lists[list].append(element)
 
@@ -166,6 +168,8 @@ async def definv(info, inventory, size):
         if character in info.forbidden_characters:
             raise Exception (f"Character '{character}' can't be used in an inventory name") #TODO
     info.extrainvs[inventory] = Inventory(size)
+
+inv = definv
 
 async def invadd(info, item, gofail, amount=1, inventory=None, gosuccess=None):
     if inventory == None:
