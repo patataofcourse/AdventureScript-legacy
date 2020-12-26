@@ -45,9 +45,6 @@ the moneying happen
 {notenoughmuns} ok wtf asshole you don't have enough money please go
 [goto pos={merge}]
 #
-{notenoughwallet} ??????
-[goto pos={merge}]
-#
 {notenoughspace} Your inventory is too tiny for all the stuff you're trying to carry :P
 [goto pos={merge}]
 #

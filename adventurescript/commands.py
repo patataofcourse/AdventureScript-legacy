@@ -88,6 +88,12 @@ async def flag(info, **kwargs):
 
 setflag = flag #viva le alias
 
+async def delflag(info, flag):
+    try:
+        info.flags.pop(flag)
+    except KeyError:
+        raise UndefinedFlagError(info.scriptname, info.pointer+1, flag)
+
 #Variable commands
 
 async def var(info, **kwargs):
@@ -132,6 +138,12 @@ async def switch(info, var, default=None, **kwargs): #hehe i actually did a swit
 async def incvar(info, var, value): #basically +=
     info.variables[var] += value
 
+async def delvar(info, var):
+    try:
+        info.variables.pop(var)
+    except KeyError:
+        raise UndefinedVariableError(info.scriptname, info.pointer+1, var)
+
 #List commands
 
 async def deflist(info, list):
@@ -145,6 +157,8 @@ list = deflist #careful: this alias might not work well
 async def append(info, list, element):
     info.lists[list].append(element)
 
+addlist = append
+
 async def remove(info, list, element, find="pos"):
     if find == "pos":
         info.lists[list].pop(int(element))
@@ -153,6 +167,8 @@ async def remove(info, list, element, find="pos"):
     else:
         raise Exception() #TODO
 
+rmvlist = append
+
 async def checklist(info, list, element, gotrue, gofalse):
     if element in info.lists[list]:
         await goto(info, gotrue)
@@ -160,6 +176,13 @@ async def checklist(info, list, element, gotrue, gofalse):
         await goto(info, gofalse)
 
 listfind = checklist
+chklist = checklist
+
+async def dellist(info, list):
+    try:
+        info.lists.pop(list)
+    except KeyError:
+        raise UndefinedListError(info.scriptname, info.pointer+1, list)
 
 #Inventory commands
 
@@ -217,6 +240,7 @@ async def invfind(info, item, gotrue, gofalse, amount=1, inventory=None):
         await goto(info, gotrue)
 
 checkinv = invfind
+chkinv = invfind
 
 async def addmoney(info, amount, inventory=None): #I will add gofail/gosuccess to this one whenever I make wallet limits a thing. If I do.
     if inventory == None:
@@ -261,3 +285,9 @@ async def buy(info, item, price, gofail, amount=1, inventory=None): #Buy/sell co
 
 async def sell(info, item, price, gofail, amount=1, inventory=None):
     pass
+
+async def delinv(info, inv):
+    try:
+        info.extrainvs.pop(inv)
+    except KeyError:
+        raise UndefinedInventoryError(info.scriptname, info.pointer+1, inv)
