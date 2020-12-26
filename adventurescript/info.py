@@ -71,7 +71,8 @@ class ContextInfo:
                     var = self.variables[word.split(".")[0][1:]]
                 if len(word.split(".")) > 1:
                     op = word.split(".")[1:]
-                    word = str(await parsecmd.manage_operations(var, op))
+                    word = await parsecmd.manage_operations(var, op, False)
+                    word = str(word) if type(word) != str else word
                 else:
                     word = str(var)
             if word.startswith("&"):
@@ -81,7 +82,7 @@ class ContextInfo:
                     inv = self.extrainvs[word.split(".")[0][1:]]
                 if len(word.split(".")) > 1:
                     op = word.split(".")[1:]
-                    word = str(await parsecmd.manage_operations(inv, op))
+                    word = str(await parsecmd.manage_operations(inv, op, False))
                 else:
                     word = inv.represent()
             text2.append(word)
