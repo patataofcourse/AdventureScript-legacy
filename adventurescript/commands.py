@@ -48,7 +48,7 @@ async def choice(info, ch1, go1, text="", **kwargs):
     await goto(info, gotos[int(result)-1])
 
 async def loadscript(info, name, pos=1):
-    info.scriptname = f"games/{info.gamename}/script/{name}"
+    info.scriptname = f"games/{info.gamename}/script/ch1/{name}" #TODO: replace "ch1" with actual chapter support
     info.script = open(f"{info.scriptname}.asf").read().split("\n")
     info.pointer = pos-1
 
