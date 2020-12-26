@@ -162,7 +162,7 @@ async def input_format(info, text):
             text2 = str_but_quotes(eval(text2+operation+text.pop(0)))
     return eval(text2)
 
-async def manage_operations(value, ops):
+async def manage_operations(value, ops, quotes=True):
     for op in ops:
         if op == "str":
             value = str(value)
@@ -208,7 +208,10 @@ async def manage_operations(value, ops):
         else:
             raise Exception(f"Invalid operation '{op}'!") #TODO
         ops.pop(0)
-    return str_but_quotes(value)             
+    if quotes:
+        return str_but_quotes(value)
+    else:
+        return value
 
 def str_but_quotes(value):
     if type(value) == type(""):
