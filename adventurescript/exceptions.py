@@ -1,6 +1,6 @@
 class ScriptEndException(Exception):
-    def __init__(self):
-        self.args = ("Reached end of script!",)
+    def __init__(self, scriptname):
+        self.args = (f"Reached end of script {scriptname} !",)
 
 class CommandException(Exception):
     def __init__(self, scriptname, line, cmdname, info=""):
