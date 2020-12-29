@@ -105,10 +105,10 @@ class ContextInfo:
             return await f
         else:
             return f
-    async def query(self, text, choices, allow_save=None):
+    async def query(self, text, choices, allow_save=None, **kwargs):
         if allow_save == None:
             allow_save = self.allow_save
-        f = self.queryfunc(self, text, choices, allow_save)
+        f = self.queryfunc(self, text, choices, allow_save, **kwargs)
         if self.is_async:
             return await f
         else:

@@ -42,7 +42,7 @@ async def choice(info, ch1, go1, text="", **kwargs):
     while "" in gotos:
         choices.pop(choices.index(""))
         gotos.pop(gotos.index(""))
-    result = await info.query(text, choices)
+    result = await info.query(text, choices, **kwargs)
     if result == 0:
         return
     await goto(info, gotos[int(result)-1])
