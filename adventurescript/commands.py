@@ -126,6 +126,7 @@ async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     else:
         info.pointer = gofalse-1
 
+#TODO: fix the switchcase you moron
 async def switch(info, var, default=None, **kwargs): #hehe i actually did a switchcase
     for kw in kwargs:
         if str(var).strip('"') == kw: #TODO: str(var).strip('"') is a terrible idea, fix everywhere
