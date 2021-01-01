@@ -164,7 +164,7 @@ async def input_format(info, text):
 
 async def manage_operations(value, ops, quotes=True):
     for op in ops:
-        if op == "str":
+        if op == "str": #TODO: use a switchcase or something *better* please ffs
             value = str(value)
         elif op == "int":
             value = int(value) #TODO: Exception
@@ -205,6 +205,11 @@ async def manage_operations(value, ops, quotes=True):
                 value = value.money
             else:
                 raise TypeError("Operation 'ol' can only be used with lists")
+        elif op == "not":
+            if type(value) == bool:
+                value = not value
+            else:
+                raise TypeError("Operation 'not' can only be used with flags")
         else:
             raise Exception(f"Invalid operation '{op}'!") #TODO
         ops.pop(0)
