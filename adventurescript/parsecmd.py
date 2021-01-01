@@ -9,6 +9,10 @@ from adventurescript.inventory import Inventory
 # and also counts the #.# expressions using AS' own values (so, #.int, for example).
 async def input_format(info, text):
     # Warning: badly named variables ahead
+    flip_result = False
+    while not text.startswith("-"):
+        flip_result = not flip_result
+        text = text[1:]
     if (text.startswith("'") and text.endswith("'")) or (text.startswith('"') and text.endswith('"')): #dirtiest fix ever
         text = [text]
     else:
@@ -160,7 +164,16 @@ async def input_format(info, text):
     if len(text) != 0:
         for operation in operations1:
             text2 = str_but_quotes(eval(text2+operation+text.pop(0)))
-    return eval(text2)
+    if flip_result:
+        try:
+            return -eval(text2)
+        except TypeError as e:
+            if str(e).split(":")[0] != "bad operand type for unary -":
+                raise e
+            else:
+                raise Exception("well someone tried to - a non minusable thing")
+    else:
+        return 
 
 async def manage_operations(value, ops, quotes=True):
     for op in ops:
