@@ -7,7 +7,7 @@ class ContextInfo:
         self.gameinfo = eval("{"+",".join(open(f"games/{name}/info").read().split("\n"))+"}")
         if self.gameinfo.get("inventory", False):
             self.inventory = Inventory(self.gameinfo["inventory_size"])
-        self.scriptname = f"games/{name}/script/chapter1/start" #TODO: replace "ch1" with actual chapter support
+        self.scriptname = f"games/{name}/script/start"
         self.script = open(self.scriptname + ".asf").read().split("\n")
         self.commands = commands.__dict__
         self.save_id = save_id
