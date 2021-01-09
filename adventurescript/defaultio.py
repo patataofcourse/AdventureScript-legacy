@@ -11,7 +11,7 @@ def wait():
     else:
         print("Platform not supported")
 
-def query(info, text, choices, allow_save):
+def query(info, text, choices, allow_save, **kwargs):
     if text != "":
         info.showfunc(text)
     c = 1

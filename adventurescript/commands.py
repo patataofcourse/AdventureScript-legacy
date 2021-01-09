@@ -42,7 +42,7 @@ async def choice(info, ch1, go1, text="", **kwargs):
     while "" in gotos:
         choices.pop(choices.index(""))
         gotos.pop(gotos.index(""))
-    result = await info.query(text, choices)
+    result = await info.query(text, choices, **kwargs)
     if result == 0:
         return
     await goto(info, gotos[int(result)-1])
@@ -88,16 +88,23 @@ async def flag(info, **kwargs):
 
 setflag = flag #viva le alias
 
+async def delflag(info, flag):
+    try:
+        info.flags.pop(flag)
+    except KeyError:
+        raise UndefinedFlagError(info.scriptname, info.pointer+1, flag)
+
 #Variable commands
 
 async def var(info, **kwargs):
     for kw in kwargs:
         for character in kw:
             if character in info.forbidden_characters:
-                raise Exception (f"Character '{character} can't be used in a variable name") #TODO
+                raise Exception (f"Character '{character}' can't be used in a variable name") #TODO
         info.variables[kw] = kwargs[kw]
 
 setvar = var
+defvar = var
 
 async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     if var not in info.variables:
@@ -119,9 +126,10 @@ async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     else:
         info.pointer = gofalse-1
 
+#TODO: fix the switchcase you moron
 async def switch(info, var, default=None, **kwargs): #hehe i actually did a switchcase
     for kw in kwargs:
-        if str(var).strip('"') == kw:
+        if str(var).strip('"') == kw: #TODO: str(var).strip('"') is a terrible idea, fix everywhere
             info.pointer = kwargs[kw]-1
             return
     if default==None:
@@ -131,6 +139,12 @@ async def switch(info, var, default=None, **kwargs): #hehe i actually did a swit
 async def incvar(info, var, value): #basically +=
     info.variables[var] += value
 
+async def delvar(info, var):
+    try:
+        info.variables.pop(var)
+    except KeyError:
+        raise UndefinedVariableError(info.scriptname, info.pointer+1, var)
+
 #List commands
 
 async def deflist(info, list):
@@ -139,8 +153,12 @@ async def deflist(info, list):
             raise Exception (f"Character '{character}' can't be used in a list name")
     info.lists[list] = []
 
+list = deflist #careful: this alias might not work well
+
 async def append(info, list, element):
     info.lists[list].append(element)
+
+addlist = append
 
 async def remove(info, list, element, find="pos"):
     if find == "pos":
@@ -150,6 +168,8 @@ async def remove(info, list, element, find="pos"):
     else:
         raise Exception() #TODO
 
+rmvlist = append
+
 async def checklist(info, list, element, gotrue, gofalse):
     if element in info.lists[list]:
         await goto(info, gotrue)
@@ -157,6 +177,13 @@ async def checklist(info, list, element, gotrue, gofalse):
         await goto(info, gofalse)
 
 listfind = checklist
+chklist = checklist
+
+async def dellist(info, list):
+    try:
+        info.lists.pop(list)
+    except KeyError:
+        raise UndefinedListError(info.scriptname, info.pointer+1, list)
 
 #Inventory commands
 
@@ -165,6 +192,8 @@ async def definv(info, inventory, size):
         if character in info.forbidden_characters:
             raise Exception (f"Character '{character}' can't be used in an inventory name") #TODO
     info.extrainvs[inventory] = Inventory(size)
+
+inv = definv
 
 async def invadd(info, item, gofail, amount=1, inventory=None, gosuccess=None):
     if inventory == None:
@@ -212,6 +241,7 @@ async def invfind(info, item, gotrue, gofalse, amount=1, inventory=None):
         await goto(info, gotrue)
 
 checkinv = invfind
+chkinv = invfind
 
 async def addmoney(info, amount, inventory=None): #I will add gofail/gosuccess to this one whenever I make wallet limits a thing. If I do.
     if inventory == None:
@@ -239,8 +269,26 @@ async def rmvmoney(info, gofail, amount, inventory=None, gosuccess=None):
     elif gosuccess != None:
         await goto(info, gosuccess)
 
+async def chkmoney(info, amount, gotrue, gofalse, inventory=None):
+    if inventory == None:
+        if not hasattr(info, "inventory"):
+            raise Exception("No default inventory preset! Check your game's info file!")
+        inventory = info.inventory
+    if inventory.money >= amount:
+        info.pointer = gotrue-1
+    else:
+        info.pointer = gofalse-1
+
+checkmoney = chkmoney
+
 async def buy(info, item, price, gofail, amount=1, inventory=None): #Buy/sell commands to make my job simpler lol
     pass
 
 async def sell(info, item, price, gofail, amount=1, inventory=None):
     pass
+
+async def delinv(info, inv):
+    try:
+        info.extrainvs.pop(inv)
+    except KeyError:
+        raise UndefinedInventoryError(info.scriptname, info.pointer+1, inv)

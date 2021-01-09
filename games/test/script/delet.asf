@@ -1,0 +1,27 @@
+[flag a=True]
+[var ten=10]
+[list list="potato"]
+[addlist list="potato"; element="eight"]
+[inv inventory="hi"; size=8]
+alright so all the things are done [n]
+proof:
+[checkflag flag="a"; gotrue={yes}; gofalse={no}]
+{no} flag: no
+fuck
+[gameover]
+{yes} flag: yes
+var: $ten
+list:
+$$potato.ul
+inventory:
+&&
+[n]
+and now...... i shall.....
+remove all of them! [n]
+[delflag flag="a"]
+[delvar var="ten"]
+[dellist list="potato"]
+[delinv inv="hi"]
+...did that work? if it got here, i guess so!
+well time to go back to the other menu [n]
+[loadscript name="test_cont"]

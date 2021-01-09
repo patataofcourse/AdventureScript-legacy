@@ -29,7 +29,11 @@ class ContextInfo:
         self.status = f"ending {end}"
     def save(self, sq=False):
         svfile = open(f"games/{self.gamename}/save/{self.save_id}.asv","w")
-        svfile.write("}{".join((self.scriptname,str(self.pointer)))+"}"+str(self.flags)+str(self.variables)+str(self.lists)[:-1])
+        if hasattr(self, "inventory"):
+            invtext = "{"+str(self.inventory)+"}"
+        else:
+            invtext = ""
+        svfile.write("}{".join((self.scriptname,str(self.pointer)))+"}"+str(self.flags)+str(self.variables)+str(self.lists)+invtext+str(self.extrainvs)[:-1])
         for slot in self.extra_slots:
             data = getattr(self, slot)
             svfile.write("}{"+str(data))
@@ -46,7 +50,8 @@ class ContextInfo:
         self.flags = eval("{"+save[2]+"}")
         self.variables = eval("{"+save[3]+"}")
         self.lists = eval("{"+save[4]+"}")
-        c = 5
+        self.inventory.recreate(*eval(save[5]))
+        c = 7
         for slot in self.extra_slots:
             exec('self.' + slot + '= save[c]')
             c+=1
@@ -66,7 +71,8 @@ class ContextInfo:
                     var = self.variables[word.split(".")[0][1:]]
                 if len(word.split(".")) > 1:
                     op = word.split(".")[1:]
-                    word = str(await parsecmd.manage_operations(var, op))
+                    word = await parsecmd.manage_operations(var, op, False)
+                    word = str(word) if type(word) != str else word
                 else:
                     word = str(var)
             if word.startswith("&"):
@@ -76,9 +82,9 @@ class ContextInfo:
                     inv = self.extrainvs[word.split(".")[0][1:]]
                 if len(word.split(".")) > 1:
                     op = word.split(".")[1:]
-                    word = str(await parsecmd.manage_operations(inv, op))
+                    word = str(await parsecmd.manage_operations(inv, op, False))
                 else:
-                    word = str(inv)
+                    word = inv.represent()
             text2.append(word)
         text = " ".join(text2)
 
@@ -99,10 +105,10 @@ class ContextInfo:
             return await f
         else:
             return f
-    async def query(self, text, choices, allow_save=None):
+    async def query(self, text, choices, allow_save=None, **kwargs):
         if allow_save == None:
             allow_save = self.allow_save
-        f = self.queryfunc(self, text, choices, allow_save)
+        f = self.queryfunc(self, text, choices, allow_save, **kwargs)
         if self.is_async:
             return await f
         else:

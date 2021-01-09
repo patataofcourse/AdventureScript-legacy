@@ -45,7 +45,7 @@ async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query
             return info.status
         else:
             raise Exception("Unknown status!") #TODO
-    raise exceptions.ScriptEndException()
+    raise exceptions.ScriptEndException(info.scriptname)
 
 def parse_sync(*args):
     return asyncio.run(parse(*args))
