@@ -4,7 +4,7 @@ class CommandException(Exception):
     def __init__(self, scriptname, line, cmdname, exception):
         self.args = (f"Error in script {scriptname}, line {line}, in command {cmdname}: {type(exception).__name__}",)
 
-class ArgumentError(Exception):
+class ArgumentSyntaxError(Exception):
     def __init__(self, scriptname, line, cmdname, exception):
         self.args = (f"Error with the arguments in command {cmdname} ({scriptname}, line {line}): {type(exception).__name__}",)
 
