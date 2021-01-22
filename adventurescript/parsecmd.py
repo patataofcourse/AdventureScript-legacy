@@ -1,7 +1,3 @@
-#TODO: ADD EXCEPTIONS WHENEVER THERE'S A POTENTIAL UNDEFINED OBJECT!!!!!!!!!!!
-#DUDE THIS IS VERY IMPORTANT AND IT'S GONNA MAKE DEBUGGING AS NOT BE ASS
-#AAAAAAAAAAAAAAAAAAAAAAAAAAAAAa
-
 from adventurescript import commands, exceptions
 from adventurescript.inventory import Inventory
 
@@ -10,14 +6,14 @@ from adventurescript.inventory import Inventory
 async def input_format(info, text):
     # Warning: badly named variables ahead
     flip_result = False
-    while not text.startswith("-"):
+    while text.startswith("-"):
         flip_result = not flip_result
         text = text[1:]
     if (text.startswith("'") and text.endswith("'")) or (text.startswith('"') and text.endswith('"')): #dirtiest fix ever
         text = [text]
     else:
-        text = text.split("+")  # text2 is used as a way to store the text through the loop, so like a temp variable
-    text2 = text + []
+        text = text.split("+")
+    text2 = text + [] # text2 is used as a way to store the text through the loop, so like a temp variable
     c = 0
     for item in text:
         if c != 0:
@@ -173,7 +169,7 @@ async def input_format(info, text):
             else:
                 raise Exception("well someone tried to - a non minusable thing")
     else:
-        return 
+        return eval(text2)
 
 async def manage_operations(value, ops, quotes=True):
     for op in ops:
@@ -256,10 +252,22 @@ async def check_commands(info, line):
                     if line[1] == "":
                         await command(info)
                         return True
-                    for pair in line[1:]:
-                        pair = pair.split("=")
-                        kwargs[pair[0].strip()] = await input_format(info,"=".join(pair[1:]))
-                    await command(info, **kwargs)
+                    try:
+                        for pair in line[1:]:
+                            pair = pair.split("=")
+                            kwargs[pair[0].strip()] = await input_format(info,"=".join(pair[1:]))
+                    except Exception as e:
+                        if type(e).__name__.split(".")[0] != "adventurescript":
+                            raise exceptions.ArgumentError(info.scriptname, info.pointer, line[0], e)
+                        else:
+                            raise e()
+                    try:
+                        await command(info, **kwargs)
+                    except Exception as e:
+                        if type(e).__name__.split(".")[0] != "adventurescript":
+                            raise exceptions.CommandException(info.scriptname, info.pointer, line[0], e)
+                        else:
+                            raise e()
                     return True
         return False
     elif line.endswith("[n]"):
