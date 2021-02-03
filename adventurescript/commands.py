@@ -23,9 +23,9 @@ async def choice(info, ch1, go1, text="", **kwargs):
         elif kwarg.startswith("flag"):
             flags.append(int(kwarg[4:]))
         else:
-            raise Exception("Unwanted argument in choice command") #TODO: use the proper exception
+            raise exceptions.UnwantedArgumentError(info.scriptname, info.pointer, "choice", kwarg)
     if not chs == gos or len(chs) != max(chs):
-        raise Exception("You screwed up somewhere with the chs and gos in a choice command") #TODO: use the proper exception
+        raise exceptions.ChoiceArgumentError(info.scriptname, info.pointer)
     flagdict = {}
     for flag in flags:
         flagdict[flag] = kwargs["flag"+str(flag)]
@@ -48,7 +48,7 @@ async def choice(info, ch1, go1, text="", **kwargs):
     await goto(info, gotos[int(result)-1])
 
 async def loadscript(info, name, pos=1):
-    info.scriptname = f"games/{info.gamename}/script/{name}"
+    info.scriptname = f"games/{info.gamename}/script/chapter1/{name}" #TODO: replace "ch1" with actual chapter support
     info.script = open(f"{info.scriptname}.asf").read().split("\n")
     info.pointer = pos-1
 
@@ -83,7 +83,7 @@ async def flag(info, **kwargs):
     for kwarg in kwargs:
         for character in kwarg:
             if character in info.forbidden_characters:
-                raise Exception (f"Character '{character}' can't be used in a flag name") #TODO
+                raise exceptions.InvalidNameCharacter(info.scriptname, info.pointer, "flag", character)
         info.flags[kwarg] = kwargs[kwarg]
 
 setflag = flag #viva le alias
@@ -92,7 +92,7 @@ async def delflag(info, flag):
     try:
         info.flags.pop(flag)
     except KeyError:
-        raise UndefinedFlagError(info.scriptname, info.pointer+1, flag)
+        raise exceptions.UndefinedFlagError(info.scriptname, info.pointer+1, flag)
 
 #Variable commands
 
@@ -100,7 +100,7 @@ async def var(info, **kwargs):
     for kw in kwargs:
         for character in kw:
             if character in info.forbidden_characters:
-                raise Exception (f"Character '{character}' can't be used in a variable name") #TODO
+                raise exceptions.InvalidNameCharacter(info.scriptname, info.pointer, "flag", character)
         info.variables[kw] = kwargs[kw]
 
 setvar = var
@@ -166,9 +166,9 @@ async def remove(info, list, element, find="pos"):
     elif find == "name":
         info.lists[list].pop(info.lists[list].index(element))
     else:
-        raise Exception() #TODO
+        raise UnwantedArgumentError(info.scriptname, info.pointer, "remove") #TODO
 
-rmvlist = append
+rmvlist = remove
 
 async def checklist(info, list, element, gotrue, gofalse):
     if element in info.lists[list]:
@@ -183,7 +183,7 @@ async def dellist(info, list):
     try:
         info.lists.pop(list)
     except KeyError:
-        raise UndefinedListError(info.scriptname, info.pointer+1, list)
+        raise exceptions.UndefinedListError(info.scriptname, info.pointer+1, list)
 
 #Inventory commands
 
@@ -198,7 +198,7 @@ inv = definv
 async def invadd(info, item, gofail, amount=1, inventory=None, gosuccess=None):
     if inventory == None:
         if not hasattr(info, "inventory"):
-            raise Exception("No default inventory preset! Check your game's info file!")
+            raise NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.add(item, amount)
     else:
         try:
@@ -213,7 +213,7 @@ async def invadd(info, item, gofail, amount=1, inventory=None, gosuccess=None):
 async def invrmv(info, item, gofail, amount=1, inventory=None, gosuccess=None):
     if inventory == None:
         if not hasattr(info, "inventory"):
-            raise Exception("No default inventory preset! Check your game's info file!")
+            raise NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.remove(item, amount)
     else:
         try:
@@ -228,7 +228,7 @@ async def invrmv(info, item, gofail, amount=1, inventory=None, gosuccess=None):
 async def invfind(info, item, gotrue, gofalse, amount=1, inventory=None):
     if inventory == None:
         if not hasattr(info, "inventory"):
-            raise Exception("No default inventory preset! Check your game's info file!")
+            raise NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.find(item, amount)
     else:
         try:
@@ -246,7 +246,7 @@ chkinv = invfind
 async def addmoney(info, amount, inventory=None): #I will add gofail/gosuccess to this one whenever I make wallet limits a thing. If I do.
     if inventory == None:
         if not hasattr(info, "inventory"):
-            raise Exception("No default inventory preset! Check your game's info file!")
+            raise NoDefaultInventoryError(info.scriptname, info.pointer)
         info.inventory.money += amount
     else:
         try:
@@ -257,7 +257,7 @@ async def addmoney(info, amount, inventory=None): #I will add gofail/gosuccess t
 async def rmvmoney(info, gofail, amount, inventory=None, gosuccess=None):
     if inventory == None:
         if not hasattr(info, "inventory"):
-            raise Exception("No default inventory preset! Check your game's info file!")
+            raise NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.remove_money(amount)
     else:
         try:
@@ -272,7 +272,7 @@ async def rmvmoney(info, gofail, amount, inventory=None, gosuccess=None):
 async def chkmoney(info, amount, gotrue, gofalse, inventory=None):
     if inventory == None:
         if not hasattr(info, "inventory"):
-            raise Exception("No default inventory preset! Check your game's info file!")
+            raise NoDefaultInventoryError(info.scriptname, info.pointer)
         inventory = info.inventory
     if inventory.money >= amount:
         info.pointer = gotrue-1
@@ -291,4 +291,4 @@ async def delinv(info, inv):
     try:
         info.extrainvs.pop(inv)
     except KeyError:
-        raise UndefinedInventoryError(info.scriptname, info.pointer+1, inv)
+        raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inv)
