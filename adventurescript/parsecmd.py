@@ -97,6 +97,10 @@ async def input_format(info, text):
         for subitem in item:
             subitem2 = []
             for subsubitem in subitem:
+                if (subsubitem.startswith("'") and subsubitem.endswith("'")) or (subsubitem.startswith('"') and subsubitem.endswith('"')):
+                    value = subsubitem #dirtiest fix ever
+                    ops = []
+                else:
                     value = subsubitem.split(".")[0]
                     value_type = ""
                     ops = subsubitem.split(".")[1:]
