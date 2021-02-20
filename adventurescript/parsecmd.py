@@ -97,10 +97,6 @@ async def input_format(info, text):
         for subitem in item:
             subitem2 = []
             for subsubitem in subitem:
-                if (subsubitem.startswith("'") and subsubitem.endswith("'")) or (subsubitem.startswith('"') and subsubitem.endswith('"')):
-                    value = subsubitem #dirtiest fix ever
-                    ops = []
-                else:
                     value = subsubitem.split(".")[0]
                     value_type = ""
                     ops = subsubitem.split(".")[1:]
@@ -228,7 +224,7 @@ async def manage_operations(value, ops, quotes=True):
         return value
 
 def str_but_quotes(value):
-    if type(value) == type(""):
+    if type(value) == str:
         return f"'''{value}'''"
     else:
         return str(value)
@@ -280,6 +276,34 @@ async def check_commands(info, line):
 
 def find_label(info, label):
     for line in info.script:
-        if line.strip().find(label) == 0:
+        if line.strip().startswith(label):
             return info.script.index(line)+1
     raise Exception(f"Label '{label}' not found!") #TODO
+
+def remove_strings(text):
+    #get the start and end of every string
+    quotepos = [] #here we'll store the index of every quote that's not been escaped
+    for quote in ("'", "\""):
+        allpos = [i for i in range(len(text)) if text.startswith(quote, i)] #gets all instances of each type of quotes
+        for index in allpos:
+            if text[index-1] != "\\":
+                quotepos.append(index) #only pass to quotepos the strings that weren't escaped
+    opened_quote = ""
+    quotes = []
+    for index in sorted(quotepos):
+        if opened_quote == "": #no open quotes
+            opened_quote = text[index]
+            quotes.append(index)
+        elif opened_quote == text[index]:       #current quote is the same as the open quote -> it closes, and
+            quotes[-1] = (quotes[-1], index)    #otherwise it just gets ignored and treated as any other character
+            opened_quote = ""
+    #now, replace them with things that won't be screwed up by the rest of input_format
+    quotes.reverse() #this way the index numbers don't get fucked up
+    c = 1
+    quotetext = []
+    for quote in quotes:
+        quotetext = [text[quote[0]+1:quote[1]]] + quotetext
+        text = text[:quote[0]] + f'"{len(quotes)-c}"' + text[quote[1]+1:]
+        c += 1
+    outquotes = [i.replace("\\'", "'").replace('\\"', '"') for i in quotetext] #gets all instances of each type of quotes
+    return text, outquotes
