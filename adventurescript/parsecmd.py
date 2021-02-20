@@ -258,14 +258,14 @@ async def check_commands(info, line):
                             kwargs[pair[0].strip()] = await input_format(info,"=".join(pair[1:]))
                     except Exception as e:
                         if type(e).__name__.split(".")[0] != "adventurescript":
-                            raise exceptions.ArgumentSyntaxError(info.scriptname, info.pointer, line[0], e)
+                            raise exceptions.ArgumentSyntaxError(info.scriptname, info.pointer, e)
                         else:
                             raise e()
                     try:
                         await command(info, **kwargs)
                     except Exception as e:
                         if type(e).__name__.split(".")[0] != "adventurescript":
-                            raise exceptions.CommandException(info.scriptname, info.pointer, line[0], e)
+                            raise exceptions.CommandException(info.scriptname, info.pointer, e)
                         else:
                             raise e()
                     return True
