@@ -1,0 +1,20 @@
+This is actually now a different script!
+Woo! [n]
+Now, do you want to return to the old choice or just exit? [n]
+[choice ch1 = "take me back to hell"; go1 = 5; ch2 = "take me out of this place"; go2 = 6; ch3="MOAR TEST"; go3=15; ch4="dbjahfajkldfla inventory shit"; go4=17; ch5="delet."; go5=19]
+[loadscript name="start"]
+k bye [n]
+[choice text="what ending do you want"; ch1="good"; ch2="bad"; go1=8; go2=10]
+[setvar doneWith="life"; fu=2381]
+[goto pos=11]
+[setvar doneWith="ildggjnkladjgaklj"]
+[checkvar var="doneWith"; value="life"; gotrue=14; gofalse=12]
+F A I L U R E $doneWith
+[ending name = "hahaha u stink"]
+[ending name = "oooo u gud"]
+test
+[loadscript name="moar_test"]
+time to get on the inventory shit, woo!
+[loadscript name="inventory"]
+time to ERASE THINGS YAYYYY
+[loadscript name="delet"]

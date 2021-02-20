@@ -1,0 +1,34 @@
+oke
+lets go
+[choice text="what test?"; ch1="list";go1=4;ch2="incvar";go2=16;ch3="switch";go3=21]
+[deflist list="list"]
+[append list="list"; element="one"]
+[append list="list"; element="two"]
+[remove list="list"; element="two"; find="name"]
+[checklist list="list"; element="one"; gotrue=9; gofalse=12]
+[checklist list="list"; element="two"; gotrue=14; gofalse=10]
+The test was a success!
+[ending name="List Test Success"]
+Oops, seems like the first element didn't get added! >.>
+[goto pos=15]
+Oops, seems like the second element didn't get removed! <.<
+[ending name="List Test Failure"]
+[setvar idiocy="Ye"; best_number=10]
+[incvar var="idiocy"; value="s"]
+[incvar var="best_number"; value=1]
+[choice text=best_number.str+idiocy;ch1="Continue";go1=20]
+[ending name="poop"]
+input thing
+[choice ch1="variable is 1"; ch2="variable is 2"; ch3="variable is eight";go1=23;go2=25;go3=27]
+[setvar v=1]
+[goto pos=28]
+[setvar v=2]
+[goto pos=28]
+[setvar v="eight"]
+[switch var=v; val1=1; go1=29; val2=2; go2=31; default=33]
+it is one
+[goto pos=34]
+it is two
+[goto pos=34]
+it is unknown
+[ending name="yay"]

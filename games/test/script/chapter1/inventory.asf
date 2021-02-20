@@ -1,0 +1,52 @@
+{merge} [n]
+Contents of **THE INVENTORY** (tm)
+&&
+Money: &&.money moneys
+
+[choice ch1="Add item"; go1={add}; ch2="Remove item"; go2={remove}; ch3="Find item"; go3={find}; ch4="Money shiz"; go4={muns};ch5="GIMME THAT COMPLEX SHIT"; go5={moar}; ch6="i wanna gtfo"; go6={gtfo}]
+#
+{add} [invadd item="item"; gofail={notenoughspace}]
+Item commit add.
+[goto pos={merge}]
+#
+{remove} [invrmv item="item"; gofail={donthave}]
+Item commit remove.
+[goto pos={merge}]
+#
+{find} Looking for item "item"...
+[invfind item="item"; gotrue={found}; gofalse={notfound}]
+[goto pos={merge}]
+#
+{found} You do have an item. Huh.
+[goto pos={merge}]
+{notfound} You don't have an item.
+[goto pos={merge}]
+#
+{muns} [choice text="ok what do you want to do with money"; ch1="get 10 moneys"; ch2="remove 10 moneys"; go1={munsplus}; go2={munsminus}]
+#
+#I am too lazy to make this not bad lol
+{munsplus} [addmoney amount=20]
+{munsminus} [rmvmoney amount=10; gofail={notenoughmuns}]
+the moneying happen
+[checkmoney amount=1; gotrue={munsgud}; gofalse={munsbad}]
+{munsgud} you have muns congrats
+[goto pos={merge}]
+{munsbad} you don't have muns you suck
+[goto pos={merge}]
+#
+{moar} lol no this is still a wip go fuck yourself
+[goto pos={merge}]
+#
+{gtfo} ok asshat [n]
+[ending name="Inventory"]
+#
+# Errors
+#
+{notenoughmuns} ok wtf asshole you don't have enough money please go
+[goto pos={merge}]
+#
+{notenoughspace} Your inventory is too tiny for all the stuff you're trying to carry :P
+[goto pos={merge}]
+#
+{donthave} You don't have any items I can remove.
+[goto pos={merge}]
