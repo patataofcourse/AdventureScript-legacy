@@ -9,10 +9,10 @@ async def input_format(info, text):
     while text.startswith("-"):
         flip_result = not flip_result
         text = text[1:]
-    if (text.startswith("'") and text.endswith("'")) or (text.startswith('"') and text.endswith('"')): #dirtiest fix ever
-        text = [text]
-    else:
-        text = text.split("+")
+    
+    text, outquotes = remove_strings(text)
+
+    text = text.split("+")
     text2 = text + [] # text2 is used as a way to store the text through the loop, so like a temp variable
     c = 0
     for item in text:
@@ -24,9 +24,6 @@ async def input_format(info, text):
     text2 = []
     operations1= []
     for item in text:
-        if (item.startswith("'") and item.endswith("'")) or (item.startswith('"') and item.endswith('"')): #aaaaaaa
-            text2 = text #dirtiest fix ever
-            continue
         if item == "+":
             operations1.append(item)
         else:
@@ -41,9 +38,6 @@ async def input_format(info, text):
     text2 = []
     operations2 = []
     for item in text:
-        if (item.startswith("'") and item.endswith("'")) or (item.startswith('"') and item.endswith('"')):
-            text2.append([item]) #dirtiest fix ever
-            continue
         operations2.append([])
         item = item.split("*")
         item2 = item
@@ -74,12 +68,6 @@ async def input_format(info, text):
         operations3.append([])
         item2 = []
         for subitem in item:
-            if (subitem.startswith("'") and subitem.endswith("'")) or (subitem.startswith('"') and subitem.endswith('"')):
-                item2.append([subitem]) #dirtiest fix ever
-                operations1 = []
-                operations2 = [[]]
-                operations3 = [[[]]]
-                continue
             operations3[-1].append([])
             subitem = subitem.split("^")
             c = 0
@@ -97,17 +85,11 @@ async def input_format(info, text):
         for subitem in item:
             subitem2 = []
             for subsubitem in subitem:
-                if (subsubitem.startswith("'") and subsubitem.endswith("'")) or (subsubitem.startswith('"') and subsubitem.endswith('"')):
-                    value = subsubitem #dirtiest fix ever
-                    ops = []
-                else:
-                    value = subsubitem.split(".")[0]
-                    value_type = ""
-                    ops = subsubitem.split(".")[1:]
+                value = subsubitem.split(".")[0]
+                value_type = ""
+                ops = subsubitem.split(".")[1:]
                 if value.isdecimal():
                     value = int(value)
-                elif (value.startswith("'") and value.endswith("'")) or (value.startswith('"') and value.endswith('"')):
-                    value = value.strip("'\"").replace("\\n","\n")
                 elif value.startswith("{") and value.endswith("}"):
                     value = find_label(info, value)
                 # elif value.startswith("(") and value.endswith(")"): #TODO: Add this. Not gonna be needed for now
@@ -136,6 +118,8 @@ async def input_format(info, text):
                         value = True
                     else:
                         value = False
+                elif value.startswith('"') and value.endswith('"') or value.startswith("'") and value.endswith("'"):
+                    value = outquotes[int(value.strip('"'))]
                 else:
                     value = info.variables[value]
                     value = str(value)
@@ -167,7 +151,7 @@ async def input_format(info, text):
             if str(e).split(":")[0] != "bad operand type for unary -":
                 raise e
             else:
-                raise Exception("well someone tried to - a non minusable thing")
+                raise Exception("well someone tried to - a non minusable thing") #TODO
     else:
         return eval(text2)
 
