@@ -2,6 +2,7 @@
 Contents of **THE INVENTORY** (tm)
 &&
 Money: &&.money moneys
+Size: &&.size items
 
 [choice ch1="Add item"; go1={add}; ch2="Remove item"; go2={remove}; ch3="Find item"; go3={find}; ch4="Money shiz"; go4={muns};ch5="GIMME THAT COMPLEX SHIT"; go5={moar}; ch6="i wanna gtfo"; go6={gtfo}]
 #
@@ -34,7 +35,15 @@ the moneying happen
 {munsbad} you don't have muns you suck
 [goto pos={merge}]
 #
-{moar} lol no this is still a wip go fuck yourself
+{moar} ok, still a wip tho
+[choice ch1="upgrade"; go1={upgrade}; ch2="buy"; go2={wip}; ch3="sell"; go3={wip}]
+#
+{upgrade} [choice text="ok which one is it"; ch1="+1 slot"; go1={up}; ch2="-1 slot"; go2={down}]
+{up} ok
+[invupgrade size=1]
+[goto pos={merge}]
+{down} ok
+[invdowngrade size=1; gofail={mini_inv}]
 [goto pos={merge}]
 #
 {gtfo} ok asshat [n]
@@ -49,4 +58,10 @@ the moneying happen
 [goto pos={merge}]
 #
 {donthave} You don't have any items I can remove.
+[goto pos={merge}]
+#
+{mini_inv} Okay, look, you need to have an inventory capable of holding *something*
+[goto pos={merge}]
+#
+{wip} not implemented yet lol
 [goto pos={merge}]

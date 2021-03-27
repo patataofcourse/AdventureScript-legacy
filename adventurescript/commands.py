@@ -268,7 +268,7 @@ async def invdowngrade(info, size, gofail, inventory=None, gosuccess=None):
         await goto(info, gosuccess)
     elif res == 0:
         await goto(info, gofail)
-    else:
+    elif res == -1:
         raise NotImplementedError("Inventory management when it gets too small for you will be added here") #TODO
 
 async def addmoney(info, amount, inventory=None): #I will add gofail/gosuccess to this one whenever I make wallet limits a thing. If I do.

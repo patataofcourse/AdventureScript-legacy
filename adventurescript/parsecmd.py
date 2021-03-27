@@ -198,6 +198,11 @@ async def manage_operations(value, ops, quotes=True):
                 value = value.money
             else:
                 raise TypeError("Operation 'money' can only be used with inventories")
+        elif op == "size":
+            if type(value) == Inventory:
+                value = value.size
+            else:
+                raise TypeError("Operation 'size' can only be used with inventories")
         elif op == "not":
             if type(value) == bool:
                 value = not value

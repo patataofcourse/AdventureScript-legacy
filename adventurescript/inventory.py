@@ -3,6 +3,7 @@ class Inventory:
         if size == 0:
             raise Exception("Inventory size cannot be 0") #TODO
         self.inv = [None]*size
+        self.size = size
         self.money = money
     def __str__(self):
         return str(self.inv) + ", " + str(self.money)
@@ -16,13 +17,16 @@ class Inventory:
         return None
     def upgrade(self, plus_size):
         self.inv += [None] * plus_size
+        self.size += plus_size
     def downgrade(self, minus_size):
         if len(self.inv) - minus_size <= 0:
             return 0
         elif self.inv.count(None) < minus_size:
+            print(self.inv, self.inv.count(None), minus_size)
             return -1 #TODO: add inventory management here
         else:
             self.inv = self.inv[:len(self.inv)-minus_size]
+            self.size -= minus_size
             return 1
     def add(self, item, quantity=1):
         item_in_inv = False
