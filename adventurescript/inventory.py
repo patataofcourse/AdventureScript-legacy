@@ -17,12 +17,13 @@ class Inventory:
     def upgrade(self, plus_size):
         self.inv += [None] * plus_size
     def downgrade(self, minus_size):
-        if len(self.inv) - minus_size == 0:
-            raise Exception("Inventory size cannot be 0") #TODO
+        if len(self.inv) - minus_size <= 0:
+            return 0
         elif self.inv.count(None) < minus_size:
-            raise Exception("Trying to remove inventory size, but there's still some items in the portion to be removed") #TODO
+            return -1 #TODO: add inventory management here
         else:
             self.inv = self.inv[:len(self.inv)-minus_size]
+            return 1
     def add(self, item, quantity=1):
         item_in_inv = False
         for pair in self.inv:

@@ -48,7 +48,7 @@ async def choice(info, ch1, go1, text="", **kwargs):
     await goto(info, gotos[int(result)-1])
 
 async def loadscript(info, name, pos=1):
-    info.scriptname = f"games/{info.gamename}/script/chapter1/{name}" #TODO: replace "ch1" with actual chapter support
+    info.scriptname = f"games/{info.gamename}/script/{name}"
     info.script = open(f"{info.scriptname}.asf").read().split("\n")
     info.pointer = pos-1
 
@@ -242,6 +242,34 @@ async def invfind(info, item, gotrue, gofalse, amount=1, inventory=None):
 
 checkinv = invfind
 chkinv = invfind
+
+async def invupgrade(info, size, inventory=None):
+    if inventory == None:
+        if not hasattr(info, "inventory"):
+            raise NoDefaultInventoryError(info.scriptname, info.pointer)
+        info.inventory.upgrade(size)
+    else:
+        try:
+            info.extrainvs[inventory].upgrade(size)
+        except NameError:
+            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+
+async def invdowngrade(info, size, gofail, inventory=None, gosuccess=None):
+    if inventory == None:
+        if not hasattr(info, "inventory"):
+            raise NoDefaultInventoryError(info.scriptname, info.pointer)
+        res = info.inventory.downgrade(size)
+    else:
+        try:
+            res = info.extrainvs[inventory].downgrade(size)
+        except NameError:
+            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+    if res == 1 and gosuccess != None:
+        await goto(info, gosuccess)
+    elif res == 0:
+        await goto(info, gofail)
+    else:
+        raise NotImplementedError("Inventory management when it gets too small for you will be added here") #TODO
 
 async def addmoney(info, amount, inventory=None): #I will add gofail/gosuccess to this one whenever I make wallet limits a thing. If I do.
     if inventory == None:
