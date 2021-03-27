@@ -197,7 +197,7 @@ async def manage_operations(value, ops, quotes=True):
             if type(value) == Inventory:
                 value = value.money
             else:
-                raise TypeError("Operation 'ol' can only be used with lists")
+                raise TypeError("Operation 'money' can only be used with inventories")
         elif op == "not":
             if type(value) == bool:
                 value = not value
