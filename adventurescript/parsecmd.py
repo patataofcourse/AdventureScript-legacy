@@ -218,7 +218,7 @@ async def manage_operations(value, ops, quotes=True):
 
 def str_but_quotes(value):
     if type(value) == str:
-        return f''' {value} '''[1:-1]
+        return f"''' {value} '''[1:-1]"
     else:
         return str(value)
 
