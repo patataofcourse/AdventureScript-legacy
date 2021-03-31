@@ -33,7 +33,7 @@ class ContextInfo:
             invtext = "{"+str(self.inventory)+"}"
         else:
             invtext = ""
-        svfile.write("}{".join((self.scriptname,str(self.pointer)))+"}"+str(self.flags)+str(self.variables)+str(self.lists)+invtext+str(self.extrainvs)[:-1])
+        svfile.write("}{".join((self.scriptname,str(self.pointer),str(self.allow_save)))+"}"+str(self.flags)+str(self.variables)+str(self.lists)+invtext+str(self.extrainvs)[:-1])
         for slot in self.extra_slots:
             data = getattr(self, slot)
             svfile.write("}{"+str(data))
@@ -47,10 +47,11 @@ class ContextInfo:
         self.scriptname = save[0]
         self.script = open(f"{self.scriptname}.asf").read().split("\n")
         self.pointer = int(save[1]) -1
-        self.flags = eval("{"+save[2]+"}")
-        self.variables = eval("{"+save[3]+"}")
-        self.lists = eval("{"+save[4]+"}")
-        self.inventory.recreate(*eval(save[5]))
+        self.allow_save = bool(save[2])
+        self.flags = eval("{"+save[3]+"}")
+        self.variables = eval("{"+save[4]+"}")
+        self.lists = eval("{"+save[5]+"}")
+        self.inventory.recreate(*eval(save[6]))
         c = 7
         for slot in self.extra_slots:
             exec('self.' + slot + '= save[c]')
