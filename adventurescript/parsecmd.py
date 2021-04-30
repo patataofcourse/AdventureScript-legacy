@@ -128,7 +128,7 @@ async def input_format(info, text):
             subitem2 = subitem.pop(0)
             if len(subitem) != 0:
                 for operation in operations3[0][0]:
-                    subitem2 = str_but_quotes(eval(subitem2+operation+subitem.pop(0)))
+                    subitem2 = repr(eval(subitem2+operation+subitem.pop(0)))
             item2.append(subitem2)
             operations3[0].pop(0)
         operations3.pop(0)
@@ -136,14 +136,14 @@ async def input_format(info, text):
         item2 = item.pop(0)
         if len(item) != 0:
             for operation in operations2[0]:
-                item2 = str_but_quotes(eval(item2+operation+item.pop(0)))
+                item2 = repr(eval(item2+operation+item.pop(0)))
         operations2.pop(0)
         text2.append(item2)
     text = text2
     text2 = text.pop(0)
     if len(text) != 0:
         for operation in operations1:
-            text2 = str_but_quotes(eval(text2+operation+text.pop(0)))
+            text2 = repr(eval(text2+operation+text.pop(0)))
     if flip_result:
         try:
             return -eval(text2)
@@ -212,15 +212,9 @@ async def manage_operations(value, ops, quotes=True):
             raise Exception(f"Invalid operation '{op}'!") #TODO
         ops.pop(0)
     if quotes:
-        return str_but_quotes(value)
+        return repr(value)
     else:
         return value
-
-def str_but_quotes(value):
-    if type(value) == str:
-        return f"''' {value} '''[1:-1]"
-    else:
-        return str(value)
 
 async def check_commands(info, line):
     line = line.strip()
@@ -234,7 +228,7 @@ async def check_commands(info, line):
         line = line[1:-1].split(";")
         line = [line[0].split(" ")[0], " ".join(line[0].split(" ")[1:])] + line[1:]
         for command in info.commands:
-            if type(info.commands[command]) == type(str_but_quotes):
+            if type(info.commands[command]) == type(remove_strings): #check if it's a function
                 if command == line[0]:
                     command = info.commands[command]
                     kwargs = {}
@@ -246,17 +240,11 @@ async def check_commands(info, line):
                             pair = pair.split("=")
                             kwargs[pair[0].strip()] = await input_format(info,"=".join(pair[1:]))
                     except Exception as e:
-                        if type(e).__name__.split(".")[0] != "adventurescript":
-                            raise exceptions.ArgumentSyntaxError(info.scriptname, info.pointer, e)
-                        else:
-                            raise e()
+                        raise exceptions.ArgumentSyntaxError(info.scriptname, info.pointer, e)
                     try:
                         await command(info, **kwargs)
                     except Exception as e:
-                        if type(e).__name__.split(".")[0] != "adventurescript":
-                            raise exceptions.CommandException(info.scriptname, info.pointer, e)
-                        else:
-                            raise e()
+                        raise exceptions.CommandException(info.scriptname, info.pointer, e)
                     return True
         return False
     elif line.endswith("[n]"):
