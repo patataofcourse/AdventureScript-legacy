@@ -143,7 +143,7 @@ async def delvar(info, var):
     try:
         info.variables.pop(var)
     except KeyError:
-        raise UndefinedVariableError(info.scriptname, info.pointer+1, var)
+        raise exceptions.UndefinedVariableError(info.scriptname, info.pointer+1, var)
 
 #List commands
 
@@ -166,7 +166,7 @@ async def remove(info, list, element, find="pos"):
     elif find == "name":
         info.lists[list].pop(info.lists[list].index(element))
     else:
-        raise UnwantedArgumentError(info.scriptname, info.pointer, "remove") #TODO
+        raise exceptions.UnwantedArgumentError(info.scriptname, info.pointer, "remove", "find") #TODO: actual exception type for this
 
 rmvlist = remove
 
@@ -190,7 +190,7 @@ async def dellist(info, list):
 async def definv(info, inventory, size):
     for character in inventory:
         if character in info.forbidden_characters:
-            raise Exception (f"Character '{character}' can't be used in an inventory name") #TODO
+            raise exceptions.InvalidNameCharacter(info.scriptname, info.pointer, "inventory", character)
     info.extrainvs[inventory] = Inventory(size)
 
 inv = definv
@@ -198,7 +198,7 @@ inv = definv
 async def invadd(info, item, gofail, amount=1, inventory=None, gosuccess=None):
     if inventory == None:
         if not hasattr(info, "inventory"):
-            raise NoDefaultInventoryError(info.scriptname, info.pointer)
+            raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.add(item, amount)
     else:
         try:
@@ -213,7 +213,7 @@ async def invadd(info, item, gofail, amount=1, inventory=None, gosuccess=None):
 async def invrmv(info, item, gofail, amount=1, inventory=None, gosuccess=None):
     if inventory == None:
         if not hasattr(info, "inventory"):
-            raise NoDefaultInventoryError(info.scriptname, info.pointer)
+            raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.remove(item, amount)
     else:
         try:
@@ -228,7 +228,7 @@ async def invrmv(info, item, gofail, amount=1, inventory=None, gosuccess=None):
 async def invfind(info, item, gotrue, gofalse, amount=1, inventory=None):
     if inventory == None:
         if not hasattr(info, "inventory"):
-            raise NoDefaultInventoryError(info.scriptname, info.pointer)
+            raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.find(item, amount)
     else:
         try:
@@ -246,7 +246,7 @@ chkinv = invfind
 async def invupgrade(info, size, inventory=None):
     if inventory == None:
         if not hasattr(info, "inventory"):
-            raise NoDefaultInventoryError(info.scriptname, info.pointer)
+            raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         info.inventory.upgrade(size)
     else:
         try:
@@ -257,7 +257,7 @@ async def invupgrade(info, size, inventory=None):
 async def invdowngrade(info, size, gofail, inventory=None, gosuccess=None):
     if inventory == None:
         if not hasattr(info, "inventory"):
-            raise NoDefaultInventoryError(info.scriptname, info.pointer)
+            raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.downgrade(size)
     else:
         try:
@@ -274,7 +274,7 @@ async def invdowngrade(info, size, gofail, inventory=None, gosuccess=None):
 async def addmoney(info, amount, inventory=None): #I will add gofail/gosuccess to this one whenever I make wallet limits a thing. If I do.
     if inventory == None:
         if not hasattr(info, "inventory"):
-            raise NoDefaultInventoryError(info.scriptname, info.pointer)
+            raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         info.inventory.money += amount
     else:
         try:
@@ -285,7 +285,7 @@ async def addmoney(info, amount, inventory=None): #I will add gofail/gosuccess t
 async def rmvmoney(info, gofail, amount, inventory=None, gosuccess=None):
     if inventory == None:
         if not hasattr(info, "inventory"):
-            raise NoDefaultInventoryError(info.scriptname, info.pointer)
+            raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.remove_money(amount)
     else:
         try:
@@ -300,7 +300,7 @@ async def rmvmoney(info, gofail, amount, inventory=None, gosuccess=None):
 async def chkmoney(info, amount, gotrue, gofalse, inventory=None):
     if inventory == None:
         if not hasattr(info, "inventory"):
-            raise NoDefaultInventoryError(info.scriptname, info.pointer)
+            raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         inventory = info.inventory
     if inventory.money >= amount:
         info.pointer = gotrue-1

@@ -107,7 +107,7 @@ async def input_format(info, text):
                         try:
                             value = info.inventory
                         except AttributeError:
-                            raise Exception("No default inventory!") #TODO
+                            raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
                     else:
                         try:
                             value = info.extrainvs[value[1:]]
@@ -259,7 +259,7 @@ def find_label(info, label):
     for line in info.script:
         if line.strip().startswith(label):
             return info.script.index(line)+1
-    raise Exception(f"Label '{label}' not found!") #TODO
+    raise exceptions.UndefinedLabelError(info.scriptname, info.pointer, label)
 
 def remove_strings(text):
     #get the start and end of every string

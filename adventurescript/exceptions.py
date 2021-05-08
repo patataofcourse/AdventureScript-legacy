@@ -42,13 +42,13 @@ class NoDefaultInventoryError(UndefinedInventoryError):
 
 class InvalidNameCharacter(CommandException):
     def __init__(self, scriptname, line, vartype, character):
-        self.args = (f"{vartype.title()} names can't have the character '{character}'! ({scriptname}, line {line})")
+        self.args = (f"{str.title(vartype)} names can't have the character '{character}'! ({scriptname}, line {line})",)
 
 #Other
 
 class ChoiceArgumentError(Exception):
     def __init__(self, scriptname, line):
-        self.args = (f"The ch/go arguments in a [choice] command aren't corresponding. ({scriptname}, line {line})")
+        self.args = (f"The ch/go arguments in a [choice] command aren't corresponding. ({scriptname}, line {line})",)
 
 class ScriptEndException(Exception):
     def __init__(self, scriptname):
