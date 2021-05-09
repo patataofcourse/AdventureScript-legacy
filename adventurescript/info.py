@@ -35,8 +35,7 @@ class ContextInfo:
             invtext = ""
         svfile.write("}{".join((self.scriptname,str(self.pointer),str(self.allow_save)))+"}"+str(self.flags)+str(self.variables)+str(self.lists)+invtext+str(self.extrainvs)[:-1])
         for slot in self.extra_slots:
-            data = getattr(self, slot)
-            svfile.write("}{"+str(data))
+            svfile.write("}{"+repr(self.extra_slots[slot]))
         svfile.close()
         if sq:
             self.status = "quit sv"
@@ -54,7 +53,7 @@ class ContextInfo:
         self.inventory.recreate(*eval(save[6]))
         c = 7
         for slot in self.extra_slots:
-            exec('self.' + slot + '= save[c]')
+            self.extra_slots[slot] = eval(save[c])
             c+=1
     async def show(self, text):
         text = text.strip()

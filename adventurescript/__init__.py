@@ -8,7 +8,7 @@ async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query
     info = ContextInfo(name, save_id, show, wait, query, is_async, pass_info)
     
     #Load addons
-    for addon in addons:
+    for addon in addons: #TODO: rework addons
         try:
             addon.setup(info)
             for command in addon.commands:
