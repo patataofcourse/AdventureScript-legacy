@@ -255,13 +255,13 @@ async def check_commands(info, line):
     else:
         return False
 
-def find_label(info, label):
+def find_label(info, label): #TODO: treat labels as their own type, instead of making them equivalent to an int
     for line in info.script:
         if line.strip().startswith(label):
             return info.script.index(line)+1
     raise exceptions.UndefinedLabelError(info.scriptname, info.pointer, label)
 
-def remove_strings(text):
+def remove_strings(text): #wow i actually commented this very cool
     #get the start and end of every string
     quotepos = [] #here we'll store the index of every quote that's not been escaped
     for quote in ("'", "\""):
@@ -284,7 +284,7 @@ def remove_strings(text):
     quotetext = []
     for quote in quotes:
         quotetext = [text[quote[0]+1:quote[1]]] + quotetext
-        text = text[:quote[0]] + f'"{len(quotes)-c}"' + text[quote[1]+1:]
+        text = text[:quote[0]] + f'"{len(quotes)-c}"' + text[quote[1]+1:] #"0", "1", etc.
         c += 1
     outquotes = [i.replace("\\'", "'").replace('\\"', '"') for i in quotetext] #gets all instances of each type of quotes
     return text, outquotes

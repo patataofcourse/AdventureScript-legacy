@@ -82,7 +82,7 @@ async def saveon(info):
 #Flag commands
 
 async def checkflag(info, flag, gotrue, gofalse):
-    if type(flag) == str:
+    if type(flag) == str: #TODO: warn that it's deprecated
         if info.flags.get(flag, None) == None: #If the flag doesn't exist, it immediately gets set as false
             info.flags[flag] = False
         flag = info.flags[flag]
