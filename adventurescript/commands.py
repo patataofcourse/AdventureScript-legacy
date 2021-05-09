@@ -11,7 +11,7 @@ pause = n
 async def goto(info, pos):
     info.pointer = int(pos)-1
 
-async def choice(info, ch1, go1, text="", **kwargs):
+async def choice(info, ch1, go1=0, text="", **kwargs):
     chs = [1]
     gos = [1]
     flags = []
@@ -38,6 +38,7 @@ async def choice(info, ch1, go1, text="", **kwargs):
             gotos.append(kwargs.get("go"+str(item)))
         else:
             gotos.append(0)
+    
     for flag in flagdict:
         if not flagdict[flag]:
             choices[flag-1] = ""
@@ -45,6 +46,7 @@ async def choice(info, ch1, go1, text="", **kwargs):
     while "" in gotos:
         choices.pop(choices.index(""))
         gotos.pop(gotos.index(""))
+    
     result = await info.query(text, choices, **kwargs)
     if result == 0: #for situations where a save/resume/quit is done
         return
@@ -80,9 +82,11 @@ async def saveon(info):
 #Flag commands
 
 async def checkflag(info, flag, gotrue, gofalse):
-    if info.flags.get(flag, None) == None: #If the flag doesn't exist, it immediately gets set as false
-        info.flags[flag] = False
-    if info.flags[flag]:
+    if type(flag) == str:
+        if info.flags.get(flag, None) == None: #If the flag doesn't exist, it immediately gets set as false
+            info.flags[flag] = False
+        flag = info.flags[flag]
+    if flag:
         info.pointer = gotrue-1
     else:
         info.pointer = gofalse-1
@@ -105,9 +109,6 @@ async def chaincheck(info, check1, go1, **kwargs):
     for item in chs[1:]:
         checks.append(kwargs["check"+str(item)])
         gotos.append(kwargs["go"+str(item)])
-    while "" in gotos:
-        checks.pop(checks.index(""))
-        gotos.pop(gotos.index(""))
     c = -1
     for flag in checks:
         c += 1
@@ -170,14 +171,31 @@ async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
         info.pointer = gofalse-1
 
 #TODO: fix the switchcase you moron
-async def switch(info, var, default=None, **kwargs): #hehe i actually did a switchcase
-    for kw in kwargs:
-        if str(var).strip('"') == kw: #TODO: str(var).strip('"') is a terrible idea, fix everywhere
-            info.pointer = kwargs[kw]-1
+async def switch(info, var, case1, go1, **kwargs): #hehe i actually did a switchcase
+    cas = [1]
+    gos = [1]
+    for kwarg in kwargs:
+        if kwarg.startswith("case"):
+            cas.append(int(kwarg[4:]))
+        elif kwarg.startswith("go") and kwarg != "godefault":
+            gos.append(int(kwarg[2:]))
+        elif kwarg != "godefault":
+            raise exceptions.UnwantedArgumentError(info.scriptname, info.pointer, "chaincheck", kwarg)
+    if not cas == gos or len(cas) != max(cas):
+        raise exceptions.SwitchArgumentError(info.scriptname, info.pointer)
+    cas.sort()
+    cases = [case1]
+    gotos = [go1]
+    for item in cas[1:]:
+        cases.append(kwargs["case"+str(item)])
+        gotos.append(kwargs["go"+str(item)])
+    for case in cases: #i know this is unnecessary but i'm keeping it for consistency
+        if var == case:
+            info.pointer = gotos[cases.index(case)]-1
             return
-    if default==None:
-        raise exceptions.CommandException(info.scriptname, info.pointer, "switch", "Missing 'default' argument")
-    info.pointer= default-1
+    if kwargs.get("godefault") == None:
+        raise exceptions.MissingArgumentError(info.scriptname, info.pointer, "switch", "godefault") #TODO: MissingOptionalArgumentWhichIsNeededHere
+    info.pointer = kwargs["godefault"]-1
 
 async def incvar(info, var, value): #basically +=
     info.variables[var] += value

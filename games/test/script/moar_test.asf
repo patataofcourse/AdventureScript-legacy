@@ -25,7 +25,7 @@ input thing
 [setvar v=2]
 [goto pos=28]
 [setvar v="eight"]
-[switch var=v; val1=1; go1=29; val2=2; go2=31; default=33]
+[switch var=v; case1=1; go1=29; case2=2; go2=31; godefault=33]
 it is one
 [goto pos=34]
 it is two

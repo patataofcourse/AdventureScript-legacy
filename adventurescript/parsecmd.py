@@ -122,7 +122,6 @@ async def input_format(info, text):
                     value = outquotes[int(value.strip('"'))]
                 else:
                     value = info.variables[value]
-                    value = str(value)
                 subitem2.append(await manage_operations(value, ops))
             subitem = subitem2
             subitem2 = subitem.pop(0)

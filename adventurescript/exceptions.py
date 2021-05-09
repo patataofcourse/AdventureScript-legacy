@@ -62,6 +62,10 @@ class CheckArgumentError(Exception):
     def __init__(self, scriptname, line):
         self.args = (f"The check/go arguments in a [chaincheck] command aren't corresponding. ({scriptname}, line {line})",)
 
+class SwitchArgumentError(Exception):
+    def __init__(self, scriptname, line):
+        self.args = (f"The case/go arguments in a [switch] command aren't corresponding. ({scriptname}, line {line})",)
+
 class ScriptEndException(Exception):
     def __init__(self, scriptname):
         self.args = (f"Reached end of script {scriptname}!",)
