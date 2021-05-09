@@ -242,6 +242,7 @@ async def check_commands(info, line):
                     except Exception as e:
                         raise exceptions.ArgumentSyntaxError(info.scriptname, info.pointer, e)
                     try:
+                        #insert here checking the args
                         await command(info, **kwargs)
                     except Exception as e:
                         raise exceptions.CommandException(info.scriptname, info.pointer, e)

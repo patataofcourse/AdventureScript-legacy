@@ -43,7 +43,7 @@ async def choice(info, ch1, go1, text="", **kwargs):
         choices.pop(choices.index(""))
         gotos.pop(gotos.index(""))
     result = await info.query(text, choices, **kwargs)
-    if result == 0:
+    if result == 0: #TODO: i think this means that if the go_ is 0, it just continues without going. this is confusing though?
         return
     await goto(info, gotos[int(result)-1])
 
@@ -78,6 +78,41 @@ async def checkflag(info, flag, gotrue, gofalse):
         info.pointer = gotrue-1
     else:
         info.pointer = gofalse-1
+
+async def chaincheck(info, check1, go1, **kwargs):
+    chs = [1]
+    gos = [1]
+    for kwarg in kwargs:
+        if kwarg.startswith("check"):
+            chs.append(int(kwarg[2:]))
+        elif kwarg.startswith("go"):
+            gos.append(int(kwarg[2:]))
+        else:
+            raise exceptions.UnwantedArgumentError(info.scriptname, info.pointer, "chaincheck", kwarg)
+    if not chs == gos or len(chs) != max(chs):
+        raise exceptions.CheckArgumentError(info.scriptname, info.pointer)
+    chs.sort()
+    checks = [ch1]
+    gotos = [go1]
+    for item in chs[1:]:
+        checks.append(kwargs["check"+str(item)])
+        gotos.append(kwargs["go"+str(item)])
+    while "" in gotos:
+        checks.pop(checks.index(""))
+        gotos.pop(gotos.index(""))
+    c = 0
+    for flag in checks:
+        if info.flags.get(flag, None) == None: #If the flag doesn't exist, it immediately gets set as false
+           info.flags[flag] = False
+           continue
+        if info.flags[flag]:
+            await goto(info, gotos[c])
+            return
+        c += 1
+    #this will only happen if no check has happened
+    if kwargs.get("godefault") == None:
+        raise exceptions.MissingArgumentError(info.scriptname, info.pointer, "chaincheck", "godefault") #TODO:MissingOptionalArgumentWhichIsNeededHere
+    await goto(info, godefault)
 
 async def flag(info, **kwargs):
     for kwarg in kwargs:
