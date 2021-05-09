@@ -2,8 +2,65 @@ from adventurescript import commands, exceptions, parsecmd
 from adventurescript.inventory import Inventory
 
 class ContextInfo:
-    def __init__(self, name, save_id, show, wait, query, is_async, pass_info):
-        self.gamename = name
+    '''A class to keep all the information concerning the current game session
+    [Documentation is WIP]
+
+    Attributes
+    -----------
+
+    [Handled by __init__ parameters]
+
+    gamename
+    
+    gameinfo
+
+    scriptname
+
+    script
+
+    commands
+
+    save_id
+
+    showfunc
+
+    waitfunc
+
+    queryfunc
+
+    is_async
+
+    pass_info
+
+    [Given a default value in __init__]
+
+    inventory - adventurescript.inventory.Inventory, optional, will only be made if specified so in the game's info file
+        the default inventory, accessible in AdventureScript through && instead of &[inventory name]
+
+    flags - dict {str: bool}
+
+    variables - dict {str: str/int/float/etc.}
+    
+    lists
+
+    extrainvs
+    
+    pointer
+
+    status
+    
+    allow_save
+
+    extra_slots - dict {str: ?}
+        a list of extra variables from addons, used for these addons' purposes and kept in the save
+
+    forbidden_characters - list [str], treated as constant
+        list of characters which can't be used in flag/variable/list/inventory names (TBI: label names)
+        
+        those characters are: &%$.[]{}=;\\()"', (plus the space and newline characters)
+    '''
+    def __init__(self, gamename, save_id, show, wait, query, is_async, pass_info):
+        self.gamename = gamename
         self.gameinfo = eval("{"+",".join(open(f"games/{name}/info").read().split("\n"))+"}")
         if self.gameinfo.get("inventory", False):
             self.inventory = Inventory(self.gameinfo["inventory_size"])
@@ -23,11 +80,25 @@ class ContextInfo:
         self.pointer = 1
         self.status = "ok"
         self.allow_save = True
-        self.extra_slots = []
+        self.extra_slots = [] #TODO: turn it into a dict for ease of use
         self.forbidden_characters = ["&", "%", "$", ".", "[", "]", "{", "}", "=", ";", "\\", "(", ")", " ", "\n", "\"", "'", ","]
     def ending(self, end):
+        '''Displays a "you got the __ ending" (or similar, depending on implementation) message, then quits the game
+
+        Parameters
+        ------------
+
+        end - str
+            the ending name to be displayed'''
         self.status = f"ending {end}"
     def save(self, sq=False):
+        '''Saves the game
+
+        Parameters
+        ------------
+
+        sq - bool, optional (default False)
+            if True, saves and quits, otherwise saves and continues'''
         svfile = open(f"games/{self.gamename}/save/{self.save_id}.asv","w")
         if hasattr(self, "inventory"):
             invtext = "{"+str(self.inventory)+"}"
@@ -40,8 +111,10 @@ class ContextInfo:
         if sq:
             self.status = "quit sv"
     def quit(self):
+        '''Quits the game'''
         self.status = "quit"
     def reload(self):
+        '''Brings the game back to its state before the last save'''
         save = open(f"games/{self.gamename}/save/{self.save_id}.asv").read().split("}{")
         self.scriptname = save[0]
         self.script = open(f"{self.scriptname}.asf").read().split("\n")
@@ -56,6 +129,13 @@ class ContextInfo:
             self.extra_slots[slot] = eval(save[c])
             c+=1
     async def show(self, text):
+        '''Manages displaying text using the self.show function
+        
+        Parameters
+        ------------
+
+        text - str
+            the raw AdventureScript line to process then display'''
         text = text.strip()
         if text.startswith("{"):
             text = text[text.find("}")+1:]
@@ -97,6 +177,7 @@ class ContextInfo:
         else:
             return f
     async def wait(self):
+        '''Manages waiting until the player inputs ("next textbox") using the self.wait function'''
         if self.pass_info:
             f = self.waitfunc(self)
         else:
@@ -106,6 +187,22 @@ class ContextInfo:
         else:
             return f
     async def query(self, text, choices, allow_save=None, **kwargs):
+        '''Manages showing the player a choice and taking their input using the self.query function
+        
+        Parameters
+        ------------
+
+        text - str
+            text to be shown immediately before the choice
+        
+        choices - list [str]
+            the different choices to be shown to the player
+        
+        allow_save - bool, optional
+            if True, the choice allows the player to save the game or restore their save
+
+        **kwargs - keyword arguments
+            those are passed in case the self.query function is custom and requires extra keyword arguments'''
         if allow_save == None:
             allow_save = self.allow_save
         f = self.queryfunc(self, text, choices, allow_save, **kwargs)
