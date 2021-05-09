@@ -18,13 +18,13 @@ async def choice(info, ch1, go1, text="", **kwargs):
     for kwarg in kwargs:
         if kwarg.startswith("ch"):
             chs.append(int(kwarg[2:]))
-        elif kwarg.startswith("go"):
+        elif kwarg.startswith("go") and kwarg != "godefault":
             gos.append(int(kwarg[2:]))
         elif kwarg.startswith("flag"):
             flags.append(int(kwarg[4:]))
-        else:
+        elif kwarg != "godefault":
             raise exceptions.UnwantedArgumentError(info.scriptname, info.pointer, "choice", kwarg)
-    if not chs == gos or len(chs) != max(chs):
+    if len(chs) != max(chs) or max(chs) < max(gos):
         raise exceptions.ChoiceArgumentError(info.scriptname, info.pointer)
     flagdict = {}
     for flag in flags:
@@ -34,7 +34,10 @@ async def choice(info, ch1, go1, text="", **kwargs):
     gotos = [go1]
     for item in chs[1:]:
         choices.append(kwargs["ch"+str(item)])
-        gotos.append(kwargs["go"+str(item)])
+        if item in gos:
+            gotos.append(kwargs.get("go"+str(item)))
+        else:
+            gotos.append(0)
     for flag in flagdict:
         if not flagdict[flag]:
             choices[flag-1] = ""
@@ -43,9 +46,14 @@ async def choice(info, ch1, go1, text="", **kwargs):
         choices.pop(choices.index(""))
         gotos.pop(gotos.index(""))
     result = await info.query(text, choices, **kwargs)
-    if result == 0: #TODO: i think this means that if the go_ is 0, it just continues without going. this is confusing though?
+    if result == 0: #for situations where a save/resume/quit is done
         return
-    await goto(info, gotos[int(result)-1])
+    if kwargs.get("godefault") == None and gotos[int(result)-1] == 0:
+        raise exceptions.MissingArgumentError(info.scriptname, info.pointer, "choice", "godefault") #TODO: MissingOptionalArgumentWhichIsNeededHere
+    elif gotos[int(result)-1] == 0:
+        await goto(info, kwargs["godefault"])
+    else:
+        await goto(info, gotos[int(result)-1])
 
 async def loadscript(info, name, pos=1):
     info.scriptname = f"games/{info.gamename}/script/{name}"
@@ -111,7 +119,7 @@ async def chaincheck(info, check1, go1, **kwargs):
             return
     #this will only happen if no check has happened
     if kwargs.get("godefault") == None:
-        raise exceptions.MissingArgumentError(info.scriptname, info.pointer, "chaincheck", "godefault") #TODO:MissingOptionalArgumentWhichIsNeededHere
+        raise exceptions.MissingArgumentError(info.scriptname, info.pointer, "chaincheck", "godefault") #TODO: MissingOptionalArgumentWhichIsNeededHere
     await goto(info, kwargs["godefault"])
 
 async def flag(info, **kwargs):

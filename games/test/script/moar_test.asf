@@ -1,6 +1,6 @@
 oke
 lets go
-[choice text="what test?"; ch1="list";go1=4;ch2="incvar";go2=16;ch3="switch";go3=21;ch4="chaincheck";go4=35]
+[choice text="what test?"; ch1="list";go1=4;ch2="incvar";go2=16;ch3="switch";go3=21;ch4="chaincheck";go4=35;ch5="godefault";go5=44]
 [deflist list="list"]
 [append list="list"; element="one"]
 [append list="list"; element="two"]
@@ -41,3 +41,9 @@ which one do you want?
 {go1} [ending name="one"]
 {go2} [ending name="two"]
 {godefault} [ending name="default"]
+this is just a quick dumb test
+[choice ch1="no"; ch2="yes"; go1={a}; godefault={hsdgsd}]
+{hsdgsd} it works yay
+[ending name="yayyyyy!"]
+{a} aw :(
+[ending name="a"]
