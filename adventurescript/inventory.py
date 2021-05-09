@@ -64,7 +64,7 @@ class Inventory:
         else:
             self.money -= quantity
             return True
-    def represent(self):
+    def __repr__(self):
         out = ""
         for item in self.inv:
             if item == None:

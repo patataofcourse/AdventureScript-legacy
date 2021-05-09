@@ -84,7 +84,7 @@ class ContextInfo:
                     op = word.split(".")[1:]
                     word = str(await parsecmd.manage_operations(inv, op, False))
                 else:
-                    word = inv.represent()
+                    word = repr(inv)
             text2.append(word)
         text = " ".join(text2)
 
