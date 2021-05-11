@@ -128,14 +128,17 @@ class ContextInfo:
         for slot in self.extra_slots:
             self.extra_slots[slot] = eval(save[c])
             c+=1
-    async def show(self, text):
+    async def show(self, text, ):
         '''Manages displaying text using the self.show function
         
         Parameters
         ------------
 
         text - str
-            the raw AdventureScript line to process then display'''
+            the raw AdventureScript line to process then display
+        
+        **kwargs - keyword arguments
+            those are passed in case the self.query function is custom and requires extra keyword arguments'''
         text = text.strip()
         if text.startswith("{"):
             text = text[text.find("}")+1:]
@@ -169,15 +172,21 @@ class ContextInfo:
         text = " ".join(text2)
 
         if self.pass_info:
-            f = self.showfunc(self, text)
+            f = self.showfunc(self, text, **kwargs)
         else:
-            f = self.showfunc(text)
+            f = self.showfunc(text, **kwargs)
         if self.is_async:
             return await f
         else:
             return f
-    async def wait(self):
-        '''Manages waiting until the player inputs ("next textbox") using the self.wait function'''
+    async def wait(self, **kwargs):
+        '''Manages waiting until the player inputs ("next textbox") using the self.wait function
+        
+        Parameters
+        ------------
+
+        **kwargs - keyword arguments
+            those are passed in case the self.query function is custom and requires extra keyword arguments'''
         if self.pass_info:
             f = self.waitfunc(self)
         else:

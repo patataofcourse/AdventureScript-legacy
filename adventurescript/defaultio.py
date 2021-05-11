@@ -1,9 +1,10 @@
 import os
 import platform
 
-show = print
+def show(text, **kwargs):
+    print(text)
 
-def wait():
+def wait(**kwargs):
     if platform.system() == "Linux" or platform.system() == "Darwin":
         os.system('read -s -n 1')
     elif platform.system() == "Windows":
@@ -40,3 +41,10 @@ def query(info, text, choices, allow_save, **kwargs):
             if int(result)-1 in range(len(choices)):
                 break
     return int(result)
+
+def load_file(game, filename, **kwargs):
+    if type(game) != str:
+        raise TypeError("game must be a string")
+    if type(filename) != str:
+        raise TypeError("filename must be a string")
+    return open(f"games/{game}/{filename}").read()
