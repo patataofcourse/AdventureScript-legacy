@@ -170,7 +170,6 @@ async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     else:
         info.pointer = gofalse-1
 
-#TODO: fix the switchcase you moron
 async def switch(info, var, case1, go1, **kwargs): #hehe i actually did a switchcase
     cas = [1]
     gos = [1]
