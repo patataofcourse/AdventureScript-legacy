@@ -61,10 +61,10 @@ class ContextInfo:
     '''
     def __init__(self, gamename, save_id, show, wait, query, is_async, pass_info):
         self.gamename = gamename
-        self.gameinfo = eval("{"+",".join(open(f"games/{name}/info").read().split("\n"))+"}")
+        self.gameinfo = eval("{"+",".join(open(f"games/{gamename}/info").read().split("\n"))+"}")
         if self.gameinfo.get("inventory", False):
             self.inventory = Inventory(self.gameinfo["inventory_size"])
-        self.scriptname = f"games/{name}/script/start"
+        self.scriptname = f"games/{gamename}/script/start"
         self.script = open(self.scriptname + ".asf").read().split("\n")
         self.commands = commands.__dict__
         self.save_id = save_id
@@ -128,7 +128,7 @@ class ContextInfo:
         for slot in self.extra_slots:
             self.extra_slots[slot] = eval(save[c])
             c+=1
-    async def show(self, text, ):
+    async def show(self, text, **kwargs):
         '''Manages displaying text using the self.show function
         
         Parameters

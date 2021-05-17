@@ -56,9 +56,13 @@ class Inventory:
         else:
             return False
     def add_money(self, quantity): #maybe i should add money limit? idfk
+        if quantity <= 0:
+            raise TypeError("Quantity must be bigger than 0")
         self.money += quantity
         return True
     def remove_money(self, quantity):
+        if quantity <= 0:
+            raise TypeError("Quantity must be bigger than 0")
         if self.money < quantity:
             return False
         else:

@@ -335,10 +335,10 @@ async def addmoney(info, amount, inventory=None): #I will add gofail/gosuccess t
     if inventory == None:
         if not hasattr(info, "inventory"):
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
-        info.inventory.money += amount
+        info.inventory.add_money(amount)
     else:
         try:
-            info.extrainvs[inventory].money += amount
+            info.extrainvs[inventory].add_money(amount)
         except NameError:
             raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
 

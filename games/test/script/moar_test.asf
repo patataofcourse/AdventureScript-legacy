@@ -1,6 +1,6 @@
 oke
 lets go
-[choice text="what test?"; ch1="list";go1=4;ch2="incvar";go2=16;ch3="switch";go3=21;ch4="chaincheck";go4=35;ch5="godefault";go5=44]
+[choice text="what test?"; ch1="list";go1=4;ch2="incvar";go2=16;ch3="switch";go3=21;ch4="chaincheck";go4=35;ch5="godefault";go5=44; ch6="bugfix test 1"; go6={no}]
 [deflist list="list"]
 [append list="list"; element="one"]
 [append list="list"; element="two"]
@@ -47,3 +47,4 @@ this is just a quick dumb test
 [ending name="yayyyyy!"]
 {a} aw :(
 [ending name="a"]
+{no} [addmoney amount=-9]
