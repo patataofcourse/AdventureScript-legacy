@@ -30,7 +30,7 @@ class UndefinedVariableError(UndefinedObjectError):
 
 class UndefinedLabelError(UndefinedObjectError):
     def __init__(self, scriptname, line, lblname):
-        self.args = (f"Label '{chr(123)+lblname+chr(125)}' doesn't exist! ({scriptname}, line {line}",)
+        self.args = (f"Label '{chr(123)+lblname+chr(125)}' doesn't exist! ({scriptname}, line {line})",)
 
 class UndefinedFlagError(UndefinedObjectError):
     def __init__(self, scriptname, line, flagname):

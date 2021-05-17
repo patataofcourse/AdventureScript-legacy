@@ -11,6 +11,7 @@ async def input_format(info, text):
         text = text[1:]
     
     text, outquotes = remove_strings(text)
+    text, outlabels = compress_labels(info, text)
 
     text = text.split("+")
     text2 = text + [] # text2 is used as a way to store the text through the loop, so like a temp variable
@@ -90,8 +91,6 @@ async def input_format(info, text):
                 ops = subsubitem.split(".")[1:]
                 if value.isdecimal():
                     value = int(value)
-                elif value.startswith("{") and value.endswith("}"):
-                    value = find_label(info, value)
                 # elif value.startswith("(") and value.endswith(")"): #TODO: Add this. Not gonna be needed for now
                 #     value = eval(f"[+{value[1:-1]}]")
                 elif value.startswith("$"):
@@ -118,8 +117,10 @@ async def input_format(info, text):
                         value = True
                     else:
                         value = False
-                elif value.startswith('"') and value.endswith('"') or value.startswith("'") and value.endswith("'"):
+                elif value.startswith('"') and value.endswith('"'):
                     value = outquotes[int(value.strip('"'))]
+                elif value.startswith("{") and value.endswith("}"):
+                    value = outlabels[int(value.strip("{}"))]
                 else:
                     value = info.variables[value]
                 subitem2.append(await manage_operations(value, ops))
@@ -239,11 +240,16 @@ async def check_commands(info, line):
                             pair = pair.split("=")
                             kwargs[pair[0].strip()] = await input_format(info,"=".join(pair[1:]))
                     except Exception as e:
+                        if type(e) == exceptions.ArgumentSyntaxError:
+                            raise e
                         raise exceptions.ArgumentSyntaxError(info.scriptname, info.pointer, e)
+                    
                     try:
                         #insert here checking the args
                         await command(info, **kwargs)
                     except Exception as e:
+                        if type(e) == exceptions.CommandException:
+                            raise e
                         raise exceptions.CommandException(info.scriptname, info.pointer, e)
                     return True
         return False
@@ -255,11 +261,57 @@ async def check_commands(info, line):
     else:
         return False
 
-def find_label(info, label): #TODO: treat labels as their own type, instead of making them equivalent to an int
+def find_label(info, label):
+    for ch in info.forbidden_characters:
+        if ch in label[1:-1]:
+            raise exceptions.InvalidNameCharacter(info.scriptname, info.pointer, "label", ch)
     for line in info.script:
-        if line.strip().startswith(label):
+        if line.strip().startswith("{" + label + "}"):
             return info.script.index(line)+1
     raise exceptions.UndefinedLabelError(info.scriptname, info.pointer, label)
+
+def compress_labels(info, text): #latter half stolen from remove_strings
+
+    # #get the start and end of every string
+    # quotepos = [] #here we'll store the index of every quote that's not been escaped
+    # for quote in ("'", "\""):
+    #     allpos = [i for i in range(len(text)) if text.startswith(quote, i)] #gets all instances of each type of quotes
+    #     for index in allpos:
+    #         if text[index-1] != "\\":
+    #             quotepos.append(index) #only pass to quotepos the strings that weren't escaped
+    # opened_quote = ""
+    # quotes = []
+    # for index in sorted(quotepos):
+    #     if opened_quote == "": #no open quotes
+    #         opened_quote = text[index]
+    #         quotes.append(index)
+    #     elif opened_quote == text[index]:       #current quote is the same as the open quote -> it closes, and
+    #         quotes[-1] = (quotes[-1], index)    #otherwise it just gets ignored and treated as any other character
+    #         opened_quote = ""
+
+    start = None
+    labels = []
+    c = 0
+    for char in text:
+        if start == None and char == "{":
+            start = c
+        elif start != None and char == "}":
+            labels.append((start, c))
+            start = None
+        c += 1
+    if start != None:
+        raise SyntaxError("AdventureScript syntax: unclosed {")
+    
+    #now, replace them with things that won't be screwed up by the rest of input_format
+    labels.reverse() #this way the index numbers don't get fucked up
+    c = 1
+    outlabels = []
+    for label in labels:
+        outlabels = [text[label[0]+1:label[1]]] + outlabels
+        text = text[:label[0]]  + "{" + str(len(labels)-c) + "}" +  text[label[1]+1:] #"0", "1", etc.
+        c += 1
+    outlabels = [find_label(info, i) for i in outlabels] #gets the positions of the labels
+    return text, outlabels
 
 def remove_strings(text): #wow i actually commented this very cool
     #get the start and end of every string
@@ -278,6 +330,8 @@ def remove_strings(text): #wow i actually commented this very cool
         elif opened_quote == text[index]:       #current quote is the same as the open quote -> it closes, and
             quotes[-1] = (quotes[-1], index)    #otherwise it just gets ignored and treated as any other character
             opened_quote = ""
+    if opened_quote != "":
+        raise SyntaxError(f"AdventureScript syntax: unclosed {opened_quote}")
     #now, replace them with things that won't be screwed up by the rest of input_format
     quotes.reverse() #this way the index numbers don't get fucked up
     c = 1

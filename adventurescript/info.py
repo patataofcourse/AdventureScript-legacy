@@ -141,6 +141,9 @@ class ContextInfo:
             those are passed in case the self.query function is custom and requires extra keyword arguments'''
         text = text.strip()
         if text.startswith("{"):
+            for ch in self.forbidden_characters:
+                if ch in text[1:text.find("}")]:
+                    raise exceptions.InvalidNameCharacter(self.scriptname, self.pointer, "label", ch)
             text = text[text.find("}")+1:]
             text = text.lstrip()
             
