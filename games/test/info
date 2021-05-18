@@ -4,3 +4,4 @@
 "banner_url":None
 "inventory":True
 "inventory_size":1
+"chapter": ["", "chapter1"]

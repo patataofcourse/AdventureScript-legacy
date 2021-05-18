@@ -47,4 +47,20 @@ def load_file(game, filename, **kwargs):
         raise TypeError("game must be a string")
     if type(filename) != str:
         raise TypeError("filename must be a string")
-    return open(f"games/{game}/{filename}").read()
+    
+    filetype = kwargs.get("type")
+    if filetype == "": filetype = None 
+
+    if kwargs.get("chapter") != None and kwargs.get("chapter") != "":
+        chapter = kwargs.get("chapter") + "/"
+    else:
+        chapter = ""
+
+    outfile = "games/" + {
+        None: f"{game}/{filename}",
+        "script": f"{game}/script/{chapter}{filename}.asf",
+        "save": f"{game}/save/{filename}.asv",
+        "save_p": f"{game}/save/{filename}.p.asv" #for future persistent save (achievements)
+    }.get(filetype)
+
+    return open(outfile).read()
