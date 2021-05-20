@@ -45,7 +45,7 @@ def query(info, text, choices, allow_save, **kwargs):
                 break
     return int(result)
 
-def load_file(game, filename, **kwargs):
+def load_file(game, filename, mode="r", **kwargs):
     if type(game) != str:
         raise TypeError("game must be a string")
     if type(filename) != str:
@@ -65,5 +65,8 @@ def load_file(game, filename, **kwargs):
         "save": f"{game}/save/{filename}.asv",
         "save_p": f"{game}/save/{filename}.p.asv" #for future persistent save (achievements)
     }.get(filetype)
-
-    return open(outfile).read()
+    
+    if mode == "r":
+        return open(outfile).read()
+    else:
+        return open(outfile, mode=mode)

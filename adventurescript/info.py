@@ -223,7 +223,7 @@ class ContextInfo:
             return await f
         else:
             return f
-    async def load_file(self, filename):
+    async def load_file(self, filename, mode="r"):
         '''Loads a file from the game folder
 
         Parameters
@@ -231,7 +231,7 @@ class ContextInfo:
         
         filename - str
             the name of the file to be loaded'''
-        return self.loadfunc(self.gamename, filename)
+        return self.loadfunc(self.gamename, filename, mode=mode)
     async def load_script(self, scriptname):
         '''Loads a script file (from the game/script folder)'s text content
 
@@ -241,7 +241,7 @@ class ContextInfo:
         scriptname - str
             the name of the script to be loaded''' #TODO: Chapter
         return self.loadfunc(self.gamename, scriptname, type=script) #TODO: Chapter
-    async def load_save(self, persistent = False):
+    async def load_save(self, persistent = False, mode="r"):
         '''Loads the current player's save
 
         Parameters
@@ -249,4 +249,4 @@ class ContextInfo:
         
         persistent - bool, optional (defaults to False)
             whether to load the persistent (achievement) save [True] or the regular save [False]'''
-        return self.loadfunc(self.gamename, self.save_id, type="save_p" if persistent else "save")
+        return self.loadfunc(self.gamename, self.save_id, type="save_p" if persistent else "save", mode=mode)
