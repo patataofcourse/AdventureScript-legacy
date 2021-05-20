@@ -28,6 +28,8 @@ class ContextInfo:
 
     queryfunc
 
+    loadfunc
+
     is_async
 
     pass_info
@@ -60,19 +62,19 @@ class ContextInfo:
         those characters are: &%$.[]{}=;\\()"', (plus the space and newline characters)
     '''
     def __init__(self, gamename, save_id, show, wait, query, is_async, pass_info, load_file):
+        self.loadfunc = load_file
         self.gamename = gamename
-        self.gameinfo = eval("{"+",".join(open(f"games/{gamename}/info").read().split("\n"))+"}")
+        self.gameinfo = eval("{"+",".join(self.load_file("info").split("\n"))+"}")
         if self.gameinfo.get("inventory", False):
             self.inventory = Inventory(self.gameinfo["inventory_size"])
-        self.scriptname = f"games/{gamename}/script/start"
-        self.script = open(self.scriptname + ".asf").read().split("\n")
+        self.scriptname = "start"
+        self.script = self.load_script(self.scriptname).split("\n")
         self.pointer = 1
         self.commands = commands.__dict__
         self.save_id = save_id
         self.showfunc = show
         self.waitfunc = wait
         self.queryfunc = query
-        self.loadfunc = load_file
         self.is_async = is_async
         self.pass_info = pass_info
         self.flags = {}
@@ -100,7 +102,7 @@ class ContextInfo:
 
         sq - bool, optional (defaults to False)
             if True, saves and quits, otherwise saves and continues'''
-        svfile = open(f"games/{self.gamename}/save/{self.save_id}.asv","w")
+        svfile = self.load_save(mode="w")
         if hasattr(self, "inventory"):
             invtext = "{"+str(self.inventory)+"}"
         else:
@@ -116,9 +118,9 @@ class ContextInfo:
         self.status = "quit"
     def reload(self):
         '''Brings the game back to its state before the last save'''
-        save = open(f"games/{self.gamename}/save/{self.save_id}.asv").read().split("}{")
+        save = self.load_save().split("}{")
         self.scriptname = save[0]
-        self.script = open(f"{self.scriptname}.asf").read().split("\n")
+        self.script = self.load_script(self.scriptname).split("\n")
         self.pointer = int(save[1]) -1
         self.allow_save = bool(save[2])
         self.flags = eval("{"+save[3]+"}")
@@ -199,7 +201,7 @@ class ContextInfo:
             return await f
         else:
             return f
-    async def query(self, text, choices, allow_save=False, **kwargs):
+    async def query(self, text, choices, allow_save=None, **kwargs):
         '''Manages showing the player a choice and taking their input using the self.query function
         
         Parameters
@@ -211,7 +213,7 @@ class ContextInfo:
         choices - list [str]
             the different choices to be shown to the player
         
-        allow_save - bool, optional (defaults to False)
+        allow_save - bool, optional (defaults to None)
             if True, the choice allows the player to save the game or restore their save
 
         **kwargs - keyword arguments
@@ -223,16 +225,19 @@ class ContextInfo:
             return await f
         else:
             return f
-    async def load_file(self, filename, mode="r"):
+    def load_file(self, filename, mode="r"):
         '''Loads a file from the game folder
 
         Parameters
         ------------
         
         filename - str
-            the name of the file to be loaded'''
+            the name of the file to be loaded
+        
+        mode - str, optional (defaults to "r")
+            the mode in which to load the file. See help(open) for more information'''
         return self.loadfunc(self.gamename, filename, mode=mode)
-    async def load_script(self, scriptname):
+    def load_script(self, scriptname):
         '''Loads a script file (from the game/script folder)'s text content
 
         Parameters
@@ -240,13 +245,16 @@ class ContextInfo:
         
         scriptname - str
             the name of the script to be loaded''' #TODO: Chapter
-        return self.loadfunc(self.gamename, scriptname, type=script) #TODO: Chapter
-    async def load_save(self, persistent = False, mode="r"):
+        return self.loadfunc(self.gamename, scriptname, type="script") #TODO: Chapter
+    def load_save(self, persistent = False, mode="r"):
         '''Loads the current player's save
 
         Parameters
         ------------
         
         persistent - bool, optional (defaults to False)
-            whether to load the persistent (achievement) save [True] or the regular save [False]'''
-        return self.loadfunc(self.gamename, self.save_id, type="save_p" if persistent else "save", mode=mode)
+            whether to load the persistent (achievement) save [True] or the regular save [False]
+        
+        mode - str, optional (defaults to "r")
+            the mode in which to load the save. See help(open) for more information'''
+        return self.loadfunc(self.gamename, str(self.save_id), type="save_p" if persistent else "save", mode=mode)

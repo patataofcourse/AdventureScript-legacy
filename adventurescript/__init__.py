@@ -18,7 +18,7 @@ async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query
 
     #Prompt to restore last save
     try:
-        save = open(f"games/{info.gamename}/save/{info.save_id}.asv").read().split("}{")
+        info.load_save()
     except:
         pass
     else:
