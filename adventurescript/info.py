@@ -59,25 +59,26 @@ class ContextInfo:
         
         those characters are: &%$.[]{}=;\\()"', (plus the space and newline characters)
     '''
-    def __init__(self, gamename, save_id, show, wait, query, is_async, pass_info):
+    def __init__(self, gamename, save_id, show, wait, query, is_async, pass_info, load_file):
         self.gamename = gamename
         self.gameinfo = eval("{"+",".join(open(f"games/{gamename}/info").read().split("\n"))+"}")
         if self.gameinfo.get("inventory", False):
             self.inventory = Inventory(self.gameinfo["inventory_size"])
         self.scriptname = f"games/{gamename}/script/start"
         self.script = open(self.scriptname + ".asf").read().split("\n")
+        self.pointer = 1
         self.commands = commands.__dict__
         self.save_id = save_id
         self.showfunc = show
         self.waitfunc = wait
         self.queryfunc = query
+        self.loadfunc = load_file
         self.is_async = is_async
         self.pass_info = pass_info
         self.flags = {}
         self.variables = {}
         self.lists = {}
         self.extrainvs = {} #Added for shop storage purposes and crap
-        self.pointer = 1
         self.status = "ok"
         self.allow_save = True
         self.extra_slots = [] #TODO: turn it into a dict for ease of use
@@ -97,7 +98,7 @@ class ContextInfo:
         Parameters
         ------------
 
-        sq - bool, optional (default False)
+        sq - bool, optional (defaults to False)
             if True, saves and quits, otherwise saves and continues'''
         svfile = open(f"games/{self.gamename}/save/{self.save_id}.asv","w")
         if hasattr(self, "inventory"):
@@ -198,7 +199,7 @@ class ContextInfo:
             return await f
         else:
             return f
-    async def query(self, text, choices, allow_save=None, **kwargs):
+    async def query(self, text, choices, allow_save=False, **kwargs):
         '''Manages showing the player a choice and taking their input using the self.query function
         
         Parameters
@@ -210,7 +211,7 @@ class ContextInfo:
         choices - list [str]
             the different choices to be shown to the player
         
-        allow_save - bool, optional
+        allow_save - bool, optional (defaults to False)
             if True, the choice allows the player to save the game or restore their save
 
         **kwargs - keyword arguments
@@ -222,3 +223,30 @@ class ContextInfo:
             return await f
         else:
             return f
+    async def load_file(self, filename):
+        '''Loads a file from the game folder
+
+        Parameters
+        ------------
+        
+        filename - str
+            the name of the file to be loaded'''
+        return self.loadfunc(self.gamename, filename)
+    async def load_script(self, scriptname):
+        '''Loads a script file (from the game/script folder)'s text content
+
+        Parameters
+        ------------
+        
+        scriptname - str
+            the name of the script to be loaded''' #TODO: Chapter
+        return self.loadfunc(self.gamename, scriptname, type=script) #TODO: Chapter
+    async def load_save(self, persistent = False):
+        '''Loads the current player's save
+
+        Parameters
+        ------------
+        
+        persistent - bool, optional (defaults to False)
+            whether to load the persistent (achievement) save [True] or the regular save [False]'''
+        return self.loadfunc(self.gamename, self.save_id, type="save_p" if persistent else "save")

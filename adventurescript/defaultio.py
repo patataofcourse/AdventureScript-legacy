@@ -37,7 +37,10 @@ def query(info, text, choices, allow_save, **kwargs):
                     info.showfunc("Save restored!")
                     info.reload()
                     return 0
-        if result.isdecimal():
+        if result == "q":
+            info.status = "quit"
+            return 0
+        elif result.isdecimal():
             if int(result)-1 in range(len(choices)):
                 break
     return int(result)
