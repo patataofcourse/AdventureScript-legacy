@@ -48,6 +48,22 @@ class NoDefaultInventoryError(UndefinedInventoryError):
     def __init__(self, scriptname, line):
         self.args = (f"The default inventory isn't set up! ({scriptname}, line {line})",)
 
+#Invalid save/save_p data
+
+class InvalidPersSaveData(Exception):
+    def __init__(self, id):
+        if id != None:
+            self.args = (f"Tried to load invalid persistent save data! (save ID {id})",)
+        else:
+            self.args = (f"Tried to load invalid persistent save data!",)
+
+class InvalidAchievementData(Exception):
+    def __init__(self, id):
+        if id != None:
+            self.args = (f"Tried to load invalid achievement data! (save ID {id})",)
+        else:
+            self.args = (f"Tried to load invalid achievement data!",)
+
 #Other
 
 class InvalidNameCharacter(CommandException):

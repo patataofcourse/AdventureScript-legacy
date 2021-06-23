@@ -27,6 +27,8 @@ async def parse(name, save_id=None, show=defaultio.show, wait=defaultio.wait, qu
         if response == 2:
             await info.show("A new game will be started.")
             await info.wait()
+        elif response == 0:
+            return info.status
         else:
             info.reload()
             info.pointer += 1

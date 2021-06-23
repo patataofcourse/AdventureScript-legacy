@@ -6,6 +6,8 @@ class ContextInfo:
         self.loadfunc = load_file
         self.gamename = gamename
         self.gameinfo = eval("{"+",".join(self.load_file("info").split("\n"))+"}")
+        if self.gameinfo["achievements"]:
+            self.gameinfo["achievements"] = eval("[("+"),(".join(self.load_file("achievements").split("\n"))+")]")
         if self.gameinfo.get("inventory", False):
             self.inventory = Inventory(self.gameinfo["inventory_size"])
         self.scriptname = "start"
@@ -22,6 +24,7 @@ class ContextInfo:
         self.variables = {}
         self.lists = {}
         self.extrainvs = {} #Added for shop storage purposes and crap
+        self.achievements = []
         self.status = "ok"
         self.allow_save = True
         self.extra_slots = {}
@@ -72,6 +75,10 @@ class ContextInfo:
         for slot in self.extra_slots:
             self.extra_slots[slot] = eval(save[c])
             c+=1
+        for a in self.load_save(True).split(" "):
+            if not a.isdigit():
+                raise exceptions.InvalidAchievementData(self.save_id)
+            self.achievements.append(int(a))
     async def show(self, text, **kwargs):
         '''Manages displaying text using the self.show function
         
