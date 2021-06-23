@@ -57,7 +57,7 @@ class InvalidPersSaveData(Exception):
         else:
             self.args = (f"Tried to load invalid persistent save data!",)
 
-class InvalidAchievementData(Exception):
+class InvalidAchievementData(InvalidPersSaveData):
     def __init__(self, id):
         if id != None:
             self.args = (f"Tried to load invalid achievement data! (save ID {id})",)

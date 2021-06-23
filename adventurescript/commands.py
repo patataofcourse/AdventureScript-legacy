@@ -384,14 +384,18 @@ async def delinv(info, inv):
 #Achievement commands
 
 async def achievement(info, name): #TODO: make it work with numbers
-    if name in info.achievements: #TODO: numbers
+    if name in info.achievements:
         return
+    
+    if info.gameinfo["achievements"][name]["type"] != "flag":
+        raise NotImplementedError("Achievement types other than flag are not implemented in achievement command!")
 
     achievefile = info.load_save(True, "r+")
     if len(achievefile.read()) != 0:
         achievefile.write("|")
-    achievefile.write(name)
+    
+    achievefile.write(name) #TODO: numbers
     achievefile.close()
-
-    info.achievements.append(name) #TODO: numbers
+    
+    info.achievements.append(name)
     await info.show(f"\n__[You just got the **{name}** achievement!]__\n")
