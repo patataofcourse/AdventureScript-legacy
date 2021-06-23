@@ -2,65 +2,6 @@ from adventurescript import commands, exceptions, parsecmd
 from adventurescript.inventory import Inventory
 
 class ContextInfo:
-    '''A class to keep all the information concerning the current game session
-    [Documentation is WIP]
-
-    Attributes
-    -----------
-
-    [Handled by __init__ parameters]
-
-    gamename
-    
-    gameinfo
-
-    scriptname
-
-    script
-
-    commands
-
-    save_id
-
-    showfunc
-
-    waitfunc
-
-    queryfunc
-
-    loadfunc
-
-    is_async
-
-    pass_info
-
-    [Given a default value in __init__]
-
-    inventory - adventurescript.inventory.Inventory, optional, will only be made if specified so in the game's info file
-        the default inventory, accessible in AdventureScript through && instead of &[inventory name]
-
-    flags - dict {str: bool}
-
-    variables - dict {str: str/int/float/etc.}
-    
-    lists
-
-    extrainvs
-    
-    pointer
-
-    status
-    
-    allow_save
-
-    extra_slots - dict {str: ?}
-        a list of extra variables from addons, used for these addons' purposes and kept in the save
-
-    forbidden_characters - list [str], treated as constant
-        list of characters which can't be used in flag/variable/list/inventory names (TBI: label names)
-        
-        those characters are: &%$.[]{}=;\\()"', (plus the space and newline characters)
-    '''
     def __init__(self, gamename, save_id, show, wait, query, is_async, pass_info, load_file):
         self.loadfunc = load_file
         self.gamename = gamename
