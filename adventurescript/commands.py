@@ -380,3 +380,20 @@ async def delinv(info, inv):
         info.extrainvs.pop(inv)
     except KeyError:
         raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inv)
+
+#Achievement commands
+
+async def achievement(info, name): #TODO: make it work with numbers, achievements file
+    try:
+        achievefile = info.load_save(True, "r+")
+    except:
+        achievefile = info.load_save(True, "w")
+    else:
+        contents = achievefile.read()
+        if name in contents.split("|"):
+            return
+        if contents != "":
+            achievefile.write("|")
+    achievefile.write(name)
+    achievefile.close()
+    await info.show(f"\n__[You just got the **{name}** achievement!]__\n")

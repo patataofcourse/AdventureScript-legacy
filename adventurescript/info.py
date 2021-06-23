@@ -24,7 +24,7 @@ class ContextInfo:
         self.extrainvs = {} #Added for shop storage purposes and crap
         self.status = "ok"
         self.allow_save = True
-        self.extra_slots = [] #TODO: turn it into a dict for ease of use
+        self.extra_slots = {}
         self.forbidden_characters = ["&", "%", "$", ".", "[", "]", "{", "}", "=", ";", "\\", "(", ")", " ", "\n", "\"", "'", ","]
     def ending(self, end):
         '''Displays a "you got the __ ending" (or similar, depending on implementation) message, then quits the game
@@ -83,8 +83,7 @@ class ContextInfo:
         
         **kwargs - keyword arguments
             those are passed in case the self.query function is custom and requires extra keyword arguments'''
-        text = text.strip()
-        if text.startswith("{"):
+        if text.strip().startswith("{"):
             for ch in self.forbidden_characters:
                 if ch in text[1:text.find("}")]:
                     raise exceptions.InvalidNameCharacter(self.scriptname, self.pointer, "label", ch)
