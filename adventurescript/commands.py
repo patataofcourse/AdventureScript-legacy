@@ -383,7 +383,7 @@ async def delinv(info, inv):
 
 #Achievement commands
 
-async def achievement(info, name): #TODO: make it work with numbers
+async def achievement(info, name): #TODO: pls remove file i/o code from here, move it to info.py or something
     if name in info.achievements:
         return
     
@@ -392,9 +392,9 @@ async def achievement(info, name): #TODO: make it work with numbers
 
     achievefile = info.load_save(True, "r+")
     if len(achievefile.read()) != 0:
-        achievefile.write("|")
+        achievefile.write(" ")
     
-    achievefile.write(name) #TODO: numbers
+    achievefile.write(str(info.gameinfo["achievements"][name]["num"]))
     achievefile.close()
     
     info.achievements.append(name)

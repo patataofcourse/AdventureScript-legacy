@@ -9,17 +9,17 @@ class ContextInfo:
         if self.gameinfo["achievements"]:
             self.gameinfo["achievements"] = {}
             pos = -1
-            for a in eval("[("+"),(".join(self.load_file("achievements").split("\n"))+")]"):
+            for a in eval("[["+"],[".join(self.load_file("achievements").split("\n"))+"]]"):
                 pos += 1
                 
                 if len(a) == 0:
                     continue
                 elif len(a) == 1:
                     a_type = "flag"
-                    a_args = []
+                    a_args = ()
                 else:
                     a_type = a[1]
-                    a_args = a[2:]
+                    a_args = tuple(a[2:])
                 
                 self.gameinfo["achievements"][a[0]] = {"type": a_type, "num": pos, "args": a_args}
         if self.gameinfo.get("inventory", False):
@@ -39,10 +39,19 @@ class ContextInfo:
         self.lists = {}
         self.extrainvs = {} #Added for shop storage purposes and crap
         self.achievements = []
-        for a in self.load_save(True).split("|"): #when u make it numbers make it split(" ")
-            #if not a.isdigit():
-            #    raise exceptions.InvalidAchievementData(self.save_id)
-            self.achievements.append(a.strip()) #int(a)
+        for a in self.load_save(True).split(" "):
+            if a == "":
+                continue
+            if not a.isdigit():
+                raise exceptions.InvalidAchievementData(self.save_id)
+            name = None
+            for ach in self.gameinfo["achievements"]:
+                if self.gameinfo["achievements"][ach]["num"] == int(a):
+                    name = ach
+                    break
+            if name == None:
+                raise Exception(f"invalid achievement {a}")
+            self.achievements.append(name)
         self.status = "ok" #TODO: cmon .-.
         self.allow_save = True
         self.extra_slots = {}
