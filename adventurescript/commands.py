@@ -386,15 +386,12 @@ async def delinv(info, inv):
 async def achievement(info, name): #TODO: make it work with numbers
     if name in info.achievements: #TODO: numbers
         return
-    try:
-        achievefile = info.load_save(True, "r+")
-    except:
-        achievefile = info.load_save(True, "w")
-    else:
-        contents = achievefile.read()
-        if contents != "":
-            achievefile.write("|")
+
+    achievefile = info.load_save(True, "r+")
+    if len(achievefile.read()) != 0:
+        achievefile.write("|")
     achievefile.write(name)
     achievefile.close()
+
     info.achievements.append(name) #TODO: numbers
     await info.show(f"\n__[You just got the **{name}** achievement!]__\n")

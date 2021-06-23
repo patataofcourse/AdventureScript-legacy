@@ -66,7 +66,17 @@ def load_file(game, filename, mode="r", **kwargs):
         "save_p": f"{game}/save_p/{filename}.asv" #for future persistent save (achievements)
     }.get(filetype)
     
-    if mode == "r":
-        return open(outfile).read()
-    else:
-        return open(outfile, mode=mode)
+    try:
+        if mode == "r":
+            return open(outfile).read()
+        else:
+            return open(outfile, mode=mode)
+    except FileNotFoundError as e:
+        if kwargs.get("create"):
+            open(outfile, "w").close()
+            if mode == "r":
+                return open(outfile).read()
+            else:
+                return open(outfile, mode=mode)
+        else:
+            raise e
