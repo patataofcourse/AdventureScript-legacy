@@ -7,7 +7,21 @@ class ContextInfo:
         self.gamename = gamename
         self.gameinfo = eval("{"+",".join(self.load_file("info").split("\n"))+"}")
         if self.gameinfo["achievements"]:
-            self.gameinfo["achievements"] = eval("[("+"),(".join(self.load_file("achievements").split("\n"))+")]")
+            self.gameinfo["achievements"] = {}
+            pos = -1
+            for a in eval("[("+"),(".join(self.load_file("achievements").split("\n"))+")]"):
+                pos += 1
+                
+                if len(a) == 0:
+                    continue
+                elif len(a) == 1:
+                    a_type = "flag"
+                    a_args = []
+                else:
+                    a_type = a[1]
+                    a_args = a[2:]
+                
+                self.gameinfo["achievements"][a[0]] = {"type": a_type, "num": pos, "args": a_args}
         if self.gameinfo.get("inventory", False):
             self.inventory = Inventory(self.gameinfo["inventory_size"])
         self.scriptname = "start"
@@ -25,7 +39,11 @@ class ContextInfo:
         self.lists = {}
         self.extrainvs = {} #Added for shop storage purposes and crap
         self.achievements = []
-        self.status = "ok"
+        for a in self.load_save(True).split("|"): #when u make it numbers make it split(" ")
+            #if not a.isdigit():
+            #    raise exceptions.InvalidAchievementData(self.save_id)
+            self.achievements.append(a.strip()) #int(a)
+        self.status = "ok" #TODO: cmon .-.
         self.allow_save = True
         self.extra_slots = {}
         self.forbidden_characters = ["&", "%", "$", ".", "[", "]", "{", "}", "=", ";", "\\", "(", ")", " ", "\n", "\"", "'", ","]
@@ -75,10 +93,6 @@ class ContextInfo:
         for slot in self.extra_slots:
             self.extra_slots[slot] = eval(save[c])
             c+=1
-        for a in self.load_save(True).split(" "):
-            if not a.isdigit():
-                raise exceptions.InvalidAchievementData(self.save_id)
-            self.achievements.append(int(a))
     async def show(self, text, **kwargs):
         '''Manages displaying text using the self.show function
         
