@@ -399,3 +399,9 @@ async def achievement(info, name): #TODO: pls remove file i/o code from here, mo
     
     info.achievements.append(name)
     await info.show(f"\n__[You just got the **{name}** achievement!]__\n")
+
+#Chapter commands
+
+async def chapter(info, name):
+    info.chapter = name
+    await loadscript(info, "start")

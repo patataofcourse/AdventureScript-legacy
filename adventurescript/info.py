@@ -25,6 +25,7 @@ class ContextInfo:
         if self.gameinfo.get("inventory", False):
             self.inventory = Inventory(self.gameinfo["inventory_size"])
         self.scriptname = "start"
+        self.chapter = ""
         self.script = self.load_script(self.scriptname).split("\n")
         self.pointer = 1
         self.commands = commands.__dict__
@@ -209,13 +210,14 @@ class ContextInfo:
         return self.loadfunc(self.gamename, filename, mode=mode)
     def load_script(self, scriptname):
         '''Loads a script file (from the game/script folder)'s text content
+        Will be loaded inside the current chapter, if any
 
         Parameters
         ------------
         
         scriptname - str
-            the name of the script to be loaded''' #TODO: Chapter
-        return self.loadfunc(self.gamename, scriptname, type="script") #TODO: Chapter
+            the name of the script to be loaded'''
+        return self.loadfunc(self.gamename, scriptname, type="script", chapter = self.chapter)
     def load_save(self, persistent = False, mode="r"):
         '''Loads the current player's save
 
