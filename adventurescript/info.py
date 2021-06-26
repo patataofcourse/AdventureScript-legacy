@@ -6,7 +6,7 @@ class ContextInfo:
         self.loadfunc = load_file
         self.gamename = gamename
         self.gameinfo = eval("{"+",".join(self.load_file("info").split("\n"))+"}")
-        if self.gameinfo["achievements"]:
+        if self.gameinfo.get("achievements", False):
             self.gameinfo["achievements"] = {}
             pos = -1
             for a in eval("[["+"],[".join(self.load_file("achievements").split("\n"))+"]]"):
