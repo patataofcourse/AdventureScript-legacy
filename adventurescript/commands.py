@@ -71,6 +71,7 @@ async def gameover(info):
         info.quit()
 
 async def ending(info, name):
+    await info.wait()
     info.ending(name)
 
 async def saveoff(info):
