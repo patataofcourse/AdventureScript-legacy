@@ -107,16 +107,16 @@ class ContextInfo:
         self.chapter = save["chapter"]
         self.scriptname = save["script"]
         self.script = self.load_script(self.scriptname).split("\n")
-        self.pointer = int(save[1]) -1
-        self.allow_save = bool(save[2])
-        self.flags = eval("{"+save[3]+"}")
-        self.variables = eval("{"+save[4]+"}")
-        self.lists = eval("{"+save[5]+"}")
-        self.inventory.recreate(*eval(save[6]))
-        c = 7
-        for slot in self.extra_slots:
-            self.extra_slots[slot] = eval(save[c])
-            c+=1
+        self.pointer = save["pointer"] -1
+        self.allow_save = save["allow_save"]
+        self.flags = save["flags"]
+        self.variables = save["variables"]
+        self.lists = save["lists"]
+        if save.get("default_inv"):
+            self.inventory.recreate(*eval(save["default_inv"]))
+        for item in save["inventories"]:
+            self.extrainvs[item] = Inventory().recreate(*eval(save["inventories"][item]))
+        self.extra_slots = save["extra"]
     async def show(self, text, **kwargs):
         '''Manages displaying text using the self.show function
         
