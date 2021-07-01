@@ -6,6 +6,7 @@ from adventurescript.inventory import Inventory
 async def input_format(info, text):
     # Warning: badly named variables ahead
     flip_result = False
+    text = text.lstrip()
     while text.startswith("-"):
         flip_result = not flip_result
         text = text[1:]
