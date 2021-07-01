@@ -1,4 +1,6 @@
-from adventurescript import commands, exceptions, parsecmd
+import json
+
+from adventurescript import commands, exceptions, parsecmd, version
 from adventurescript.inventory import Inventory
 
 class ContextInfo:
@@ -24,6 +26,8 @@ class ContextInfo:
                 self.gameinfo["achievements"][a[0]] = {"type": a_type, "num": pos, "args": a_args}
         if self.gameinfo.get("inventory", False):
             self.inventory = Inventory(self.gameinfo["inventory_size"])
+        else:
+            self.inventory = None
         self.scriptname = "start"
         self.chapter = ""
         self.script = self.load_script(self.scriptname).split("\n")
@@ -74,14 +78,21 @@ class ContextInfo:
 
         sq - bool, optional (defaults to False)
             if True, saves and quits, otherwise saves and continues'''
+        save = {
+            "version": version.version,
+            "chapter": self.chapter,
+            "script": self.scriptname,
+            "pointer": self.pointer,
+            "allow_save": self.allow_save,
+            "flags": self.flags,
+            "variables": self.variables,
+            "lists": self.lists,
+            "default_inv": str(self.inventory), 
+            "inventories": self.extrainvs,
+            "extra": self.extra_slots
+        }
         svfile = self.load_save(mode="w")
-        if hasattr(self, "inventory"):
-            invtext = "{"+str(self.inventory)+"}"
-        else:
-            invtext = ""
-        svfile.write("}{".join((self.scriptname,str(self.pointer),str(self.allow_save)))+"}"+str(self.flags)+str(self.variables)+str(self.lists)+invtext+str(self.extrainvs)[:-1])
-        for slot in self.extra_slots:
-            svfile.write("}{"+repr(self.extra_slots[slot]))
+        svfile.write(json.dumps(save))
         svfile.close()
         if sq:
             self.status = "quit sv"

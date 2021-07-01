@@ -1,8 +1,10 @@
 import asyncio
-from adventurescript import commands, exceptions, defaultio, inventory, parsecmd
+from adventurescript import commands, exceptions, defaultio, inventory, parsecmd, version
 from adventurescript.info import ContextInfo
 import os
 import platform
+
+__version__ = version.version
 
 async def parse(name, save_id=None, show=defaultio.show, wait=defaultio.wait, query=defaultio.query, pass_info = False, addons = [], is_async=False, load_file=defaultio.load_file):
     info = ContextInfo(name, save_id, show, wait, query, is_async, pass_info, load_file)
