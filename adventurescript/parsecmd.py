@@ -95,7 +95,7 @@ async def input_format(info, text):
                 # elif value.startswith("(") and value.endswith(")"): #TODO: Add this. Not gonna be needed for now
                 #     value = eval(f"[+{value[1:-1]}]")
                 elif value.startswith("$"):
-                    value = info.lists[value[1:]]
+                    value = info.list(value[1:])
                 elif value.startswith("%"):
                     val = info.flags.get(value[1:], None)
                     if val == None:
@@ -109,10 +109,7 @@ async def input_format(info, text):
                         except AttributeError:
                             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
                     else:
-                        try:
-                            value = info.extrainvs[value[1:]]
-                        except NameError:
-                            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+                        value = info.inv(value[1:])
                 elif value.lower() in ("true", "false"):
                     if value.lower() == "true":
                         value = True
@@ -123,7 +120,7 @@ async def input_format(info, text):
                 elif value.startswith("{") and value.endswith("}"):
                     value = outlabels[int(value.strip("{}"))]
                 else:
-                    value = info.variables[value]
+                    value = info.var(value)
                 subitem2.append(await manage_operations(value, ops))
             subitem = subitem2
             subitem2 = subitem.pop(0)

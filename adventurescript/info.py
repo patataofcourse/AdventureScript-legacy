@@ -117,6 +117,54 @@ class ContextInfo:
         for item in save["inventories"]:
             self.extrainvs[item] = Inventory().recreate(*eval(save["inventories"][item]))
         self.extra_slots = save["extra"]
+    def flag(self, name):
+        '''Gets a flag from its name
+
+        Parameters
+        ------------
+
+        name - str
+            the name of the flag to be obtained'''
+        try:
+            return self.flags[name]
+        except KeyError:
+            raise exceptions.UndefinedFlagError(self.scriptname, self.pointer+1, name)
+    def var(self, name):
+        '''Gets a variable from its name
+
+        Parameters
+        ------------
+
+        name - str
+            the name of the variable to be obtained'''
+        try:
+            return self.variables[name]
+        except KeyError:
+            raise exceptions.UndefinedVariableError(self.scriptname, self.pointer+1, name)
+    def list(self, name):
+        '''Gets a list from its name
+
+        Parameters
+        ------------
+
+        name - str
+            the name of the list to be obtained'''
+        try:
+            return self.lists[name]
+        except KeyError:
+            raise exceptions.UndefinedListError(self.scriptname, self.pointer+1, name)
+    def inv(self, name):
+        '''Gets an inventory from its name
+
+        Parameters
+        ------------
+
+        name - str
+            the name of the inventory to be obtained'''
+        try:
+            return self.extrainvs[name]
+        except KeyError:
+            raise exceptions.UndefinedInventoryError(self.scriptname, self.pointer+1, name)
     async def show(self, text, **kwargs):
         '''Manages displaying text using the self.show function
         
@@ -140,9 +188,9 @@ class ContextInfo:
         for word in text:
             if word.startswith("$"):
                 if word.startswith("$$"):
-                    var = self.lists[word.split(".")[0][2:]]
+                    var = self.list(word.split(".")[0][2:])
                 else:
-                    var = self.variables[word.split(".")[0][1:]]
+                    var = self.var(word.split(".")[0][1:])
                 if len(word.split(".")) > 1:
                     op = word.split(".")[1:]
                     word = await parsecmd.manage_operations(var, op, False)
@@ -153,7 +201,7 @@ class ContextInfo:
                 if word.startswith("&&"):
                     inv = self.inventory
                 else:
-                    inv = self.extrainvs[word.split(".")[0][1:]]
+                    inv = self.inv(word.split(".")[0][1:])
                 if len(word.split(".")) > 1:
                     op = word.split(".")[1:]
                     word = str(await parsecmd.manage_operations(inv, op, False))

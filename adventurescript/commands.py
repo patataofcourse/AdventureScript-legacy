@@ -155,15 +155,15 @@ async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     if var not in info.variables:
         raise exceptions.UndefinedVariableError(info.scriptname, info.pointer+1, var)
     if comparison.lower() in ("equal", "=", "==", "==="):
-        result = info.variables[var] == value
+        result = info.var(var) == value
     elif comparison.lower() in ("greater", ">"):
-        result = info.variables[var] > value
+        result = info.var(var) > value
     elif comparison.lower() in ("greater or equal", ">="):
-        result = info.variables[var] >= value
+        result = info.var(var) >= value
     elif comparison.lower() in ("lesser", "<"):
-        result = info.variables[var] < value
+        result = info.var(var) < value
     elif comparison.lower() in ("lesser or equal", "<="):
-        result = info.variables[var] <= value
+        result = info.var(var) <= value
     else:
         raise exceptions.CommandException(info.scriptname, info.pointer+1, "checkvar", f"Invalid comparison type: {comparison}")
     if result:
@@ -198,6 +198,8 @@ async def switch(info, var, case1, go1, **kwargs): #hehe i actually did a switch
     info.pointer = kwargs["godefault"]-1
 
 async def incvar(info, var, value): #basically +=
+    if info.variables.get(var) == None:
+        raise UndefinedVariableError(info.scriptname, info.pointer+1, var)
     info.variables[var] += value
 
 async def delvar(info, var):
@@ -217,22 +219,22 @@ async def deflist(info, list):
 list = deflist #careful: this alias might not work well
 
 async def append(info, list, element):
-    info.lists[list].append(element)
+    info.list(list).append(element)
 
 addlist = append
 
 async def remove(info, list, element, find="pos"):
     if find == "pos":
-        info.lists[list].pop(int(element))
+        info.list(list).pop(int(element))
     elif find == "name":
-        info.lists[list].pop(info.lists[list].index(element))
+        info.list(list).pop(info.list(list).index(element))
     else:
         raise exceptions.UnwantedArgumentError(info.scriptname, info.pointer, "remove", "find") #TODO: actual exception type for this
 
 rmvlist = remove
 
 async def checklist(info, list, element, gotrue, gofalse):
-    if element in info.lists[list]:
+    if element in info.list(list):
         await goto(info, gotrue)
     else:
         await goto(info, gofalse)
@@ -262,10 +264,7 @@ async def invadd(info, item, gofail, amount=1, inventory=None, gosuccess=None):
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.add(item, amount)
     else:
-        try:
-            res = info.extrainvs[inventory].add(item, amount)
-        except NameError:
-            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+        res = info.inv(inventory).add(item, amount)
     if not res:
         await goto(info, gofail)
     elif gosuccess != None:
@@ -277,10 +276,7 @@ async def invrmv(info, item, gofail, amount=1, inventory=None, gosuccess=None):
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.remove(item, amount)
     else:
-        try:
-            res = info.extrainvs[inventory].remove(item, amount)
-        except NameError:
-            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+        res = info.inv(inventory).remove(item, amount)
     if not res:
         await goto(info, gofail)
     elif gosuccess != None:
@@ -292,10 +288,7 @@ async def invfind(info, item, gotrue, gofalse, amount=1, inventory=None):
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.find(item, amount)
     else:
-        try:
-            res = info.extrainvs[inventory].find(item, amount)
-        except NameError:
-            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+        res = info.inv(inventory).find(item, amount)
     if res == None:
         await goto(info, gofalse)
     else:
@@ -310,10 +303,7 @@ async def invupgrade(info, size, inventory=None):
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         info.inventory.upgrade(size)
     else:
-        try:
-            info.extrainvs[inventory].upgrade(size)
-        except NameError:
-            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+        info.inv(inventory).upgrade(size)
 
 async def invdowngrade(info, size, gofail, inventory=None, gosuccess=None):
     if inventory == None:
@@ -321,10 +311,7 @@ async def invdowngrade(info, size, gofail, inventory=None, gosuccess=None):
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.downgrade(size)
     else:
-        try:
-            res = info.extrainvs[inventory].downgrade(size)
-        except NameError:
-            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+        res = info.inv(inventory).downgrade(size)
     if res == 1 and gosuccess != None:
         await goto(info, gosuccess)
     elif res == 0:
@@ -338,10 +325,7 @@ async def addmoney(info, amount, inventory=None): #I will add gofail/gosuccess t
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         info.inventory.add_money(amount)
     else:
-        try:
-            info.extrainvs[inventory].add_money(amount)
-        except NameError:
-            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+        info.inv(inventory).add_money(amount)
 
 async def rmvmoney(info, gofail, amount, inventory=None, gosuccess=None):
     if inventory == None:
@@ -349,10 +333,7 @@ async def rmvmoney(info, gofail, amount, inventory=None, gosuccess=None):
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.remove_money(amount)
     else:
-        try:
-            res = info.extrainvs[inventory].remove_money(amount)
-        except NameError:
-            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+        res = info.inv(inventory).remove_money(amount)
     if not res:
         await goto(info, gofail)
     elif gosuccess != None:
