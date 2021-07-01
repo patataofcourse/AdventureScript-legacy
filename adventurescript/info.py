@@ -101,8 +101,11 @@ class ContextInfo:
         self.status = "quit"
     def reload(self):
         '''Brings the game back to its state before the last save'''
-        save = self.load_save().split("}{")
-        self.scriptname = save[0]
+        save = json.loads(self.load_save())
+        if not version.check(save["version"]):
+            raise exceptions.OldSaveException(save["version"])
+        self.chapter = save["chapter"]
+        self.scriptname = save["script"]
         self.script = self.load_script(self.scriptname).split("\n")
         self.pointer = int(save[1]) -1
         self.allow_save = bool(save[2])

@@ -1,5 +1,3 @@
-#Command exceptions (commands.py, parsecmd.py)
-
 #Generic exceptions
 
 class CommandException(Exception):
@@ -20,7 +18,7 @@ class MissingArgumentError(CommandException):
 
 #Undefined variables
 
-class UndefinedObjectError(Exception):
+class UndefinedObjectError(CommandException):
     def __init__(self, scriptname, line, name):
         self.args = (f"'{varname}' doesn't exist! ({scriptname}, line {line})",)
 
@@ -50,7 +48,7 @@ class NoDefaultInventoryError(UndefinedInventoryError):
 
 #Invalid save/save_p data
 
-class InvalidPersSaveData(Exception):
+class InvalidPersSaveData(CommandException):
     def __init__(self, id):
         if id != None:
             self.args = (f"Tried to load invalid persistent save data! (save ID {id})",)
@@ -70,18 +68,23 @@ class InvalidNameCharacter(CommandException):
     def __init__(self, scriptname, line, vartype, character):
         self.args = (f"{str.title(vartype)} names can't have the character '{character}'! ({scriptname}, line {line})",)
 
-class ChoiceArgumentError(Exception):
+class ChoiceArgumentError(CommandException):
     def __init__(self, scriptname, line):
         self.args = (f"The ch/go arguments in a [choice] command aren't corresponding. ({scriptname}, line {line})",)
 
-class CheckArgumentError(Exception):
+class CheckArgumentError(CommandException):
     def __init__(self, scriptname, line):
         self.args = (f"The check/go arguments in a [chaincheck] command aren't corresponding. ({scriptname}, line {line})",)
 
-class SwitchArgumentError(Exception):
+class SwitchArgumentError(CommandException):
     def __init__(self, scriptname, line):
         self.args = (f"The case/go arguments in a [switch] command aren't corresponding. ({scriptname}, line {line})",)
 
 class ScriptEndException(Exception):
     def __init__(self, scriptname):
         self.args = (f"Reached end of script {scriptname}!",)
+
+class OldSaveException(Exception):
+    def __init__(self, ver):
+        self.args = (f"Tried to load a save from an old version of AdventureScript (v{ver}), which is no longer compatible.",)
+        self.ver = ver
