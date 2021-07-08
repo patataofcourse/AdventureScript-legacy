@@ -48,7 +48,7 @@ async def parse(name, save_id=None, show=defaultio.show, wait=defaultio.wait, qu
         elif info.status.startswith("ending") or info.status.startswith("quit"):
             return info.status
         else:
-            raise Exception("Unknown status!") #TODO
+            raise exceptions.InvalidStatus(info.scriptname, info.pointer, info.status)
     raise exceptions.ScriptEndException(info.scriptname)
 
 def parse_sync(*args, **kwargs):

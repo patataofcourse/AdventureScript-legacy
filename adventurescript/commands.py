@@ -254,7 +254,10 @@ async def definv(info, inventory, size):
     for character in inventory:
         if character in info.forbidden_characters:
             raise exceptions.InvalidNameCharacter(info.scriptname, info.pointer, "inventory", character)
-    info.extrainvs[inventory] = Inventory(size)
+    try:
+        info.extrainvs[inventory] = Inventory(size)
+    except exceptions.invsize():
+         raise ZeroInventorySizeError(info.scriptname, info.pointer)
 
 inv = definv
 

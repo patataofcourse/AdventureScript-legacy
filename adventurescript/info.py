@@ -55,7 +55,7 @@ class ContextInfo:
                     name = ach
                     break
             if name == None:
-                raise Exception(f"invalid achievement {a}")
+                raise exceptions.InvalidAchievementData(self.scriptname, self.pointer)
             self.achievements.append(name)
         self.status = "ok" #TODO: cmon .-.
         self.allow_save = True
@@ -102,8 +102,11 @@ class ContextInfo:
     def reload(self):
         '''Brings the game back to its state before the last save'''
         save = json.loads(self.load_save())
-        if not version.check(save["version"]):
-            raise exceptions.OldSaveException(save["version"])
+        try:
+            if not version.check(save["version"]):
+                raise exceptions.OldSaveException(save["version"])
+        except exceptions.SaveVer as e:
+            raise exceptions.InvalidSaveVersion(self.id, e.ver)
         self.chapter = save["chapter"]
         self.scriptname = save["script"]
         self.script = self.load_script(self.scriptname).split("\n")

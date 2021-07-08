@@ -143,13 +143,7 @@ async def input_format(info, text):
         for operation in operations1:
             text2 = repr(eval(text2+operation+text.pop(0)))
     if flip_result:
-        try:
-            return -eval(text2)
-        except TypeError as e:
-            if str(e).split(":")[0] != "bad operand type for unary -":
-                raise e
-            else:
-                raise Exception("well someone tried to - a non minusable thing") #TODO
+        return -eval(text2)
     else:
         return eval(text2)
 
@@ -207,7 +201,7 @@ async def manage_operations(value, ops, quotes=True):
             else:
                 raise TypeError("Operation 'not' can only be used with flags")
         else:
-            raise Exception(f"Invalid operation '{op}'!") #TODO
+            raise exceptions.InvalidOperation(info.scriptname, info.pointer, op)
         ops.pop(0)
     if quotes:
         return repr(value)

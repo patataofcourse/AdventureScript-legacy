@@ -1,3 +1,5 @@
+from adventurescript import exceptions
+
 version = "1.3.1-dev"
 save_comp = "1.3.1-dev"
 
@@ -9,7 +11,7 @@ def str_to_ver(ver):
         ver = ver[:-4]
     ver = ver.split(".")
     if len(ver) > 3:
-        raise Exception(f"Invalid version {v}!") #TODO
+        raise exceptions.SaveVer(ver)
     vnum = []
     for item in ver:
         vnum.append(int(item))
