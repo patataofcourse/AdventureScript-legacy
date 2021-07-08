@@ -1,4 +1,4 @@
-version = "1.3.1-dev"
+version = "1.3.1-dev (random branch)"
 save_comp = "1.3.1-dev"
 
 def str_to_ver(ver):

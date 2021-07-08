@@ -1,3 +1,5 @@
+import random
+
 from adventurescript import exceptions
 from adventurescript.inventory import Inventory
 
@@ -387,3 +389,15 @@ async def achievement(info, name): #TODO: pls remove file i/o code from here, mo
 async def chapter(info, name):
     info.chapter = name
     await loadscript(info, "start")
+
+#Randomness command
+
+async def randint(info, var, max, min=0):
+    if info.variables.get(var) == None:
+        raise UndefinedVariableError(info.scriptname, info.pointer+1, var)
+    info.variables[var] = random.randint(min, max)
+
+async def randpick(info, list, var):
+    if info.variables.get(var) == None:
+        raise UndefinedVariableError(info.scriptname, info.pointer+1, var)
+    info.variables[var] = info.list(list)[random.randint(0, len(info.list(list)-1))]
