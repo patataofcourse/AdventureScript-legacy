@@ -1,6 +1,6 @@
 import json
 
-from adventurescript import commands, exceptions, parsecmd, version
+from adventurescript import commands, exceptions, operations, parsecmd, version
 from adventurescript.inventory import Inventory
 
 class ContextInfo:
@@ -196,7 +196,7 @@ class ContextInfo:
                     var = self.var(word.split(".")[0][1:])
                 if len(word.split(".")) > 1:
                     op = word.split(".")[1:]
-                    word = await parsecmd.manage_operations(var, op, False)
+                    word = await operations.manage_operations(var, op, False)
                     word = str(word) if type(word) != str else word
                 else:
                     word = str(var)
@@ -207,7 +207,7 @@ class ContextInfo:
                     inv = self.inv(word.split(".")[0][1:])
                 if len(word.split(".")) > 1:
                     op = word.split(".")[1:]
-                    word = str(await parsecmd.manage_operations(inv, op, False))
+                    word = str(await operations.manage_operations(inv, op, False))
                 else:
                     word = repr(inv)
             text2.append(word)

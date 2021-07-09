@@ -1,4 +1,5 @@
 from adventurescript.inventory import Inventory
+from adventurescript import func
 
 class Operation:
     def __init__(self, name, func, allowed_types = None):
@@ -55,22 +56,25 @@ ol = Operation("ol", func, ["list"])
 
 def func(value)
     return value.money
-money = Operation("ol", func, ["Inventory"])
+money = Operation("money", func, ["Inventory"])
+
+def func(value)
+    return value.size
+size = Operation("size", func, ["Inventory"])
+
+def func(value)
+    return not value
+notOP = Operation("not", func, ["flag"])
 
 operations = [strOP, intOP, listOP, flag, elmt, ul, ol, money, size, notOP]
 
-elif op == "money":
-    if type(value) == Inventory:
-        value = value.money
+async def manage_operations(value, ops, quotes=True):
+    for op in ops:
+        if "(" in op and op.endswith(")"):
+            name = op.split("(")[0]
+            #TODO: get param
+        #TODO: for operation in operations, if op == operation.name, execute operation
+    if quotes:
+        return repr(value)
     else:
-        raise TypeError("Operation 'money' can only be used with inventories")
-elif op == "size":
-    if type(value) == Inventory:
-        value = value.size
-    else:
-        raise TypeError("Operation 'size' can only be used with inventories")
-elif op == "not":
-    if type(value) == bool:
-        value = not value
-    else:
-        raise TypeError("Operation 'not' can only be used with flags")
+        return value
