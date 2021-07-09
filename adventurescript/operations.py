@@ -1,50 +1,64 @@
 from adventurescript.inventory import Inventory
+
 class Operation:
     def __init__(self, name, func, allowed_types = None):
         self.name = name
         self.func = func
         self.allowed_types = allowed_types
-    def execute(self, value):
-        return self.func(value)
+    def execute(self, info, value, *params):
+        type_ = type(value).__name__
+        if type_ == "bool": type_ = "flag" 
+        if not in self.allowed_types:
+            raise TypeError(f"operation {self.name} can only be used with: {', '.join(allowed_types)}")
+        return self.func(value, *params)
+
+def func(value):
+    return str(value)
+strOP = Operation("str", func)
+
+def func(value):
+    return int(value)
+intOP = Operation("int", func)
+
+def func(value):
+    try:
+        return list(value)
+    except TypeError:
+        return [value]
+listOP = Operation("list", func)
+
+def func(value):
+    if type(value) == str and value.lower() == "false":
+        return False
+    return bool(value)
+flag = Operation("flag", func)
+
+def func(value, pos):
+    value = value[int(pos)]
+elmt = Operation("item", func, ["list"])
+
+def func(value):
+    out = ""
+    for item in value:
+        out += f"•{item}\n"
+    value = out.strip()
+ul = Operation("ul", func, ["list"])
+
+def func(value)
+    out = ""
+    c = 1
+    for item in value:
+        out += f"{c}- {item}\n"
+        c += 1
+    value = out.strip()
+ol = Operation("ol", func, ["list"])
+
+def func(value)
+    return value.money
+money = Operation("ol", func, ["Inventory"])
 
 operations = [strOP, intOP, listOP, flag, elmt, ul, ol, money, size, notOP]
 
-if op == "str": #TODO: use a switchcase or something *better* please ffs
-    value = str(value)
-elif op == "int":
-    value = int(value) #TODO: Exception
-elif op == "list":
-    try:
-        value = list(value)
-    except TypeError:
-        value = [value]
-elif op == "flag":
-    if value.lower == "false":
-        value = False
-    value = bool(value) # I do not know how bool() works, but it's probably stupid enough to be used in AS
-elif op.split("(")[0] == "elmt" and op.endswith(")") and op.split("(")[1][:-1].isdecimal():
-    if type(value) == type([]):
-        value = value[int(op.split("(")[1][:-1])]
-    else:
-        raise TypeError("Operation 'elmt' can only be used with lists")
-elif op == "ul":
-    if type(value) == type([]):
-        out = ""
-        for item in value:
-            out += f"•{item}\n"
-        value = out.strip()
-    else:
-        raise TypeError("Operation 'ul' can only be used with lists")
-elif op == "ol":
-    if type(value) == type([]):
-        out = ""
-        c = 1
-        for item in value:
-            out += f"{c}- {item}\n"
-            c += 1
-        value = out.strip()
-    else:
-        raise TypeError("Operation 'ol' can only be used with lists")
 elif op == "money":
     if type(value) == Inventory:
         value = value.money

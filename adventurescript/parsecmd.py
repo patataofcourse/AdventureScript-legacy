@@ -171,7 +171,7 @@ async def manage_operations(value, ops, quotes=True):
             if type(value) == type([]):
                 out = ""
                 for item in value:
-                    out += f"•{item}\n"
+                    out += f"• {item}\n"
                 value = out.strip()
             else:
                 raise TypeError("Operation 'ul' can only be used with lists")
