@@ -1,14 +1,16 @@
 import asyncio
-from adventurescript import commands, exceptions, defaultio, inventory, parsecmd
+from adventurescript import commands, exceptions, defaultio, inventory, parsecmd, version
 from adventurescript.info import ContextInfo
 import os
 import platform
 
-async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query=defaultio.query, pass_info = False, addons = [], is_async=False):
-    info = ContextInfo(name, save_id, show, wait, query, is_async, pass_info)
+__version__ = version.version
+
+async def parse(name, save_id=None, show=defaultio.show, wait=defaultio.wait, query=defaultio.query, pass_info = False, addons = [], is_async=False, load_file=defaultio.load_file):
+    info = ContextInfo(name, save_id, show, wait, query, is_async, pass_info, load_file)
     
     #Load addons
-    for addon in addons:
+    for addon in addons: #TODO: rework addons
         try:
             addon.setup(info)
             for command in addon.commands:
@@ -18,7 +20,7 @@ async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query
 
     #Prompt to restore last save
     try:
-        save = open(f"games/{info.gamename}/save/{info.save_id}.asv").read().split("}{")
+        info.load_save()
     except:
         pass
     else:
@@ -27,6 +29,8 @@ async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query
         if response == 2:
             await info.show("A new game will be started.")
             await info.wait()
+        elif response == 0:
+            return info.status
         else:
             info.reload()
             info.pointer += 1
@@ -44,8 +48,8 @@ async def parse(name, save_id=0, show=defaultio.show, wait=defaultio.wait, query
         elif info.status.startswith("ending") or info.status.startswith("quit"):
             return info.status
         else:
-            raise Exception("Unknown status!") #TODO
+            raise exceptions.InvalidStatus(info.scriptname, info.pointer, info.status)
     raise exceptions.ScriptEndException(info.scriptname)
 
-def parse_sync(*args):
-    return asyncio.run(parse(*args))
+def parse_sync(*args, **kwargs):
+    return asyncio.run(parse(*args, **kwargs))

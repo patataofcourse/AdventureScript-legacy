@@ -1,9 +1,10 @@
 import os
 import platform
 
-show = print
+def show(text, **kwargs):
+    print(text)
 
-def wait():
+def wait(**kwargs):
     if platform.system() == "Linux" or platform.system() == "Darwin":
         os.system('read -s -n 1')
     elif platform.system() == "Windows":
@@ -28,7 +29,7 @@ def query(info, text, choices, allow_save, **kwargs):
                 continue
             elif result == "r":
                 try:
-                    open(f"games/{info.gamename}/save/{info.save_id}.asv").read().split("}{")
+                    info.load_save()
                 except Exception as e:
                     print(e)
                     info.showfunc("No save exists!")
@@ -36,7 +37,46 @@ def query(info, text, choices, allow_save, **kwargs):
                     info.showfunc("Save restored!")
                     info.reload()
                     return 0
-        if result.isdecimal():
+        if result == "q":
+            info.status = "quit"
+            return 0
+        elif result.isdecimal():
             if int(result)-1 in range(len(choices)):
                 break
     return int(result)
+
+def load_file(game, filename, mode="r", **kwargs):
+    if type(game) != str:
+        raise TypeError("game must be a string")
+    if type(filename) != str:
+        raise TypeError("filename must be a string")
+    
+    filetype = kwargs.get("type")
+    if filetype == "": filetype = None 
+
+    if kwargs.get("chapter") != None and kwargs.get("chapter") != "":
+        chapter = kwargs.get("chapter") + "/"
+    else:
+        chapter = ""
+
+    outfile = "games/" + {
+        None: f"{game}/{filename}",
+        "script": f"{game}/script/{chapter}{filename}.asf",
+        "save": f"{game}/save/{filename}.asv",
+        "save_p": f"{game}/save_p/{filename}.asv" #for future persistent save (achievements)
+    }.get(filetype)
+    
+    try:
+        if mode == "r":
+            return open(outfile).read()
+        else:
+            return open(outfile, mode=mode)
+    except FileNotFoundError as e:
+        if kwargs.get("create"):
+            open(outfile, "w").close()
+            if mode == "r":
+                return open(outfile).read()
+            else:
+                return open(outfile, mode=mode)
+        else:
+            raise e

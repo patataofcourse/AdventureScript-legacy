@@ -1,6 +1,6 @@
 oke
 lets go
-[choice text="what test?"; ch1="list";go1=4;ch2="incvar";go2=16;ch3="switch";go3=21]
+[choice text="what test?"; ch1="list";go1=4;ch2="incvar";go2=16;ch3="switch";go3=21;ch4="chaincheck";go4=35;ch5="godefault";go5=44; ch6="bugfix test 1"; go6={no}]
 [deflist list="list"]
 [append list="list"; element="one"]
 [append list="list"; element="two"]
@@ -25,10 +25,26 @@ input thing
 [setvar v=2]
 [goto pos=28]
 [setvar v="eight"]
-[switch var=v; val1=1; go1=29; val2=2; go2=31; default=33]
+[switch var=v; case1=1; go1=29; case2=2; go2=31; godefault=33]
 it is one
 [goto pos=34]
 it is two
 [goto pos=34]
 it is unknown
 [ending name="yay"]
+which one do you want?
+[choice ch1="first option"; ch2="second option"; ch3="default"; go1={one}; go2={two}; go3={check}]
+{one} [flag flag1=True]
+[goto pos={check}]
+{two} [flag flag2=True]
+{check} [chaincheck check1="flag1"; go1={go1}; check2="flag2"; go2={go2}; godefault={godefault}]
+{go1} [ending name="one"]
+{go2} [ending name="two"]
+{godefault} [ending name="default"]
+this is just a quick dumb test
+[choice ch1="no"; ch2="yes"; go1={a}; godefault={hsdgsd}]
+{hsdgsd} it works yay
+[ending name="yayyyyy!"]
+{a} aw :(
+[ending name="a"]
+{no} [addmoney amount=-9]

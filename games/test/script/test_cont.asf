@@ -1,7 +1,7 @@
 This is actually now a different script!
 Woo! [n]
 Now, do you want to return to the old choice or just exit? [n]
-[choice ch1 = "take me back to hell"; go1 = 5; ch2 = "take me out of this place"; go2 = 6; ch3="MOAR TEST"; go3=15; ch4="dbjahfajkldfla inventory shit"; go4=17; ch5="delet."; go5=19]
+[choice ch1 = "take me back to hell"; go1 = 5; ch2 = "take me out of this place"; go2 = 6; ch3="MOAR TEST"; go3=15; ch4="dbjahfajkldfla inventory shit"; go4=17; ch5="delet."; go5=19; ch6="achievements!!!!!"; go6=21; ch7="test chapter :D"; go7=23]
 [loadscript name="start"]
 k bye [n]
 [choice text="what ending do you want"; ch1="good"; ch2="bad"; go1=8; go2=10]
@@ -18,3 +18,6 @@ time to get on the inventory shit, woo!
 [loadscript name="inventory"]
 time to ERASE THINGS YAYYYY
 [loadscript name="delet"]
+this was originally in asbot you fu-
+[loadscript name="achieve"]
+[chapter name="test_chapter"]

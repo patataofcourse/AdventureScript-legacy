@@ -1,7 +1,9 @@
+from adventurescript import exceptions
+
 class Inventory:
     def __init__(self, size, money=0):
         if size == 0:
-            raise Exception("Inventory size cannot be 0") #TODO
+            raise exceptions.InvSize()
         self.inv = [None]*size
         self.size = size
         self.money = money
@@ -56,15 +58,19 @@ class Inventory:
         else:
             return False
     def add_money(self, quantity): #maybe i should add money limit? idfk
+        if quantity <= 0:
+            raise TypeError("Quantity must be bigger than 0")
         self.money += quantity
         return True
     def remove_money(self, quantity):
+        if quantity <= 0:
+            raise TypeError("Quantity must be bigger than 0")
         if self.money < quantity:
             return False
         else:
             self.money -= quantity
             return True
-    def represent(self):
+    def __repr__(self):
         out = ""
         for item in self.inv:
             if item == None:

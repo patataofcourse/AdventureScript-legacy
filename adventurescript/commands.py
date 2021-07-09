@@ -11,20 +11,20 @@ pause = n
 async def goto(info, pos):
     info.pointer = int(pos)-1
 
-async def choice(info, ch1, go1, text="", **kwargs):
+async def choice(info, ch1, go1=0, text="", **kwargs):
     chs = [1]
     gos = [1]
     flags = []
     for kwarg in kwargs:
         if kwarg.startswith("ch"):
             chs.append(int(kwarg[2:]))
-        elif kwarg.startswith("go"):
+        elif kwarg.startswith("go") and kwarg != "godefault":
             gos.append(int(kwarg[2:]))
         elif kwarg.startswith("flag"):
             flags.append(int(kwarg[4:]))
-        else:
+        elif kwarg != "godefault":
             raise exceptions.UnwantedArgumentError(info.scriptname, info.pointer, "choice", kwarg)
-    if not chs == gos or len(chs) != max(chs):
+    if len(chs) != max(chs) or max(chs) < max(gos):
         raise exceptions.ChoiceArgumentError(info.scriptname, info.pointer)
     flagdict = {}
     for flag in flags:
@@ -34,7 +34,11 @@ async def choice(info, ch1, go1, text="", **kwargs):
     gotos = [go1]
     for item in chs[1:]:
         choices.append(kwargs["ch"+str(item)])
-        gotos.append(kwargs["go"+str(item)])
+        if item in gos:
+            gotos.append(kwargs.get("go"+str(item)))
+        else:
+            gotos.append(0)
+    
     for flag in flagdict:
         if not flagdict[flag]:
             choices[flag-1] = ""
@@ -42,14 +46,20 @@ async def choice(info, ch1, go1, text="", **kwargs):
     while "" in gotos:
         choices.pop(choices.index(""))
         gotos.pop(gotos.index(""))
+    
     result = await info.query(text, choices, **kwargs)
-    if result == 0:
+    if result == 0: #for situations where a save/resume/quit is done
         return
-    await goto(info, gotos[int(result)-1])
+    if kwargs.get("godefault") == None and gotos[int(result)-1] == 0:
+        raise exceptions.MissingArgumentError(info.scriptname, info.pointer, "choice", "godefault") #TODO: MissingOptionalArgumentWhichIsNeededHere
+    elif gotos[int(result)-1] == 0:
+        await goto(info, kwargs["godefault"])
+    else:
+        await goto(info, gotos[int(result)-1])
 
 async def loadscript(info, name, pos=1):
-    info.scriptname = f"games/{info.gamename}/script/{name}"
-    info.script = open(f"{info.scriptname}.asf").read().split("\n")
+    info.scriptname = name
+    info.script = info.load_script(name).split("\n")
     info.pointer = pos-1
 
 async def gameover(info):
@@ -61,6 +71,7 @@ async def gameover(info):
         info.quit()
 
 async def ending(info, name):
+    await info.wait()
     info.ending(name)
 
 async def saveoff(info):
@@ -72,12 +83,46 @@ async def saveon(info):
 #Flag commands
 
 async def checkflag(info, flag, gotrue, gofalse):
-    if info.flags.get(flag, None) == None: #If the flag doesn't exist, it immediately gets set as false
-        info.flags[flag] = False
-    if info.flags[flag]:
+    if type(flag) == str: #TODO: warn that it's deprecated
+        if info.flags.get(flag, None) == None: #If the flag doesn't exist, it immediately gets set as false
+            info.flags[flag] = False
+        flag = info.flags[flag]
+    if flag:
         info.pointer = gotrue-1
     else:
         info.pointer = gofalse-1
+
+async def chaincheck(info, check1, go1, **kwargs):
+    chs = [1]
+    gos = [1]
+    for kwarg in kwargs:
+        if kwarg.startswith("check"):
+            chs.append(int(kwarg[5:]))
+        elif kwarg.startswith("go") and kwarg != "godefault":
+            gos.append(int(kwarg[2:]))
+        elif kwarg != "godefault":
+            raise exceptions.UnwantedArgumentError(info.scriptname, info.pointer, "chaincheck", kwarg)
+    if not chs == gos or len(chs) != max(chs):
+        raise exceptions.CheckArgumentError(info.scriptname, info.pointer)
+    chs.sort()
+    checks = [check1]
+    gotos = [go1]
+    for item in chs[1:]:
+        checks.append(kwargs["check"+str(item)])
+        gotos.append(kwargs["go"+str(item)])
+    c = -1
+    for flag in checks:
+        c += 1
+        if info.flags.get(flag, None) == None: #If the flag doesn't exist, it immediately gets set as false
+            info.flags[flag] = False
+            continue
+        if info.flags[flag]:
+            await goto(info, gotos[c])
+            return
+    #this will only happen if no check has happened
+    if kwargs.get("godefault") == None:
+        raise exceptions.MissingArgumentError(info.scriptname, info.pointer, "chaincheck", "godefault") #TODO: MissingOptionalArgumentWhichIsNeededHere
+    await goto(info, kwargs["godefault"])
 
 async def flag(info, **kwargs):
     for kwarg in kwargs:
@@ -110,15 +155,15 @@ async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     if var not in info.variables:
         raise exceptions.UndefinedVariableError(info.scriptname, info.pointer+1, var)
     if comparison.lower() in ("equal", "=", "==", "==="):
-        result = info.variables[var] == value
+        result = info.var(var) == value
     elif comparison.lower() in ("greater", ">"):
-        result = info.variables[var] > value
+        result = info.var(var) > value
     elif comparison.lower() in ("greater or equal", ">="):
-        result = info.variables[var] >= value
+        result = info.var(var) >= value
     elif comparison.lower() in ("lesser", "<"):
-        result = info.variables[var] < value
+        result = info.var(var) < value
     elif comparison.lower() in ("lesser or equal", "<="):
-        result = info.variables[var] <= value
+        result = info.var(var) <= value
     else:
         raise exceptions.CommandException(info.scriptname, info.pointer+1, "checkvar", f"Invalid comparison type: {comparison}")
     if result:
@@ -126,17 +171,35 @@ async def checkvar(info, var, value, gotrue, gofalse, comparison="equal"):
     else:
         info.pointer = gofalse-1
 
-#TODO: fix the switchcase you moron
-async def switch(info, var, default=None, **kwargs): #hehe i actually did a switchcase
-    for kw in kwargs:
-        if str(var).strip('"') == kw: #TODO: str(var).strip('"') is a terrible idea, fix everywhere
-            info.pointer = kwargs[kw]-1
+async def switch(info, var, case1, go1, **kwargs): #hehe i actually did a switchcase
+    cas = [1]
+    gos = [1]
+    for kwarg in kwargs:
+        if kwarg.startswith("case"):
+            cas.append(int(kwarg[4:]))
+        elif kwarg.startswith("go") and kwarg != "godefault":
+            gos.append(int(kwarg[2:]))
+        elif kwarg != "godefault":
+            raise exceptions.UnwantedArgumentError(info.scriptname, info.pointer, "chaincheck", kwarg)
+    if not cas == gos or len(cas) != max(cas):
+        raise exceptions.SwitchArgumentError(info.scriptname, info.pointer)
+    cas.sort()
+    cases = [case1]
+    gotos = [go1]
+    for item in cas[1:]:
+        cases.append(kwargs["case"+str(item)])
+        gotos.append(kwargs["go"+str(item)])
+    for case in cases: #i know this is unnecessary but i'm keeping it for consistency
+        if var == case:
+            info.pointer = gotos[cases.index(case)]-1
             return
-    if default==None:
-        raise exceptions.CommandException(info.scriptname, info.pointer, "switch", "Missing 'default' argument")
-    info.pointer= default-1
+    if kwargs.get("godefault") == None:
+        raise exceptions.MissingArgumentError(info.scriptname, info.pointer, "switch", "godefault") #TODO: MissingOptionalArgumentWhichIsNeededHere
+    info.pointer = kwargs["godefault"]-1
 
 async def incvar(info, var, value): #basically +=
+    if info.variables.get(var) == None:
+        raise UndefinedVariableError(info.scriptname, info.pointer+1, var)
     info.variables[var] += value
 
 async def delvar(info, var):
@@ -156,22 +219,22 @@ async def deflist(info, list):
 list = deflist #careful: this alias might not work well
 
 async def append(info, list, element):
-    info.lists[list].append(element)
+    info.list(list).append(element)
 
 addlist = append
 
 async def remove(info, list, element, find="pos"):
     if find == "pos":
-        info.lists[list].pop(int(element))
+        info.list(list).pop(int(element))
     elif find == "name":
-        info.lists[list].pop(info.lists[list].index(element))
+        info.list(list).pop(info.list(list).index(element))
     else:
         raise exceptions.UnwantedArgumentError(info.scriptname, info.pointer, "remove", "find") #TODO: actual exception type for this
 
 rmvlist = remove
 
 async def checklist(info, list, element, gotrue, gofalse):
-    if element in info.lists[list]:
+    if element in info.list(list):
         await goto(info, gotrue)
     else:
         await goto(info, gofalse)
@@ -191,7 +254,10 @@ async def definv(info, inventory, size):
     for character in inventory:
         if character in info.forbidden_characters:
             raise exceptions.InvalidNameCharacter(info.scriptname, info.pointer, "inventory", character)
-    info.extrainvs[inventory] = Inventory(size)
+    try:
+        info.extrainvs[inventory] = Inventory(size)
+    except exceptions.invsize():
+         raise ZeroInventorySizeError(info.scriptname, info.pointer)
 
 inv = definv
 
@@ -201,10 +267,7 @@ async def invadd(info, item, gofail, amount=1, inventory=None, gosuccess=None):
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.add(item, amount)
     else:
-        try:
-            res = info.extrainvs[inventory].add(item, amount)
-        except NameError:
-            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+        res = info.inv(inventory).add(item, amount)
     if not res:
         await goto(info, gofail)
     elif gosuccess != None:
@@ -216,10 +279,7 @@ async def invrmv(info, item, gofail, amount=1, inventory=None, gosuccess=None):
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.remove(item, amount)
     else:
-        try:
-            res = info.extrainvs[inventory].remove(item, amount)
-        except NameError:
-            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+        res = info.inv(inventory).remove(item, amount)
     if not res:
         await goto(info, gofail)
     elif gosuccess != None:
@@ -231,10 +291,7 @@ async def invfind(info, item, gotrue, gofalse, amount=1, inventory=None):
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.find(item, amount)
     else:
-        try:
-            res = info.extrainvs[inventory].find(item, amount)
-        except NameError:
-            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+        res = info.inv(inventory).find(item, amount)
     if res == None:
         await goto(info, gofalse)
     else:
@@ -249,10 +306,7 @@ async def invupgrade(info, size, inventory=None):
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         info.inventory.upgrade(size)
     else:
-        try:
-            info.extrainvs[inventory].upgrade(size)
-        except NameError:
-            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+        info.inv(inventory).upgrade(size)
 
 async def invdowngrade(info, size, gofail, inventory=None, gosuccess=None):
     if inventory == None:
@@ -260,10 +314,7 @@ async def invdowngrade(info, size, gofail, inventory=None, gosuccess=None):
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.downgrade(size)
     else:
-        try:
-            res = info.extrainvs[inventory].downgrade(size)
-        except NameError:
-            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+        res = info.inv(inventory).downgrade(size)
     if res == 1 and gosuccess != None:
         await goto(info, gosuccess)
     elif res == 0:
@@ -275,12 +326,9 @@ async def addmoney(info, amount, inventory=None): #I will add gofail/gosuccess t
     if inventory == None:
         if not hasattr(info, "inventory"):
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
-        info.inventory.money += amount
+        info.inventory.add_money(amount)
     else:
-        try:
-            info.extrainvs[inventory].money += amount
-        except NameError:
-            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+        info.inv(inventory).add_money(amount)
 
 async def rmvmoney(info, gofail, amount, inventory=None, gosuccess=None):
     if inventory == None:
@@ -288,10 +336,7 @@ async def rmvmoney(info, gofail, amount, inventory=None, gosuccess=None):
             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
         res = info.inventory.remove_money(amount)
     else:
-        try:
-            res = info.extrainvs[inventory].remove_money(amount)
-        except NameError:
-            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+        res = info.inv(inventory).remove_money(amount)
     if not res:
         await goto(info, gofail)
     elif gosuccess != None:
@@ -320,3 +365,28 @@ async def delinv(info, inv):
         info.extrainvs.pop(inv)
     except KeyError:
         raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inv)
+
+#Achievement commands
+
+async def achievement(info, name): #TODO: pls remove file i/o code from here, move it to info.py or something
+    if name in info.achievements:
+        return
+    
+    if info.gameinfo["achievements"][name]["type"] != "flag":
+        raise NotImplementedError("Achievement types other than flag are not implemented in achievement command!")
+
+    achievefile = info.load_save(True, "r+")
+    if len(achievefile.read()) != 0:
+        achievefile.write(" ")
+    
+    achievefile.write(str(info.gameinfo["achievements"][name]["num"]))
+    achievefile.close()
+    
+    info.achievements.append(name)
+    await info.show(f"\n__[You just got the **{name}** achievement!]__\n")
+
+#Chapter commands
+
+async def chapter(info, name):
+    info.chapter = name
+    await loadscript(info, "start")

@@ -1,0 +1,8 @@
+ok so this is a test with the very limited achievement support we have
+[choice ch1="Flag achievement, defined explicitly"; go1={one}; ch2="Counter achievement"; go2={two}; ch3="Flag achievement, not defined explicitly"; go3={three}]
+{one} [achievement name="Achievement 1"]
+[goto pos={end}]
+{two} [achievement name="Achievement 2"]
+[goto pos={end}]
+{three} [achievement name="Achievement 3"]
+{end} [ending name="fucker"]

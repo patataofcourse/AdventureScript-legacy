@@ -6,11 +6,13 @@ from adventurescript.inventory import Inventory
 async def input_format(info, text):
     # Warning: badly named variables ahead
     flip_result = False
+    text = text.lstrip()
     while text.startswith("-"):
         flip_result = not flip_result
         text = text[1:]
     
     text, outquotes = remove_strings(text)
+    text, outlabels = compress_labels(info, text)
 
     text = text.split("+")
     text2 = text + [] # text2 is used as a way to store the text through the loop, so like a temp variable
@@ -90,12 +92,10 @@ async def input_format(info, text):
                 ops = subsubitem.split(".")[1:]
                 if value.isdecimal():
                     value = int(value)
-                elif value.startswith("{") and value.endswith("}"):
-                    value = find_label(info, value)
                 # elif value.startswith("(") and value.endswith(")"): #TODO: Add this. Not gonna be needed for now
                 #     value = eval(f"[+{value[1:-1]}]")
                 elif value.startswith("$"):
-                    value = info.lists[value[1:]]
+                    value = info.list(value[1:])
                 elif value.startswith("%"):
                     val = info.flags.get(value[1:], None)
                     if val == None:
@@ -109,20 +109,18 @@ async def input_format(info, text):
                         except AttributeError:
                             raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
                     else:
-                        try:
-                            value = info.extrainvs[value[1:]]
-                        except NameError:
-                            raise exceptions.UndefinedInventoryError(info.scriptname, info.pointer+1, inventory)
+                        value = info.inv(value[1:])
                 elif value.lower() in ("true", "false"):
                     if value.lower() == "true":
                         value = True
                     else:
                         value = False
-                elif value.startswith('"') and value.endswith('"') or value.startswith("'") and value.endswith("'"):
+                elif value.startswith('"') and value.endswith('"'):
                     value = outquotes[int(value.strip('"'))]
+                elif value.startswith("{") and value.endswith("}"):
+                    value = outlabels[int(value.strip("{}"))]
                 else:
-                    value = info.variables[value]
-                    value = str(value)
+                    value = info.var(value)
                 subitem2.append(await manage_operations(value, ops))
             subitem = subitem2
             subitem2 = subitem.pop(0)
@@ -145,13 +143,7 @@ async def input_format(info, text):
         for operation in operations1:
             text2 = repr(eval(text2+operation+text.pop(0)))
     if flip_result:
-        try:
-            return -eval(text2)
-        except TypeError as e:
-            if str(e).split(":")[0] != "bad operand type for unary -":
-                raise e
-            else:
-                raise Exception("well someone tried to - a non minusable thing") #TODO
+        return -eval(text2)
     else:
         return eval(text2)
 
@@ -209,7 +201,7 @@ async def manage_operations(value, ops, quotes=True):
             else:
                 raise TypeError("Operation 'not' can only be used with flags")
         else:
-            raise Exception(f"Invalid operation '{op}'!") #TODO
+            raise exceptions.InvalidOperation(info.scriptname, info.pointer, op)
         ops.pop(0)
     if quotes:
         return repr(value)
@@ -240,10 +232,16 @@ async def check_commands(info, line):
                             pair = pair.split("=")
                             kwargs[pair[0].strip()] = await input_format(info,"=".join(pair[1:]))
                     except Exception as e:
+                        if type(e) == exceptions.ArgumentSyntaxError:
+                            raise e
                         raise exceptions.ArgumentSyntaxError(info.scriptname, info.pointer, e)
+                    
                     try:
+                        #insert here checking the args
                         await command(info, **kwargs)
                     except Exception as e:
+                        if type(e) == exceptions.CommandException:
+                            raise e
                         raise exceptions.CommandException(info.scriptname, info.pointer, e)
                     return True
         return False
@@ -256,12 +254,58 @@ async def check_commands(info, line):
         return False
 
 def find_label(info, label):
+    for ch in info.forbidden_characters:
+        if ch in label[1:-1]:
+            raise exceptions.InvalidNameCharacter(info.scriptname, info.pointer, "label", ch)
     for line in info.script:
-        if line.strip().startswith(label):
+        if line.strip().startswith("{" + label + "}"):
             return info.script.index(line)+1
     raise exceptions.UndefinedLabelError(info.scriptname, info.pointer, label)
 
-def remove_strings(text):
+def compress_labels(info, text): #latter half stolen from remove_strings
+
+    # #get the start and end of every string
+    # quotepos = [] #here we'll store the index of every quote that's not been escaped
+    # for quote in ("'", "\""):
+    #     allpos = [i for i in range(len(text)) if text.startswith(quote, i)] #gets all instances of each type of quotes
+    #     for index in allpos:
+    #         if text[index-1] != "\\":
+    #             quotepos.append(index) #only pass to quotepos the strings that weren't escaped
+    # opened_quote = ""
+    # quotes = []
+    # for index in sorted(quotepos):
+    #     if opened_quote == "": #no open quotes
+    #         opened_quote = text[index]
+    #         quotes.append(index)
+    #     elif opened_quote == text[index]:       #current quote is the same as the open quote -> it closes, and
+    #         quotes[-1] = (quotes[-1], index)    #otherwise it just gets ignored and treated as any other character
+    #         opened_quote = ""
+
+    start = None
+    labels = []
+    c = 0
+    for char in text:
+        if start == None and char == "{":
+            start = c
+        elif start != None and char == "}":
+            labels.append((start, c))
+            start = None
+        c += 1
+    if start != None:
+        raise SyntaxError("AdventureScript syntax: unclosed {")
+    
+    #now, replace them with things that won't be screwed up by the rest of input_format
+    labels.reverse() #this way the index numbers don't get fucked up
+    c = 1
+    outlabels = []
+    for label in labels:
+        outlabels = [text[label[0]+1:label[1]]] + outlabels
+        text = text[:label[0]]  + "{" + str(len(labels)-c) + "}" +  text[label[1]+1:] #"0", "1", etc.
+        c += 1
+    outlabels = [find_label(info, i) for i in outlabels] #gets the positions of the labels
+    return text, outlabels
+
+def remove_strings(text): #wow i actually commented this very cool
     #get the start and end of every string
     quotepos = [] #here we'll store the index of every quote that's not been escaped
     for quote in ("'", "\""):
@@ -278,13 +322,15 @@ def remove_strings(text):
         elif opened_quote == text[index]:       #current quote is the same as the open quote -> it closes, and
             quotes[-1] = (quotes[-1], index)    #otherwise it just gets ignored and treated as any other character
             opened_quote = ""
+    if opened_quote != "":
+        raise SyntaxError(f"AdventureScript syntax: unclosed {opened_quote}")
     #now, replace them with things that won't be screwed up by the rest of input_format
     quotes.reverse() #this way the index numbers don't get fucked up
     c = 1
     quotetext = []
     for quote in quotes:
         quotetext = [text[quote[0]+1:quote[1]]] + quotetext
-        text = text[:quote[0]] + f'"{len(quotes)-c}"' + text[quote[1]+1:]
+        text = text[:quote[0]] + f'"{len(quotes)-c}"' + text[quote[1]+1:] #"0", "1", etc.
         c += 1
     outquotes = [i.replace("\\'", "'").replace('\\"', '"') for i in quotetext] #gets all instances of each type of quotes
     return text, outquotes
