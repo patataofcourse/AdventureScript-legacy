@@ -73,6 +73,11 @@ def load_file(game, filename, mode="r", **kwargs):
             return open(outfile, mode=mode)
     except FileNotFoundError as e:
         if kwargs.get("create"):
+            dirname = "/".join(outfile.split("/")[:-1])
+            print(dirname)
+            if not os.path.isdir(dirname):
+                os.system(f"mkdir {repr(dirname)}")
+            
             open(outfile, "w").close()
             if mode == "r":
                 return open(outfile).read()
