@@ -1,5 +1,4 @@
 from adventurescript.inventory import Inventory
-from adventurescript import func
 
 class Operation:
     def __init__(self, name, func, allowed_types = None):
@@ -60,7 +59,7 @@ money = Operation("money", money, ["Inventory"])
 
 def size(value):
     return value.size
-size = Operation("size", func, ["Inventory"])
+size = Operation("size", size, ["Inventory"])
 
 def notOP(value):
     return not value
