@@ -35,14 +35,14 @@ def flag(value):
 flag = Operation("flag", flag)
 
 def item(value, pos):
-    value = value[int(pos)]
+    return value[int(pos)]
 item = Operation("item", item, ["list"])
 
 def ul(value):
     out = ""
     for item in value:
         out += f"•{item}\n"
-    value = out.strip()
+    return out.strip()
 ul = Operation("ul", ul, ["list"])
 
 def ol(value):
@@ -51,7 +51,7 @@ def ol(value):
     for item in value:
         out += f"{c}- {item}\n"
         c += 1
-    value = out.strip()
+    return out.strip()
 ol = Operation("ol", ol, ["list"])
 
 def money(value):
@@ -79,7 +79,7 @@ async def manage_operations(value, ops, quotes=True):
             param = ()
         for operation in operations:
             if name == operation.name:
-                value = operation(value, *param)
+                return operation(value, *param)
                 break
     if quotes:
         return repr(value)
