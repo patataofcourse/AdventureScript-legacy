@@ -6,74 +6,81 @@ class Operation:
         self.name = name
         self.func = func
         self.allowed_types = allowed_types
-    def execute(self, info, value, *params):
+    def __call__(self, value, *params):
         type_ = type(value).__name__
         if type_ == "bool": type_ = "flag" 
-        if not in self.allowed_types:
-            raise TypeError(f"operation {self.name} can only be used with: {', '.join(allowed_types)}")
+        if self.allowed_types != None and not type_ in self.allowed_types:
+            raise TypeError(f"operation {self.name} can only be used with: {', '.join(self.allowed_types)} (type given was {type_})")
         return self.func(value, *params)
 
-def func(value):
+def strOP(value):
     return str(value)
-strOP = Operation("str", func)
+strOP = Operation("str", strOP)
 
-def func(value):
+def intOP(value):
     return int(value)
-intOP = Operation("int", func)
+intOP = Operation("int", intOP)
 
-def func(value):
+def listOP(value):
     try:
         return list(value)
     except TypeError:
         return [value]
-listOP = Operation("list", func)
+listOP = Operation("list", listOP)
 
-def func(value):
+def flag(value):
     if type(value) == str and value.lower() == "false":
         return False
     return bool(value)
-flag = Operation("flag", func)
+flag = Operation("flag", flag)
 
-def func(value, pos):
+def item(value, pos):
     value = value[int(pos)]
-elmt = Operation("item", func, ["list"])
+item = Operation("item", item, ["list"])
 
-def func(value):
+def ul(value):
     out = ""
     for item in value:
         out += f"•{item}\n"
     value = out.strip()
-ul = Operation("ul", func, ["list"])
+ul = Operation("ul", ul, ["list"])
 
-def func(value)
+def ol(value):
     out = ""
     c = 1
     for item in value:
         out += f"{c}- {item}\n"
         c += 1
     value = out.strip()
-ol = Operation("ol", func, ["list"])
+ol = Operation("ol", ol, ["list"])
 
-def func(value)
+def money(value):
     return value.money
-money = Operation("money", func, ["Inventory"])
+money = Operation("money", money, ["Inventory"])
 
-def func(value)
+def size(value):
     return value.size
 size = Operation("size", func, ["Inventory"])
 
-def func(value)
+def notOP(value):
     return not value
-notOP = Operation("not", func, ["flag"])
+notOP = Operation("not", notOP, ["flag"])
 
-operations = [strOP, intOP, listOP, flag, elmt, ul, ol, money, size, notOP]
+operations = [strOP, intOP, listOP, flag, item, ul, ol, money, size, notOP]
 
 async def manage_operations(value, ops, quotes=True):
     for op in ops:
         if "(" in op and op.endswith(")"):
             name = op.split("(")[0]
-            #TODO: get param
-        #TODO: for operation in operations, if op == operation.name, execute operation
+            p = "(".join(op.split("(")[1:])[:-1]
+            param = tuple(p.split(","))
+        else:
+            name = op
+            param = ()
+        for operation in operations:
+            if name == operation.name:
+                value = operation(value, *param)
+                break
     if quotes:
         return repr(value)
     else:
