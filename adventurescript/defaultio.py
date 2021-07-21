@@ -68,9 +68,9 @@ def load_file(game, filename, mode="r", **kwargs):
     
     try:
         if mode == "r":
-            return open(outfile).read()
+            return open(outfile, encoding="utf-8").read()
         else:
-            return open(outfile, mode=mode)
+            return open(outfile, mode=mode, encoding="utf-8")
     except FileNotFoundError as e:
         if kwargs.get("create"):
             dirname = "/".join(outfile.split("/")[:-1])
@@ -80,8 +80,8 @@ def load_file(game, filename, mode="r", **kwargs):
             
             open(outfile, "w").close()
             if mode == "r":
-                return open(outfile).read()
+                return open(outfile, encoding="utf-8").read()
             else:
-                return open(outfile, mode=mode)
+                return open(outfile, mode=mode, encoding="utf-8")
         else:
             raise e
