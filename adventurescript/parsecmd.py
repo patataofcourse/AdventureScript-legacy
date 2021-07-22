@@ -1,4 +1,4 @@
-from adventurescript import commands, exceptions
+from adventurescript import commands, exceptions, func, operations
 from adventurescript.inventory import Inventory
 
 # This function takes a string and does a sort of eval() with it, but using AS' variables, flags and lists;
@@ -11,7 +11,7 @@ async def input_format(info, text):
         flip_result = not flip_result
         text = text[1:]
     
-    text, outquotes = remove_strings(text)
+    text, outquotes = func.remove_strings(text)
     text, outlabels = compress_labels(info, text)
 
     text = text.split("+")
@@ -121,7 +121,7 @@ async def input_format(info, text):
                     value = outlabels[int(value.strip("{}"))]
                 else:
                     value = info.var(value)
-                subitem2.append(await manage_operations(value, ops))
+                subitem2.append(await operations.manage_operations(value, ops))
             subitem = subitem2
             subitem2 = subitem.pop(0)
             if len(subitem) != 0:
@@ -147,67 +147,6 @@ async def input_format(info, text):
     else:
         return eval(text2)
 
-async def manage_operations(value, ops, quotes=True):
-    for op in ops:
-        if op == "str": #TODO: use a switchcase or something *better* please ffs
-            value = str(value)
-        elif op == "int":
-            value = int(value) #TODO: Exception
-        elif op == "list":
-            try:
-                value = list(value)
-            except TypeError:
-                value = [value]
-        elif op == "flag":
-            if value.lower == "false":
-                value = False
-            value = bool(value) # I do not know how bool() works, but it's probably stupid enough to be used in AS
-        elif op.split("(")[0] == "elmt" and op.endswith(")") and op.split("(")[1][:-1].isdecimal():
-            if type(value) == type([]):
-                value = value[int(op.split("(")[1][:-1])]
-            else:
-                raise TypeError("Operation 'elmt' can only be used with lists")
-        elif op == "ul":
-            if type(value) == type([]):
-                out = ""
-                for item in value:
-                    out += f"•{item}\n"
-                value = out.strip()
-            else:
-                raise TypeError("Operation 'ul' can only be used with lists")
-        elif op == "ol":
-            if type(value) == type([]):
-                out = ""
-                c = 1
-                for item in value:
-                    out += f"{c}- {item}\n"
-                    c += 1
-                value = out.strip()
-            else:
-                raise TypeError("Operation 'ol' can only be used with lists")
-        elif op == "money":
-            if type(value) == Inventory:
-                value = value.money
-            else:
-                raise TypeError("Operation 'money' can only be used with inventories")
-        elif op == "size":
-            if type(value) == Inventory:
-                value = value.size
-            else:
-                raise TypeError("Operation 'size' can only be used with inventories")
-        elif op == "not":
-            if type(value) == bool:
-                value = not value
-            else:
-                raise TypeError("Operation 'not' can only be used with flags")
-        else:
-            raise exceptions.InvalidOperation(info.scriptname, info.pointer, op)
-        ops.pop(0)
-    if quotes:
-        return repr(value)
-    else:
-        return value
-
 async def check_commands(info, line):
     line = line.strip()
     if line.startswith("{"):
@@ -220,7 +159,7 @@ async def check_commands(info, line):
         line = line[1:-1].split(";")
         line = [line[0].split(" ")[0], " ".join(line[0].split(" ")[1:])] + line[1:]
         for command in info.commands:
-            if type(info.commands[command]) == type(remove_strings): #check if it's a function
+            if type(info.commands[command]) == type(func.remove_strings): #check if it's a function
                 if command == line[0]:
                     command = info.commands[command]
                     kwargs = {}
@@ -304,33 +243,3 @@ def compress_labels(info, text): #latter half stolen from remove_strings
         c += 1
     outlabels = [find_label(info, i) for i in outlabels] #gets the positions of the labels
     return text, outlabels
-
-def remove_strings(text): #wow i actually commented this very cool
-    #get the start and end of every string
-    quotepos = [] #here we'll store the index of every quote that's not been escaped
-    for quote in ("'", "\""):
-        allpos = [i for i in range(len(text)) if text.startswith(quote, i)] #gets all instances of each type of quotes
-        for index in allpos:
-            if text[index-1] != "\\":
-                quotepos.append(index) #only pass to quotepos the strings that weren't escaped
-    opened_quote = ""
-    quotes = []
-    for index in sorted(quotepos):
-        if opened_quote == "": #no open quotes
-            opened_quote = text[index]
-            quotes.append(index)
-        elif opened_quote == text[index]:       #current quote is the same as the open quote -> it closes, and
-            quotes[-1] = (quotes[-1], index)    #otherwise it just gets ignored and treated as any other character
-            opened_quote = ""
-    if opened_quote != "":
-        raise SyntaxError(f"AdventureScript syntax: unclosed {opened_quote}")
-    #now, replace them with things that won't be screwed up by the rest of input_format
-    quotes.reverse() #this way the index numbers don't get fucked up
-    c = 1
-    quotetext = []
-    for quote in quotes:
-        quotetext = [text[quote[0]+1:quote[1]]] + quotetext
-        text = text[:quote[0]] + f'"{len(quotes)-c}"' + text[quote[1]+1:] #"0", "1", etc.
-        c += 1
-    outquotes = [i.replace("\\'", "'").replace('\\"', '"') for i in quotetext] #gets all instances of each type of quotes
-    return text, outquotes
