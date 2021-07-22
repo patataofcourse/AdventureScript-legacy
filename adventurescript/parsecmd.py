@@ -202,24 +202,6 @@ def find_label(info, label):
     raise exceptions.UndefinedLabelError(info.scriptname, info.pointer, label)
 
 def compress_labels(info, text): #latter half stolen from remove_strings
-
-    # #get the start and end of every string
-    # quotepos = [] #here we'll store the index of every quote that's not been escaped
-    # for quote in ("'", "\""):
-    #     allpos = [i for i in range(len(text)) if text.startswith(quote, i)] #gets all instances of each type of quotes
-    #     for index in allpos:
-    #         if text[index-1] != "\\":
-    #             quotepos.append(index) #only pass to quotepos the strings that weren't escaped
-    # opened_quote = ""
-    # quotes = []
-    # for index in sorted(quotepos):
-    #     if opened_quote == "": #no open quotes
-    #         opened_quote = text[index]
-    #         quotes.append(index)
-    #     elif opened_quote == text[index]:       #current quote is the same as the open quote -> it closes, and
-    #         quotes[-1] = (quotes[-1], index)    #otherwise it just gets ignored and treated as any other character
-    #         opened_quote = ""
-
     start = None
     labels = []
     c = 0
