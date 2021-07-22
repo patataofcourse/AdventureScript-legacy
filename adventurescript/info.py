@@ -43,20 +43,7 @@ class ContextInfo:
         self.variables = {}
         self.lists = {}
         self.extrainvs = {} #Added for shop storage purposes and crap
-        self.achievements = []
-        for a in self.load_save(True).split(" "):
-            if a == "":
-                continue
-            if not a.isdigit():
-                raise exceptions.InvalidAchievementData(self.save_id)
-            name = None
-            for ach in self.gameinfo["achievements"]:
-                if self.gameinfo["achievements"][ach]["num"] == int(a):
-                    name = ach
-                    break
-            if name == None:
-                raise exceptions.InvalidAchievementData(self.scriptname, self.pointer)
-            self.achievements.append(name)
+        self.achievements = json.loads(self.load_save(True)).get("achievements", [])
         self.status = "ok" #TODO: cmon .-.
         self.allow_save = True
         self.extra_slots = {}

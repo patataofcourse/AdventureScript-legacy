@@ -1,3 +1,5 @@
+import json
+
 from adventurescript import exceptions
 from adventurescript.inventory import Inventory
 
@@ -375,14 +377,15 @@ async def achievement(info, name): #TODO: pls remove file i/o code from here, mo
     if info.gameinfo["achievements"][name]["type"] != "flag":
         raise NotImplementedError("Achievement types other than flag are not implemented in achievement command!")
 
-    achievefile = info.load_save(True, "r+")
-    if len(achievefile.read()) != 0:
-        achievefile.write(" ")
-    
-    achievefile.write(str(info.gameinfo["achievements"][name]["num"]))
-    achievefile.close()
+    pers_save = json.loads(info.load_save(True))
+    savep_file = info.load_save(True, "w")
     
     info.achievements.append(name)
+    pers_save["achievements"] = info.achievements
+    
+    savep_file.write(json.dumps(pers_save))
+    savep_file.close()
+    
     await info.show(f"\n__[You just got the **{name}** achievement!]__\n")
 
 #Chapter commands

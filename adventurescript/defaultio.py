@@ -78,7 +78,9 @@ def load_file(game, filename, mode="r", **kwargs):
             if not os.path.isdir(dirname):
                 os.system(f"mkdir {repr(dirname)}")
             
-            open(outfile, "w").close()
+            a = open(outfile, "w")
+            a.write("{}")
+            a.close()
             if mode == "r":
                 return open(outfile, encoding="utf-8").read()
             else:
