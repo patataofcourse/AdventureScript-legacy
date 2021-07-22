@@ -183,8 +183,7 @@ class ContextInfo:
                     var = self.var(word.split(".")[0][1:])
                 if len(word.split(".")) > 1:
                     op = word.split(".")[1:]
-                    word = await operations.manage_operations(var, op, False)
-                    word = str(word) if type(word) != str else word
+                    word = repr(await operations.manage_operations(var, op))
                 else:
                     word = str(var)
             if word.startswith("&"):
@@ -194,7 +193,7 @@ class ContextInfo:
                     inv = self.inv(word.split(".")[0][1:])
                 if len(word.split(".")) > 1:
                     op = word.split(".")[1:]
-                    word = str(await operations.manage_operations(inv, op, False))
+                    word = repr(await operations.manage_operations(inv, op))
                 else:
                     word = repr(inv)
             text2.append(word)

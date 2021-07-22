@@ -67,7 +67,7 @@ notOP = Operation("not", notOP, ["flag"])
 
 operations = [strOP, intOP, listOP, flag, item, ul, ol, money, size, notOP]
 
-async def manage_operations(value, ops, quotes=True):
+async def manage_operations(value, ops):
     for op in ops:
         if "(" in op and op.endswith(")"):
             name = op.split("(")[0]
@@ -78,9 +78,6 @@ async def manage_operations(value, ops, quotes=True):
             param = ()
         for operation in operations:
             if name == operation.name:
-                return operation(value, *param)
+                value = operation(value, *param)
                 break
-    if quotes:
-        return repr(value)
-    else:
-        return value
+    return value
