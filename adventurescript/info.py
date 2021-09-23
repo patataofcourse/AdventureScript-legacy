@@ -4,7 +4,7 @@ from adventurescript import commands, exceptions, operations, parsecmd, version
 from adventurescript.inventory import Inventory
 
 class ContextInfo:
-    def __init__(self, gamename, save_id, show, wait, query, is_async, pass_info, load_file):
+    def __init__(self, gamename, save_id, show, wait, query, is_async, load_file):
         self.loadfunc = load_file
         self.gamename = gamename
         self.gameinfo = eval("{"+",".join(self.load_file("info").split("\n"))+"}")
@@ -38,7 +38,6 @@ class ContextInfo:
         self.waitfunc = wait
         self.queryfunc = query
         self.is_async = is_async
-        self.pass_info = pass_info
         self.flags = {}
         self.variables = {}
         self.lists = {}
@@ -199,10 +198,7 @@ class ContextInfo:
             text2.append(word)
         text = " ".join(text2)
 
-        if self.pass_info:
-            f = self.showfunc(self, text, **kwargs)
-        else:
-            f = self.showfunc(text, **kwargs)
+        f = self.showfunc(self, text, **kwargs)
         if self.is_async:
             return await f
         else:
@@ -215,10 +211,7 @@ class ContextInfo:
 
         **kwargs - keyword arguments
             those are passed in case the self.query function is custom and requires extra keyword arguments'''
-        if self.pass_info:
-            f = self.waitfunc(self)
-        else:
-            f = self.waitfunc()
+        f = self.waitfunc(self)
         if self.is_async:
             return await f
         else:

@@ -1,10 +1,10 @@
 import os
 import platform
 
-def show(text, **kwargs):
+def show(info, text, **kwargs):
     print(text)
 
-def wait(**kwargs):
+def wait(info, **kwargs):
     if platform.system() == "Linux" or platform.system() == "Darwin":
         os.system('read -s -n 1')
     elif platform.system() == "Windows":
