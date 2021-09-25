@@ -37,18 +37,18 @@ async def parse(name, save_id=None, show=defaultio.show, wait=defaultio.wait, qu
     
     #The actual parsing
     while info.pointer <= len(info.script):
-        line = info.script[info.pointer-1].rstrip()
-        if not line.startswith("#"):
-            result = await parsecmd.check_commands(info, line)
-            if not result:
-                await info.show(line)
-        info.pointer += 1
         if info.status == "ok":
             pass
         elif info.status.startswith("ending") or info.status.startswith("quit"):
             return info.status
         else:
             raise exceptions.InvalidStatus(info.scriptname, info.pointer, info.status)
+        line = info.script[info.pointer-1].rstrip()
+        if not line.startswith("#"):
+            result = await parsecmd.check_commands(info, line)
+            if not result:
+                await info.show(line)
+        info.pointer += 1
     raise exceptions.ScriptEndException(info.scriptname)
 
 def parse_sync(*args, **kwargs):
