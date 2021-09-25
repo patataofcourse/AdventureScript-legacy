@@ -10,7 +10,7 @@ def wait(info, **kwargs):
     elif platform.system() == "Windows":
         os.system("pause >nul")
     else:
-        print("Platform not supported")
+        raise Exception("Platform not supported: " + platform.system())
 
 def query(info, text, choices, allow_save, **kwargs):
     if text != "":
@@ -31,7 +31,6 @@ def query(info, text, choices, allow_save, **kwargs):
                 try:
                     info.load_save()
                 except Exception as e:
-                    print(e)
                     info.showfunc(info, "No save exists!")
                 else:
                     info.showfunc(info, "Save restored!")
