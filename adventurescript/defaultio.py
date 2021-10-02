@@ -78,7 +78,7 @@ def load_file(game, filename, mode="r", **kwargs):
         if kwargs.get("createdir"):
             dirname = "/".join(outfile.split("/")[:-1])
             if not os.path.isdir(dirname):
-                os.system(f"mkdir {repr(dirname)}")
+                os.mkdir(dirname)
             
             if kwargs.get("create"):
                 a = open(outfile, "w")
