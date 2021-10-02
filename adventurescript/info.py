@@ -4,10 +4,10 @@ from adventurescript import commands, exceptions, operations, parsecmd, version
 from adventurescript.inventory import Inventory
 
 class ContextInfo:
-    def __init__(self, gamename, save_id, show, wait, query, is_async, load_file):
-        self.loadfunc = load_file
+    def __init__(self, gamename, save_id, io, is_async):
+        self.io = io
         self.gamename = gamename
-        self.gameinfo = json.loads(self.loadfunc(self.gamename, "info.json"))
+        self.gameinfo = json.loads(self.io.load_file(self.gamename, "info.json"))
         if False and self.gameinfo.get("achievements", False):
             self.gameinfo["achievements"] = {}
             pos = -1
@@ -34,9 +34,6 @@ class ContextInfo:
         self.pointer = 1
         self.commands = commands.__dict__
         self.save_id = save_id
-        self.showfunc = show
-        self.waitfunc = wait
-        self.queryfunc = query
         self.is_async = is_async
         self.flags = {}
         self.variables = {}
@@ -155,7 +152,7 @@ class ContextInfo:
         except KeyError:
             raise exceptions.UndefinedInventoryError(self.scriptname, self.pointer+1, name)
     async def show(self, text, **kwargs):
-        '''Manages displaying text using the self.show function
+        '''Manages displaying text using the io.show function
         
         Parameters
         ------------
@@ -164,7 +161,7 @@ class ContextInfo:
             the raw AdventureScript line to process then display
         
         **kwargs - keyword arguments
-            those are passed in case the self.query function is custom and requires extra keyword arguments'''
+            those are passed in case the io.query function is custom and requires extra keyword arguments'''
         if text.strip().startswith("{"):
             for ch in self.forbidden_characters:
                 if ch in text[1:text.find("}")]:
@@ -198,26 +195,26 @@ class ContextInfo:
             text2.append(word)
         text = " ".join(text2)
 
-        f = self.showfunc(self, text, **kwargs)
+        f = self.io.show(self, text, **kwargs)
         if self.is_async:
             return await f
         else:
             return f
     async def wait(self, **kwargs):
-        '''Manages waiting until the player inputs ("next textbox") using the self.wait function
+        '''Manages waiting until the player inputs ("next textbox") using the io.wait function
         
         Parameters
         ------------
 
         **kwargs - keyword arguments
-            those are passed in case the self.query function is custom and requires extra keyword arguments'''
-        f = self.waitfunc(self)
+            those are passed in case the io.query function is custom and requires extra keyword arguments'''
+        f = self.io.wait(self)
         if self.is_async:
             return await f
         else:
             return f
     async def query(self, text, choices, allow_save=None, **kwargs):
-        '''Manages showing the player a choice and taking their input using the self.query function
+        '''Manages showing the player a choice and taking their input using the io.query function
         
         Parameters
         ------------
@@ -232,10 +229,10 @@ class ContextInfo:
             if True, the choice allows the player to save the game or restore their save
 
         **kwargs - keyword arguments
-            those are passed in case the self.query function is custom and requires extra keyword arguments'''
+            those are passed in case the io.query function is custom and requires extra keyword arguments'''
         if allow_save == None:
             allow_save = self.allow_save
-        f = self.queryfunc(self, text, choices, allow_save, **kwargs)
+        f = self.io.query(self, text, choices, allow_save, **kwargs)
         if self.is_async:
             return await f
         else:
@@ -251,7 +248,7 @@ class ContextInfo:
         
         mode - str, optional (defaults to "r")
             the mode in which to load the file. See help(open) for more information'''
-        return self.loadfunc(self.gamename, filename, mode=mode)
+        return self.io.load_file(self.gamename, filename, mode=mode)
     def load_script(self, scriptname):
         '''Loads a script file (from the game/script folder)'s text content
         Will be loaded inside the current chapter, if any
@@ -261,7 +258,7 @@ class ContextInfo:
         
         scriptname - str
             the name of the script to be loaded'''
-        return self.loadfunc(self.gamename, scriptname, type="script", chapter = self.chapter)
+        return self.io.load_file(self.gamename, scriptname, type="script", chapter = self.chapter)
     def load_save(self, persistent = False, mode="r"):
         '''Loads the current player's save
 
@@ -273,4 +270,4 @@ class ContextInfo:
         
         mode - str, optional (defaults to "r")
             the mode in which to load the save. See help(open) for more information'''
-        return self.loadfunc(self.gamename, str(self.save_id if self.save_id != None else "save"), type="save_p" if persistent else "save", mode=mode, create=True, createdir=persistent)
+        return self.io.load_file(self.gamename, str(self.save_id if self.save_id != None else "save"), type="save_p" if persistent else "save", mode=mode, create=True, createdir=persistent)
