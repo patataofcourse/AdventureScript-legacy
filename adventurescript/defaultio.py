@@ -1,6 +1,10 @@
 import os
 import platform
 
+class DefaultIO:
+    def __init__(self, show, wait, query):
+        pass
+
 def show(info, text, **kwargs):
     print(text)
 
@@ -71,15 +75,15 @@ def load_file(game, filename, mode="r", **kwargs):
         else:
             return open(outfile, mode=mode, encoding="utf-8")
     except FileNotFoundError as e:
-        if kwargs.get("create"):
+        if kwargs.get("createdir"):
             dirname = "/".join(outfile.split("/")[:-1])
-            print(dirname)
             if not os.path.isdir(dirname):
                 os.system(f"mkdir {repr(dirname)}")
             
-            a = open(outfile, "w")
-            a.write("{}")
-            a.close()
+            if kwargs.get("create"):
+                a = open(outfile, "w")
+                a.write("{}")
+                a.close()
             if mode == "r":
                 return open(outfile, encoding="utf-8").read()
             else:
