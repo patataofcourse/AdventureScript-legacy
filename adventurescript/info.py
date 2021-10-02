@@ -7,8 +7,8 @@ class ContextInfo:
     def __init__(self, gamename, save_id, show, wait, query, is_async, load_file):
         self.loadfunc = load_file
         self.gamename = gamename
-        self.gameinfo = eval("{"+",".join(self.load_file("info").split("\n"))+"}")
-        if self.gameinfo.get("achievements", False):
+        self.gameinfo = json.loads(self.loadfunc(self.gamename, "info.json"))
+        if False and self.gameinfo.get("achievements", False):
             self.gameinfo["achievements"] = {}
             pos = -1
             for a in eval("[["+"],[".join(self.load_file("achievements").split("\n"))+"]]"):

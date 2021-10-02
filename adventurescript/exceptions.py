@@ -115,6 +115,10 @@ class ZeroInventorySizeError(CommandException):
     def __init__(self, scriptname, line):
         self.args = (f"Inventory size can't be 0! ({scriptname}, line {line})",)
 
+class NonExistentAchievementError(CommandException):
+    def __init__(self, scriptname, line, name):
+        self.args = (f"Tried to load nonexistent achievement {name}. ({scriptname}, line {line})",)
+
 #These are to be used when an info isn't present and later caught through the use of try/except
 
 class InvSize(ZeroInventorySizeError):

@@ -374,7 +374,15 @@ async def achievement(info, name): #TODO: pls remove file i/o code from here, mo
     if name in info.achievements:
         return
     
-    if info.gameinfo["achievements"][name]["type"] != "flag":
+    ach = None
+    for a in info.gameinfo["achievements"]:
+        if a["name"] == name:
+            ach = a
+
+    if ach == None:
+        raise NonExistentAchievementError(info.scriptname, info.pointer+1)
+
+    if ach.get("type", "flag") != "flag":
         raise NotImplementedError("Achievement types other than flag are not implemented in achievement command!")
 
     pers_save = json.loads(info.load_save(True))

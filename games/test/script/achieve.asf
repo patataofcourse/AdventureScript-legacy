@@ -5,4 +5,5 @@ ok so this is a test with the very limited achievement support we have
 {two} [achievement name="Achievement 2"]
 [goto pos={end}]
 {three} [achievement name="Achievement 3"]
-{end} [ending name="fucker"]
+{end}
+[ending name="fucker"]

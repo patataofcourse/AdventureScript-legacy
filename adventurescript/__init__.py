@@ -36,7 +36,7 @@ async def parse(name, save_id=None, show=defaultio.show, wait=defaultio.wait, qu
             info.pointer += 1
     
     #The actual parsing
-    while info.pointer <= len(info.script):
+    while info.pointer <= len(info.script) or info.status != "ok":
         if info.status == "ok":
             pass
         elif info.status.startswith("ending") or info.status.startswith("quit"):
