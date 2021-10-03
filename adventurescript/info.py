@@ -35,6 +35,7 @@ class ContextInfo:
         self.commands = commands.__dict__
         self.save_id = save_id
         self.is_async = is_async
+        self.savetext = ""
         self.flags = {}
         self.variables = {}
         self.lists = {}
@@ -72,7 +73,8 @@ class ContextInfo:
             "lists": self.lists,
             "default_inv": str(self.inventory), 
             "inventories": self.extrainvs,
-            "extra": self.extra_slots
+            "extra": self.extra_slots,
+            "text": self.savetext
         }
         svfile = self.load_save(mode="w")
         svfile.write(json.dumps(save))
@@ -98,6 +100,7 @@ class ContextInfo:
         self.flags = save["flags"]
         self.variables = save["variables"]
         self.lists = save["lists"]
+        self.savetext = save.get("text", "")
         if save.get("default_inv"):
             self.inventory.recreate(*eval(save["default_inv"]))
         for item in save["inventories"]:
