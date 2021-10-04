@@ -1,6 +1,6 @@
 from adventurescript import exceptions
 
-version = "1.3.2-dev"
+version = "2.0-dev"
 save_comp = "1.3.1-dev"
 
 def str_to_ver(ver):

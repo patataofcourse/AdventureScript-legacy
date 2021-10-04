@@ -198,6 +198,9 @@ class ContextInfo:
             text2.append(word)
         text = " ".join(text2)
 
+        if text == "":
+            return
+
         f = self.io.show(self, text, **kwargs)
         if self.is_async:
             return await f

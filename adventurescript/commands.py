@@ -5,10 +5,12 @@ from adventurescript.inventory import Inventory
 
 #General use commands
 
-async def n(info):
+async def input(info):
     await info.wait()
 
-pause = n
+pause = input
+
+n = input #Deprecated alias
 
 async def goto(info, pos):
     info.pointer = int(pos)-1

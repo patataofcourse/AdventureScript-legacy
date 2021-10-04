@@ -67,7 +67,7 @@ def load_file(game, filename, mode="r", **kwargs):
 
     outfile = "games/" + {
         None: f"{game}/{filename}",
-        "script": f"{game}/script/{chapter}{filename}.asf",
+        "script": f"{game}/script/{chapter}{filename}.as2",
         "save": f"{game}/save/{filename}.asv",
         "save_p": f"{game}/save_p/{filename}.asv" #for future persistent save (achievements)
     }.get(filetype)

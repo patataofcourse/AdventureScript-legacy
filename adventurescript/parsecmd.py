@@ -83,8 +83,8 @@ async def check_commands(info, line):
 
     if line == "":
         return False
-    elif line.startswith("[") and line.endswith("]"):
-        line = line[1:-1].split(";")
+    elif line.startswith("!"):
+        line = line[1:].strip().split(";")
         line = [line[0].split(" ")[0], " ".join(line[0].split(" ")[1:])] + line[1:]
         for command in info.commands:
             if type(info.commands[command]) == type(func.remove_strings): #check if it's a function
@@ -112,8 +112,8 @@ async def check_commands(info, line):
                         raise exceptions.CommandException(info.scriptname, info.pointer, e)
                     return True
         return False
-    elif line.endswith("[n]"):
-        line = line[:-3]
+    elif line.endswith("\i"):
+        line = line[:-2]
         await info.show(line)
         await commands.n(info)
         return True
