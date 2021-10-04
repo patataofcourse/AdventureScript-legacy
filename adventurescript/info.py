@@ -169,10 +169,11 @@ class ContextInfo:
             for ch in self.forbidden_characters:
                 if ch in text[1:text.find("}")]:
                     raise exceptions.InvalidNameCharacter(self.scriptname, self.pointer, "label", ch)
-            text = text[text.find("}")+1:]
-            text = text.lstrip()
-            
-        text = text.split(" ")
+            text = text[text.find("}"):].lstrip()
+        
+        text = text.rstrip().split(" ")
+        
+        #TODO: replace this shit
         text2 = []
         for word in text:
             if word.startswith("$"):
