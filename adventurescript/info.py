@@ -1,10 +1,11 @@
+import builtins
 import json
 
 from adventurescript import commands, exceptions, operations, parsecmd, version
 from adventurescript.inventory import Inventory
 
 class ContextInfo:
-    def __init__(self, gamename, save_id, io, is_async):
+    def __init__(self, gamename, save_id, io):
         self.io = io
         self.gamename = gamename
         self.gameinfo = json.loads(self.io.load_file(self.gamename, "info.json"))
@@ -34,7 +35,6 @@ class ContextInfo:
         self.pointer = 1
         self.commands = commands.__dict__
         self.save_id = save_id
-        self.is_async = is_async
         self.savetext = ""
         self.flags = {}
         self.variables = {}
@@ -199,7 +199,7 @@ class ContextInfo:
         text = " ".join(text2)
 
         f = self.io.show(self, text, **kwargs)
-        if self.is_async:
+        if type(f) == builtins.coroutine:
             return await f
         else:
             return f
@@ -212,7 +212,7 @@ class ContextInfo:
         **kwargs - keyword arguments
             those are passed in case the io.query function is custom and requires extra keyword arguments'''
         f = self.io.wait(self)
-        if self.is_async:
+        if type(f) == builtins.coroutine:
             return await f
         else:
             return f
@@ -236,7 +236,7 @@ class ContextInfo:
         if allow_save == None:
             allow_save = self.allow_save
         f = self.io.query(self, text, choices, allow_save, **kwargs)
-        if self.is_async:
+        if type(f) == builtins.coroutine:
             return await f
         else:
             return f
