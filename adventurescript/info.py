@@ -273,4 +273,4 @@ class ContextInfo:
         
         mode - str, optional (defaults to "r")
             the mode in which to load the save. See help(open) for more information'''
-        return self.io.load_file(self.gamename, str(self.save_id if self.save_id != None else "save"), type="save_p" if persistent else "save", mode=mode, create=True, createdir=persistent)
+        return self.io.load_file(self.gamename, str(self.save_id if self.save_id != None else "save"), type="save_p" if persistent else "save", mode=mode, create=persistent, createdir=True)
