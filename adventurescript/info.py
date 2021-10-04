@@ -1,5 +1,6 @@
-import builtins
+import asyncio
 import json
+import types
 
 from adventurescript import commands, exceptions, operations, parsecmd, version
 from adventurescript.inventory import Inventory
@@ -36,6 +37,7 @@ class ContextInfo:
         self.commands = commands.__dict__
         self.save_id = save_id
         self.savetext = ""
+        self.just_restored = False
         self.flags = {}
         self.variables = {}
         self.lists = {}
@@ -101,6 +103,7 @@ class ContextInfo:
         self.variables = save["variables"]
         self.lists = save["lists"]
         self.savetext = save.get("text", "")
+        self.just_restored = True
         if save.get("default_inv"):
             self.inventory.recreate(*eval(save["default_inv"]))
         for item in save["inventories"]:
@@ -199,7 +202,7 @@ class ContextInfo:
         text = " ".join(text2)
 
         f = self.io.show(self, text, **kwargs)
-        if type(f) == builtins.coroutine:
+        if type(f) == types.CoroutineType:
             return await f
         else:
             return f
@@ -212,7 +215,7 @@ class ContextInfo:
         **kwargs - keyword arguments
             those are passed in case the io.query function is custom and requires extra keyword arguments'''
         f = self.io.wait(self)
-        if type(f) == builtins.coroutine:
+        if type(f) == types.CoroutineType:
             return await f
         else:
             return f
@@ -233,10 +236,13 @@ class ContextInfo:
 
         **kwargs - keyword arguments
             those are passed in case the io.query function is custom and requires extra keyword arguments'''
+        if self.just_restored:
+            await self.show(self.savetext.rstrip())
+            self.just_restored = False
         if allow_save == None:
             allow_save = self.allow_save
         f = self.io.query(self, text, choices, allow_save, **kwargs)
-        if type(f) == builtins.coroutine:
+        if type(f) == types.CoroutineType:
             return await f
         else:
             return f
