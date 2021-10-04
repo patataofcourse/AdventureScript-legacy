@@ -6,8 +6,8 @@ import platform
 
 __version__ = version.version
 
-async def parse(name, save_id=None, io=defaultio.defaultio, addons = [], is_async=False):
-    info = ContextInfo(name, save_id, io, is_async)
+async def parse(name, save_id=None, io=defaultio.defaultio, addons = []):
+    info = ContextInfo(name, save_id, io)
     
     #Load addons
     for addon in addons: #TODO: rework addons
