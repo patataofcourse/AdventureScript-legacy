@@ -1,0 +1,29 @@
+{
+    "name": "Test test",
+    "description": "A tasty, testy test",
+    "logo_url": null,
+    "banner_url": null,
+    "inventory": true,
+    "inventory_size": 1,
+    "chapters": [
+        null,
+        {
+            "name": "Test Chapter",
+            "internal": "test_chapter"
+        }
+    ],
+    "achievements": [
+        {
+            "name":"Achievement 1",
+            "type": "flag"
+        },
+        {
+            "name": "Achievement 2", 
+            "type": "count",
+            "amount": 2
+        },
+        {
+            "name":"Achievement 3"
+        }
+    ]
+}

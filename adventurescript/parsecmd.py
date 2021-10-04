@@ -1,6 +1,7 @@
 from adventurescript import commands, exceptions, func, operations
 from adventurescript.inventory import Inventory
 
+import builtins
 import re
 
 # This function takes a string and does a sort of eval() with it, but using AS' variables, flags and lists;
@@ -52,7 +53,7 @@ async def evaluate(info, text):
                 try:
                     value = info.inventory
                 except AttributeError:
-                    raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer)
+                    raise exceptions.NoDefaultInventoryError(info.scriptname, info.pointer+1)
             else:
                 value = info.inv(value[1:])
         else: #values
@@ -83,11 +84,11 @@ async def check_commands(info, line):
 
     if line == "":
         return False
-    elif line.startswith("[") and line.endswith("]"):
-        line = line[1:-1].split(";")
+    elif line.startswith("!"):
+        line = line[1:].strip().split(";")
         line = [line[0].split(" ")[0], " ".join(line[0].split(" ")[1:])] + line[1:]
         for command in info.commands:
-            if type(info.commands[command]) == type(func.remove_strings): #check if it's a function
+            if type(info.commands[command]) == builtins.function:
                 if command == line[0]:
                     command = info.commands[command]
                     kwargs = {}
@@ -101,19 +102,20 @@ async def check_commands(info, line):
                     except Exception as e:
                         if type(e) == exceptions.ArgumentSyntaxError:
                             raise e
-                        raise exceptions.ArgumentSyntaxError(info.scriptname, info.pointer, e)
+                        raise exceptions.ArgumentSyntaxError(info.scriptname, info.pointer+1, e)
                     
                     try:
                         #insert here checking the args
+                        #TODO: figure out what i meant by that ^
                         await command(info, **kwargs)
                     except Exception as e:
                         if type(e) == exceptions.CommandException:
                             raise e
-                        raise exceptions.CommandException(info.scriptname, info.pointer, e)
+                        raise exceptions.CommandException(info.scriptname, info.pointer+1, e)
                     return True
-        return False
-    elif line.endswith("[n]"):
-        line = line[:-3]
+        raise exceptions.UndefinedCommandError(info.scriptname, info.pointer+1, line[0])
+    elif line.endswith("\i"):
+        line = line[:-2]
         await info.show(line)
         await commands.n(info)
         return True
@@ -123,11 +125,11 @@ async def check_commands(info, line):
 def find_label(info, label):
     for ch in info.forbidden_characters:
         if ch in label[1:-1]:
-            raise exceptions.InvalidNameCharacter(info.scriptname, info.pointer, "label", ch)
+            raise exceptions.InvalidNameCharacter(info.scriptname, info.pointer+1, "label", ch)
     for line in info.script:
         if line.strip().startswith("{" + label + "}"):
             return info.script.index(line)+1
-    raise exceptions.UndefinedLabelError(info.scriptname, info.pointer, label)
+    raise exceptions.UndefinedLabelError(info.scriptname, info.pointer+1, label)
 
 def compress_labels(info, text): #latter half stolen from remove_strings
     start = None

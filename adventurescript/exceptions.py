@@ -46,6 +46,10 @@ class NoDefaultInventoryError(UndefinedInventoryError):
     def __init__(self, scriptname, line):
         self.args = (f"The default inventory isn't set up! ({scriptname}, line {line})",)
 
+class UndefinedCommandError(UndefinedObjectError):
+    def __init__(self, scriptname, line, cmdname):
+        self.args = (f"Command '{cmdname} doesn't exist! ({scriptname}, line {line})",)
+
 #Invalid save/save_p data
 
 class InvalidSaveData(CommandException):
