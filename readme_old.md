@@ -1,8 +1,12 @@
 # AdventureScript
+
+This readme hasn't been updated since about 1.1. It's very much incomplete (and even incorrect in some of the things it points out).
+
+Please just use the recent releases (see main readme).
+
 AdventureScript is a text game engine in progress, made specifically for the game codenamed Yet Another Text Game or YATG, and written in Python. It's meant to be imported as a library and can be used asynchronously.
 
 **WARNING: IT'S NOT MEANT TO BE USED BY OTHERS AS OF RN. WILL TRY TO CLEAN UP FOR 2.0**
-# Another, more important warning: THIS README ISN'T UPDATED
 
 ## Command list
 - [n] - wait for input
